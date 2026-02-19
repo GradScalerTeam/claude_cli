@@ -2,7 +2,7 @@
 
 ## What This Project Is
 
-This is a **public knowledge-sharing repository** by [GradScaler](https://github.com/gradscaler) that teaches developers how to effectively use **Claude Code CLI** for real-world software development. It's not a library or app — it's a structured, practical guide built from hands-on experience.
+This is a **public knowledge-sharing repository** by [GradScaler](https://github.com/GradScalerTeam) that teaches developers how to effectively use **Claude Code CLI** for real-world software development. It's not a library or app — it's a structured, practical guide built from hands-on experience.
 
 The goal: help developers go from "I installed Claude CLI" to "I ship entire features with Claude CLI doing most of the heavy lifting."
 
@@ -26,42 +26,40 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 
 4. **Parallel Execution** — Run generated agents in parallel to build out the project. Claude CLI handles the implementation while the developer oversees and course-corrects.
 
-5. **Test & Improve** — Developer tests the output, creates new planning docs for improvements/fixes, and the cycle repeats.
+5. **Code Review** — Use the `global-review-code` skill to audit the implementation. Document issues with `global-doc-master`, fix, and re-review.
 
-### Topics & Guides
+6. **Test & Improve** — Test with curl (backend) or Playwright (frontend). Create new planning docs for improvements/fixes, and the cycle repeats.
 
-- **CLAUDE.md Authoring** — How to write effective project instructions that shape Claude's behavior
-- **Custom Agents** — Creating, configuring, and running project-specific agents
-- **Custom Skills** — Building reusable skills for common workflows
-- **Hooks** — Event-driven automation (PreToolUse, PostToolUse, Stop, etc.)
-- **Plugins** — Structuring and publishing Claude Code plugins
-- **MCP Servers** — Integrating external tools and services
-- **Slash Commands** — Custom commands for repetitive tasks
-- **Planning-First Development** — Why planning docs matter and how to write them well
-- **Doc Review Loops** — Iterative document refinement before coding begins
-- **Parallel Agent Workflows** — Running multiple agents simultaneously for speed
+### Guides
+
+- **[CLAUDE_SETUP.md](CLAUDE_SETUP.md)** — Installing Claude CLI, authentication, VS Code setup, plugins, slash commands
+- **[HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)** — Building a project from scratch using the full workflow
+- **[HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)** — Bringing Claude CLI into a project you're already working on
+- **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** — What agents are and how to create your own
+- **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** — What skills are and how to create your own
+
+### Tools
+
+- **[agents/global-doc-master/](agents/global-doc-master/)** — Agent that creates all technical documentation (planning, feature flows, deployment, issues, resolved, debug)
+- **[skills/global-review-doc/](skills/global-review-doc/)** — Skill that reviews documents against the codebase (9-phase review, 11-section report)
+- **[skills/global-review-code/](skills/global-review-code/)** — Skill that audits code and hunts bugs (12-phase audit + bug hunt mode)
 
 ## Project Structure
 
 ```
 claude_cli/
-├── CLAUDE.md                  # This file — project instructions
-├── docs/
-│   ├── planning/              # Planning docs for each guide/topic
-│   ├── feature_flow/          # How features/workflows connect
-│   └── guides/                # Finished, polished guides
-├── examples/
-│   ├── claude-md/             # Example CLAUDE.md files for different project types
-│   ├── agents/                # Example agent definitions
-│   ├── skills/                # Example skill definitions
-│   ├── hooks/                 # Example hook configurations
-│   ├── plugins/               # Example plugin structures
-│   ├── commands/              # Example slash commands
-│   └── workflows/             # End-to-end workflow examples
-└── templates/
-    ├── planning-doc.md        # Template for planning documents
-    ├── agent-definition.md    # Template for agent definitions
-    └── skill-definition.md    # Template for skill definitions
+├── CLAUDE.md                          # This file — project instructions
+├── README.md                          # Public-facing repo README
+├── CLAUDE_SETUP.md                    # How to install and set up Claude CLI
+├── HOW_TO_START_NEW_PROJECT.md        # Guide: building from scratch
+├── HOW_TO_START_EXISTING_PROJECT.md   # Guide: using Claude in an existing project
+├── HOW_TO_CREATE_AGENTS.md            # Guide: creating custom agents
+├── HOW_TO_CREATE_SKILLS.md            # Guide: creating custom skills
+├── agents/
+│   └── global-doc-master/             # Doc master agent definition + README
+└── skills/
+    ├── global-review-doc/             # Doc review skill + references + README
+    └── global-review-code/            # Code review skill + references + README
 ```
 
 ## Development Instructions

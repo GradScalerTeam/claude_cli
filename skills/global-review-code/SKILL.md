@@ -1,10 +1,10 @@
 ---
 name: review-code
-description: This skill should be used when the user asks to "review code", "audit a file or project", "check code quality", "find security issues", "look for bugs", "do a code review", "check for performance problems", or "review this codebase". Covers architecture, security, clean code, performance, error handling, dependencies, testing, and framework best practices. Dual mode — full code review (default) or bug investigation (triggered by "bug:" prefix or natural language bug descriptions). Adapts all checks to the detected tech stack.
+description: This skill should be used when the user asks to "review code", "audit a file or project", "check code quality", "find security issues", "look for bugs", "do a code review", "check for performance problems", or "review this codebase". Covers architecture, security, clean code, performance, error handling, dependencies, testing, and framework best practices. Dual mode — full code review (default) or bug investigation (triggered by "bug:" prefix or natural language bug descriptions). Adapts all checks to the detected tech stack. After review, offers to document findings as formal issue docs using a doc master agent.
 argument-hint: [path-or-folder-or-bug-description]
 context: fork
-agent: Explore
-allowed-tools: Read, Grep, Glob, Bash(ls/git log/git diff/git show/wc/find), context7
+agent: general-purpose
+allowed-tools: Read, Grep, Glob, Bash(ls/git log/git diff/git show/wc/find/mkdir -p), AskUserQuestion, Task, Write, context7
 user-invocable: true
 ---
 
@@ -22,7 +22,7 @@ If `$ARGUMENTS` is empty, review the entire project starting from the current wo
 
 Determine which mode to run based on the input:
 
-- **Code Review Mode** (default) — input is a file path, folder path, or no argument (review entire project). Runs the full 12-phase audit.
+- **Code Review Mode** (default) — input is a file path, folder path, or no argument (review entire project). Runs the full 12-phase audit, then offers to document findings as issue docs (Phase 12).
 - **Bug Hunt Mode** — input is a natural language bug description or starts with `bug:`. Runs the 5-step investigation.
 
 If ambiguous, default to Code Review Mode.
@@ -273,6 +273,78 @@ Before finalizing findings that reference library APIs or framework patterns:
 
 ---
 
+## Phase 12: Issue Documentation Offer
+
+After completing the full review output (sections 1-11), offer to document the findings as formal issue docs.
+
+**This phase applies ONLY to Code Review Mode, NOT Bug Hunt Mode.**
+
+### Step 1: Ask the User
+
+Use AskUserQuestion to ask:
+
+- **Question**: "Would you like me to document the issues found in this review as formal issue docs under docs/issues/?"
+- **Header**: "Document"
+- **Options**:
+  1. Label: "Yes — Critical & Important only", Description: "Create issue docs for all Critical and Important severity findings"
+  2. Label: "Yes — all findings", Description: "Create issue docs for every finding including Minor"
+  3. Label: "No", Description: "Skip documentation — review is complete"
+
+If the user selects "No", the review is complete. Stop here.
+
+### Step 2: Find a Documentation Agent
+
+Search for a doc master agent in this priority order:
+
+1. **Local project agent**: Glob for `.claude/agents/*doc*master*` in the current project root. If found, Read the file and extract the agent name from its YAML frontmatter `name:` field.
+
+2. **Global agent**: Read `~/.claude/agents/global-doc-master.md`. If it exists and is readable, use `global-doc-master` as the agent name.
+
+3. **Direct fallback**: If neither local nor global doc master agent is found, you will create issue docs directly in Step 3.
+
+### Step 3: Create Issue Documentation
+
+**If a doc master agent was found (local or global):**
+
+Use the Task tool to launch the doc master agent:
+- `subagent_type`: the agent name found in Step 2 (e.g., the local agent's `name` field, or `global-doc-master` for the global agent)
+- `description`: "Document review findings as issues"
+- `prompt`: Pass all findings the user chose to document, formatted as:
+
+> Create issue documentation under docs/issues/ for the following code review findings. Each finding should become a separate issue document following your issue template.
+>
+> Project: [project name/path]
+> Review Date: [today's date]
+>
+> Findings to document:
+> - Finding ID: F-XX | Title: [title] | Severity: [level] | Location: [file:line] | Issue: [description] | Recommendation: [fix] | Code: [before/after if available]
+> (repeat for each finding)
+
+**If no doc master agent was found (direct fallback):**
+
+1. Create the directory: `mkdir -p docs/issues`
+2. For each finding to document, create a file named `docs/issues/YYYY-MM-DD-<finding-slug>.md` with these sections:
+
+| Section | Content |
+|---|---|
+| **Title** | `# Issue: [Finding Title]` |
+| **Metadata** | Date Reported (today), Status: `Identified`, Severity (Critical/Important/Minor), Review Finding ID (F-XX) |
+| **Problem** | The issue description from the review finding |
+| **Location** | File path with line number, function/component name if known |
+| **Recommendation** | The fix recommendation from the review finding |
+| **Code** | Before (current problematic code) and After (recommended fix) — use language-appropriate code blocks |
+
+Use the same slug and date conventions as the doc master templates: `YYYY-MM-DD-<lowercase-hyphenated-slug>.md`
+
+### Step 4: Confirmation
+
+After documentation is complete, summarize:
+- How many issues were documented
+- Where the docs are located (`docs/issues/`)
+- Which method was used: **local doc master** / **global doc master** / **direct creation**
+
+---
+
 # BUG HUNT MODE
 
 When input is a bug description (natural language or `bug:` prefix):
@@ -339,7 +411,7 @@ Provide a complete fix recommendation:
 
 ## Output Formats
 
-- **Code Review Mode**: Follow the 11-section output template in `references/output-format-code-review.md`. All sections are mandatory: Executive Summary, Project Overview, What is Done Well, All Findings (grouped by Critical / Important / Minor), Architecture Assessment, Security Findings (Expanded), Performance Findings (Expanded), Quick Wins, Before/After Code Examples, Bug Predictions, and Final Verdict.
+- **Code Review Mode**: Follow the 11-section output template in `references/output-format-code-review.md`. All sections are mandatory: Executive Summary, Project Overview, What is Done Well, All Findings (grouped by Critical / Important / Minor), Architecture Assessment, Security Findings (Expanded), Performance Findings (Expanded), Quick Wins, Before/After Code Examples, Bug Predictions, and Final Verdict. After outputting all 11 sections, proceed to Phase 12 (Issue Documentation Offer) to ask the user about documenting findings.
 
 - **Bug Hunt Mode**: Follow the 6-section output template in `references/output-format-bug-hunt.md`. All sections are mandatory: Bug Summary, Investigation Trail, Root Cause, Recommended Fix, Related Risks, and Test Case.
 
@@ -370,3 +442,5 @@ Provide a complete fix recommendation:
 12. **Check what's already enforced** — don't duplicate linter/CI checks. Note what's automated and skip it.
 13. **Global finding IDs** — every finding gets a unique F-XX identifier, referenced consistently throughout the review.
 14. **One finding per issue** — keep findings discrete and individually actionable. Don't bundle multiple issues.
+15. **Documentation is optional** — always ask via AskUserQuestion before creating issue docs. Never auto-generate documentation without explicit user consent.
+16. **Doc master priority** — when documenting issues, always check for a local project doc master agent first (`.claude/agents/`), then the global agent (`~/.claude/agents/global-doc-master.md`), then create directly as a last resort.

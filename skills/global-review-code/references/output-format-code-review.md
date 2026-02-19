@@ -160,3 +160,18 @@ Provide 3-5 concrete refactoring suggestions with exact code:
 
 **Long-term Actions** (backlog):
 1. [Minor improvements]
+
+---
+
+### 12. Issue Documentation (Optional)
+
+> This section appears ONLY if the user opted to document issues via Phase 12. If the user declined, omit this section entirely.
+
+**Documentation Method:** [Local doc master agent | Global doc master agent | Direct creation (no agent found)]
+**Issues Documented:** [N findings]
+**Location:** `docs/issues/`
+
+| # | Finding ID | Severity | File Created |
+|---|---|---|---|
+| 1 | F-XX | Critical | `docs/issues/YYYY-MM-DD-<slug>.md` |
+| 2 | F-XX | Important | `docs/issues/YYYY-MM-DD-<slug>.md` |
