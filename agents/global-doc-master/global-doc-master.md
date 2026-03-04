@@ -90,7 +90,7 @@ For feature specs BEFORE they are built. These should be detailed enough for a d
 
 **Version:** v1.0
 **Status:** Draft | In Review | Approved | In Development | Complete
-**Author:** global-doc-master
+**Type:** Feature Spec | Implementation Guide | API Design | Architecture Decision
 **Created:** YYYY-MM-DD
 **Last Modified:** YYYY-MM-DD
 
@@ -195,6 +195,7 @@ For documenting HOW an existing implemented feature works end-to-end. Written by
 
 **Last Updated:** YYYY-MM-DD
 **Status:** Active | Deprecated
+**Type:** End-to-End Flow | Integration Flow
 
 ---
 
@@ -284,6 +285,7 @@ For active bugs and problems being investigated.
 
 **Date Reported:** YYYY-MM-DD
 **Status:** Investigating | Identified | Fix-In-Progress
+**Type:** Bug Report | Production Incident | Performance Issue
 **Severity:** Critical | High | Medium | Low
 **Affected Area:** <Backend | Frontend | Database | Infrastructure | ...>
 **Affected Component(s):** <specific component/module>
@@ -343,6 +345,7 @@ Closed issues. Moved from `docs/issues/` after the fix is confirmed. Add a resol
 
 **Date Identified:** YYYY-MM-DD
 **Date Resolved:** YYYY-MM-DD
+**Type:** Bug Report | Production Incident | Performance Issue
 **Severity:** Critical | High | Medium | Low
 **Affected Area:** <Backend | Frontend | Database | Infrastructure | ...>
 **Fix Commit(s):** <hash(es)>
@@ -395,6 +398,7 @@ For infrastructure, deployment processes, environment setup, and operational gui
 
 **Last Updated:** YYYY-MM-DD
 **Status:** Active | Draft | Deprecated
+**Type:** Infrastructure Setup | CI/CD Pipeline | Environment Guide
 **Environment(s):** Development | Staging | Production
 
 ---
@@ -490,6 +494,7 @@ For capturing a developer's debugging mental model — their tribal knowledge of
 
 **Last Updated:** YYYY-MM-DD
 **Status:** Active | Needs-Update
+**Type:** Feature Debug | Service Debug
 **Scope:** <what this guide covers — e.g., "Authentication flow from login to token refresh">
 
 ---
@@ -565,6 +570,35 @@ For capturing a developer's debugging mental model — their tribal knowledge of
 
 - [Links to other debug docs for related features/modules]
 ```
+
+---
+
+## Document Type Reference
+
+Every document MUST include a `**Type:**` metadata field. Pick the type that best describes the document's purpose. If none fit exactly, choose the closest match.
+
+| Folder | Available Types | When to Use |
+|--------|----------------|-------------|
+| `docs/planning/` | `Feature Spec` | High-level what & why — requirements, user stories, success criteria |
+| | `Implementation Guide` | Detailed how-to-build — code-level steps, build order, file changes |
+| | `API Design` | Endpoint contracts, request/response schemas, auth flows |
+| | `Architecture Decision` | Comparing approaches, trade-offs, final decision with rationale |
+| `docs/feature_flow/` | `End-to-End Flow` | Full user journey traced through the entire stack |
+| | `Integration Flow` | How two systems or services connect and communicate |
+| `docs/issues/` | `Bug Report` | Code-level bug found during development or testing |
+| | `Production Incident` | Something broke in production or staging |
+| | `Performance Issue` | Slowness, memory leaks, scaling problems |
+| `docs/resolved/` | *(Same as issues — type carries over when moved)* | |
+| `docs/deployment/` | `Infrastructure Setup` | Servers, Docker, cloud config, networking |
+| | `CI/CD Pipeline` | Build and deploy automation, GitHub Actions, etc. |
+| | `Environment Guide` | Environment variables, secrets management, local dev setup |
+| `docs/debug/` | `Feature Debug` | Debugging a specific feature's code paths |
+| | `Service Debug` | Debugging a service or module holistically |
+
+**Rules:**
+- The `Type` field uses the exact values from the table above (case-sensitive)
+- For `docs/resolved/`, always carry over the type from the original issue doc
+- For new `docs/` subdirectories (self-expanding folders), define appropriate types when proposing the folder and ask the user to confirm
 
 ---
 

@@ -78,11 +78,17 @@ Skills are specialized capabilities you invoke with slash commands or natural la
 | **[Global Review Doc](skills/global-review-doc/)** | Reviews any technical document against your actual codebase. 9-phase review covering codebase verification, completeness, security, bug prediction, edge cases, and agent readiness. Produces an 11-section report with a READY / REVISE / REWRITE verdict. | `skills/global-review-doc/` |
 | **[Global Review Code](skills/global-review-code/)** | Reviews actual code with a 12-phase audit covering architecture, security (OWASP + domain-specific), performance, error handling, dependencies, testing, and framework best practices. Also has a bug hunt mode that traces bugs from symptom to root cause. Adapts all checks to your detected tech stack. | `skills/global-review-code/` |
 
+### Status Line
+
+| Script | What It Does | Folder |
+|---|---|---|
+| **[Status Line](scripts/statusline-command.sh)** | Custom Claude Code status line that shows git branch, staged/modified/untracked file counts, and ahead/behind remote — all color-coded. Copy it to `~/.claude/` and configure `settings.json` to use it. | `scripts/` |
+
 ### Guides
 
 | Guide | What It Covers |
 |---|---|
-| **[CLAUDE_SETUP.md](CLAUDE_SETUP.md)** | Installing Claude CLI, authentication, VS Code setup, plugins, slash commands |
+| **[CLAUDE_SETUP.md](CLAUDE_SETUP.md)** | Installing Claude CLI, authentication, VS Code setup, plugins, slash commands, custom status line |
 | **[HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)** | Building a project from scratch — planning, review, agents, parallel build, code review, testing, local tools |
 | **[HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)** | Using Claude CLI in an existing project — feature flows, code review, issue docs, local tools, development agents |
 | **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** | What agents are, how they work, and how to create your own using the agent-development plugin |
@@ -98,9 +104,11 @@ Each agent and skill has its own README with full setup instructions. Navigate t
 - **[Global Review Doc](skills/global-review-doc/)** — the document review skill. Go to [skills/global-review-doc/README.md](skills/global-review-doc/README.md) for setup.
 - **[Global Review Code](skills/global-review-code/)** — the code review & bug hunt skill. Go to [skills/global-review-code/README.md](skills/global-review-code/README.md) for setup.
 
+> **Important:** After installing agents or skills, quit your current Claude CLI session and start a new one. Claude only loads agents and skills at session startup — so newly installed tools won't appear in `/help` or respond to `/slash-commands` until you restart.
+
 ### Install Everything
 
-To install all agents and skills at once, paste this into your Claude CLI:
+To install all agents, skills, and the status line at once, paste this into your Claude CLI:
 
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install everything:
@@ -111,7 +119,51 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install e
 
 3. Read all files in skills/global-review-code/ (SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md) — create the same structure at ~/.claude/skills/global-review-code/ with exact content.
 
+4. Read scripts/statusline-command.sh — save it to ~/.claude/statusline-command.sh with the exact same content.
+
+5. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add the statusLine config: { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } }. Merge it with any existing settings — don't overwrite them.
+
 After installing everything, read the README.md in each folder and give me a summary of what was installed and how to use each one.
+```
+
+### Install Agent Only
+
+To install just the Global Doc Master agent:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the agent:
+
+1. Read agents/global-doc-master/global-doc-master.md — create ~/.claude/agents/global-doc-master.md with the exact same content. Create the directory if it doesn't exist.
+
+After installing, read agents/global-doc-master/README.md and give me a summary of what was installed and how to use it.
+```
+
+### Install Skills Only
+
+To install just the Global Review Doc and Global Review Code skills:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the skills:
+
+1. Read all files in skills/global-review-doc/ (SKILL.md, references/output-format.md, references/security-domains.md) — create the same structure at ~/.claude/skills/global-review-doc/ with exact content.
+
+2. Read all files in skills/global-review-code/ (SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md) — create the same structure at ~/.claude/skills/global-review-code/ with exact content.
+
+After installing, read the README.md in each skill folder and give me a summary of what was installed and how to use each one.
+```
+
+### Install Status Line Only
+
+To install just the custom git status line:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the status line:
+
+1. Read scripts/statusline-command.sh — save it to ~/.claude/statusline-command.sh with the exact same content.
+
+2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add the statusLine config: { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } }. Merge it with any existing settings — don't overwrite them.
+
+Tell me when it's done and explain what the status line shows.
 ```
 
 ---

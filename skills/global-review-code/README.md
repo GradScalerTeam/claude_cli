@@ -42,21 +42,21 @@ Typical workflow:
 
 There are two ways to invoke the skill:
 
-1. **Using `/review-code`** — type the slash command followed by a path or bug description
+1. **Using `/global-review-code`** — type the slash command followed by a path or bug description
 2. **Natural language** — say "review this code" or "find this bug" and provide the target
 
 **Code Review examples:**
 ```
-/review-code src/auth/
-/review-code src/components/PaymentForm.tsx
-/review-code
+/global-review-code src/auth/
+/global-review-code src/components/PaymentForm.tsx
+/global-review-code
 ```
 No argument reviews the entire project.
 
 **Bug Hunt examples:**
 ```
-/review-code bug: users get a blank screen after login on mobile Safari
-/review-code bug: payment webhook fires but order status doesn't update
+/global-review-code bug: users get a blank screen after login on mobile Safari
+/global-review-code bug: payment webhook fires but order status doesn't update
 ```
 
 ---

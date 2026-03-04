@@ -164,6 +164,63 @@ The Anthropic team and community are constantly shipping new plugins. Run `/plug
 
 ---
 
+## Custom Status Line
+
+Claude Code has a status line at the bottom of the terminal that shows contextual information while you work. By default it's pretty basic, but you can replace it with a custom script that shows useful git info at a glance.
+
+### What This Status Line Shows
+
+```
+project_name/src | main +2 *3 ~1 / ↑1 ↓2
+```
+
+Here's what each part means:
+
+| Symbol | Color | Meaning |
+|---|---|---|
+| `project/folder` | default | Shortened path — last 2 segments of your current directory |
+| `main` | **bold cyan** | Current git branch |
+| `+2` | **green underlined** | 2 files staged (ready to commit) |
+| `*3` | **yellow underlined** | 3 files modified (unstaged changes) |
+| `~1` | **red underlined** | 1 untracked file (new, not added to git) |
+| `↑1` | **blue underlined** | 1 commit ahead of remote |
+| `↓2` | **magenta underlined** | 2 commits behind remote |
+
+The local stats (staged/modified/untracked) and remote stats (ahead/behind) are separated by a `/` divider. If there are no changes, only the branch name shows. If you're not in a git repo, it just shows the shortened path.
+
+### How to Install
+
+**Step 1:** Copy the status line script to your Claude config directory:
+
+```bash
+# Create the file
+cp scripts/statusline-command.sh ~/.claude/statusline-command.sh
+```
+
+Or if you're installing from the GitHub repo, copy the content from [`scripts/statusline-command.sh`](scripts/statusline-command.sh) and save it to `~/.claude/statusline-command.sh`.
+
+**Step 2:** Add the status line configuration to your Claude settings. Open `~/.claude/settings.json` and add:
+
+```json
+{
+  "statusLine": {
+    "command": "bash ~/.claude/statusline-command.sh"
+  }
+}
+```
+
+If you already have other settings in `settings.json`, just add the `statusLine` key alongside them.
+
+**Step 3:** Restart Claude Code. The new status line will appear at the bottom of your terminal.
+
+### How It Works
+
+The script receives JSON input from Claude Code via stdin containing workspace info (like the current directory). It runs a series of fast git commands using `--no-optional-locks` (so it never interferes with other git operations) and formats the output with ANSI color codes.
+
+The script requires `jq` to parse the JSON input. Most systems have it installed — if not, install it with `brew install jq` (macOS) or `apt install jq` (Linux).
+
+---
+
 ## What's Next
 
 Now that you have Claude Code installed and set up, read these guides to start using it:

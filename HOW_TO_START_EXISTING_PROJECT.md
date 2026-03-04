@@ -59,15 +59,15 @@ The agent reads your actual code, traces every layer, and produces flow document
 Now that the codebase is documented, review the actual code to find existing problems. Run the code review skill on your project:
 
 ```
-/review-code
+/global-review-code
 ```
 
 Or review specific areas:
 
 ```
-/review-code src/auth/
-/review-code src/api/
-/review-code src/components/
+/global-review-code src/auth/
+/global-review-code src/api/
+/global-review-code src/components/
 ```
 
 Claude will run a 12-phase audit — architecture, security, performance, error handling, dependencies, testing, and framework best practices. It produces a report with findings grouped by severity.
@@ -184,7 +184,7 @@ The difference is that everything is faster because your local tools already kno
 ```
 1. Open Claude in your project          →  cd my-project && claude
 2. Create feature flow docs             →  @global-doc-master document [each feature]
-3. Review the code                      →  /review-code
+3. Review the code                      →  /global-review-code
 4. Document issues found                →  @global-doc-master [describe each issue]
 5. Create local doc master agent        →  /agent-development
 6. Create local review skills           →  /skill-development (review-doc + review-code)

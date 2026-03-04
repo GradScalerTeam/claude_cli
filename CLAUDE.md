@@ -55,6 +55,8 @@ claude_cli/
 ├── HOW_TO_START_EXISTING_PROJECT.md   # Guide: using Claude in an existing project
 ├── HOW_TO_CREATE_AGENTS.md            # Guide: creating custom agents
 ├── HOW_TO_CREATE_SKILLS.md            # Guide: creating custom skills
+├── scripts/
+│   └── statusline-command.sh          # Custom status line script for Claude Code
 ├── agents/
 │   └── global-doc-master/             # Doc master agent definition + README
 └── skills/

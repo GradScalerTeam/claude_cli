@@ -1,5 +1,5 @@
 ---
-name: review-code
+name: global-review-code
 description: This skill should be used when the user asks to "review code", "audit a file or project", "check code quality", "find security issues", "look for bugs", "do a code review", "check for performance problems", or "review this codebase". Covers architecture, security, clean code, performance, error handling, dependencies, testing, and framework best practices. Dual mode — full code review (default) or bug investigation (triggered by "bug:" prefix or natural language bug descriptions). Adapts all checks to the detected tech stack. After review, offers to document findings as formal issue docs using a doc master agent.
 argument-hint: [path-or-folder-or-bug-description]
 context: fork

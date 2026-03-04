@@ -128,13 +128,13 @@ For a well-planned project, auto-edit mode is usually fine. The planning doc alr
 Now that the agents have written the code, review it before you even run it. Use the code review skill to audit what was built:
 
 ```
-/review-code src/
+/global-review-code src/
 ```
 
 Or review the entire project:
 
 ```
-/review-code
+/global-review-code
 ```
 
 Claude will run a 12-phase audit — architecture, security (OWASP + domain-specific), performance, error handling, dependencies, testing, and framework best practices. It produces a report with findings grouped by severity: Critical, Important, and Minor.
@@ -304,7 +304,7 @@ Think of it this way: the global tools got you from zero to a working project. T
 5.  Fix and re-review until READY        →  Iterate until verdict is READY
 6.  Generate project-specific agents     →  /agent-development
 7.  Run agents in parallel               →  Tell Claude to run all agents and build
-8.  Review the code                      →  /review-code src/
+8.  Review the code                      →  /global-review-code src/
 9.  Fix issues (doc master for big ones) →  @global-doc-master [describe the issue]
 10. Test (curl for backend, Playwright for frontend)
 11. Fix issues, repeat the cycle
