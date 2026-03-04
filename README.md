@@ -166,6 +166,24 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install t
 Tell me when it's done and explain what the status line shows.
 ```
 
+### Check for Updates
+
+Already have everything installed and want to check if there's a newer version? Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to everything I have installed:
+
+1. Compare agents/global-doc-master/global-doc-master.md with my local ~/.claude/agents/global-doc-master.md
+
+2. Compare all files in skills/global-review-doc/ (SKILL.md, references/output-format.md, references/security-domains.md) with my local versions at ~/.claude/skills/global-review-doc/
+
+3. Compare all files in skills/global-review-code/ (SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md) with my local versions at ~/.claude/skills/global-review-code/
+
+4. Compare scripts/statusline-command.sh with my local ~/.claude/statusline-command.sh
+
+For each component, tell me if there are any differences. If updates are found, ask me whether I want you to explain what changed first or directly pull the new updates into my local files.
+```
+
 ---
 
 ## Contributing
