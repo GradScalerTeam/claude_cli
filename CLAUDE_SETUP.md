@@ -204,6 +204,7 @@ Or if you're installing from the GitHub repo, copy the content from [`scripts/st
 ```json
 {
   "statusLine": {
+    "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   }
 }

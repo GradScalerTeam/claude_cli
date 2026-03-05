@@ -88,14 +88,15 @@ The agent will ask: What payment types? Subscription or one-time? Which user rol
 
 **How it works:**
 1. Tell the agent which feature to document (e.g., "authentication flow", "order processing")
-2. The agent traces the actual code — frontend components, API routes, controllers, database queries, real-time events
-3. It produces a flow document with architecture diagrams, file references with line numbers, and the complete path from user action to database
+2. The agent does a quick codebase scan, then asks you scoping questions — which specific flow path, which layers of the stack to focus on (frontend, backend, database, full stack), what depth (overview vs deep dive), and whether to cover just the happy path or error cases too
+3. Once scope is confirmed, the agent traces the actual code — only the layers and paths you asked for
+4. It produces a flow document with architecture diagrams, file references with line numbers, and the complete path from user action to database
 
 **Example:**
 ```
-@global-doc-master document the authentication flow from login to token refresh
+@global-doc-master document the authentication flow
 ```
-The agent reads your auth code, traces every layer, and maps the entire flow with real `file:line` references.
+The agent will ask: Which auth flow? (login, registration, token refresh, OAuth, all of them?) Which layers? (frontend only, backend only, full stack?) How detailed? — then traces only what you asked for with real `file:line` references.
 
 ---
 

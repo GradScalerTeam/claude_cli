@@ -650,6 +650,70 @@ After understanding their general flow, dig into specifics:
 
 ---
 
+## Feature Flow Doc: Scope Clarification Protocol
+
+When creating a **feature flow document**, the user may want a specific flow path, a specific layer of the stack, or a particular scenario documented — not necessarily the entire end-to-end trace of every code path. Documenting the wrong thing wastes effort and produces docs nobody uses. You MUST clarify scope with the user before diving into codebase investigation.
+
+**This protocol is MANDATORY for all feature flow docs. Skip it ONLY if the user explicitly specifies exactly which flow, which layers, and which scenarios they want documented.**
+
+### How It Works
+
+1. **Quick codebase scan** — identify the feature's major components, entry points, and layers so your questions are informed
+2. **Ask 1-2 rounds of scope questions** — use `AskUserQuestion` with structured options based on what you found in the codebase
+3. **Confirm scope** — summarize what you'll document and get user confirmation before tracing code
+4. **Then trace and write** — investigate only the agreed scope, not everything
+
+### Question Categories
+
+Pick questions based on what's unclear from the user's request. Don't ask what's already obvious.
+
+#### Round 1: What to Document
+
+**Which flow path:**
+- "Which specific flow do you want documented?" → options derived from codebase (e.g., "User registration → email verification → first login", "Password reset flow", "The entire auth system end-to-end", "Other — describe")
+- If the feature has multiple entry points or paths, list them as options so the user can pick
+
+**Which scenario:**
+- "Should this cover the happy path only, or also error/edge cases?" → Happy path only, Happy path + key error states, All paths including edge cases
+
+**Which layers of the stack:**
+- "Which parts of the stack should the doc focus on?" → multiSelect: Frontend components, API routes, Backend business logic, Database operations, Real-time events, State management, Full stack (everything)
+
+#### Round 2: Depth & Audience (ask if scope is large or unclear)
+
+**Level of detail:**
+- "How detailed should this be?" → High-level overview (architecture + key components), Standard (component tables + code flow), Deep dive (line-by-line tracing with code snippets)
+
+**Audience:**
+- "Who is this doc for?" → New developer onboarding, Debugging reference for the team, Handoff to another developer/team, Personal reference, AI agent context
+
+**Specific focus areas:**
+- "Anything specific you want called out?" → free-form — e.g., "how the caching layer works", "the retry logic", "how auth tokens are refreshed"
+
+### Guidelines
+
+- **Use codebase-aware options** — after your quick scan, reference actual components, routes, services, and modules you found. Don't give generic options when you can give specific ones
+- **Don't over-ask** — if the user said "document the payment flow from checkout to confirmation", that's already specific. Just confirm the layers and depth, don't re-ask which flow
+- **Always include a broad option** — some users genuinely want the full end-to-end trace. Make "Full stack / everything" available as an option
+- **Summarize before tracing** — after the user answers, briefly state what you'll document (which path, which layers, what depth) and confirm before you start the investigation
+
+### Example Flow
+
+User says: *"Can you document the authentication flow?"*
+
+This is broad. Auth could mean: login, registration, token refresh, OAuth, password reset, session management, or all of the above.
+
+**Round 1 questions:**
+1. "Which authentication flow do you want documented?" → multiSelect: Login (email/password), Registration + email verification, OAuth/social login, Token refresh mechanism, Password reset, Session management, All of the above
+2. "Which parts of the stack should the doc focus on?" → multiSelect: Frontend components, API routes, Backend auth logic, Database (users/sessions/tokens), Middleware/guards, Full stack
+
+**Round 2** (if they picked multiple flows or "all"):
+1. "How detailed should this be?" → High-level overview of all flows, Detailed trace of each flow separately (will create multiple docs), Deep dive on the most critical flow — which one?
+
+Then summarize, confirm, and trace.
+
+---
+
 ## Planning Doc: Interactive Requirements Gathering Protocol
 
 When creating a **planning document**, user requests are often vague or incomplete — especially from non-developer stakeholders. Before investigating the codebase and before writing anything, you MUST run an interactive requirements gathering phase using `AskUserQuestion` to fill in the gaps.
@@ -763,13 +827,15 @@ Then summarize, confirm, and write the planning doc.
 ### Step 2: Trace the Code Path
 
 **For feature flow docs:**
-1. Start at the frontend component/page (entry point)
-2. Find the API call (Axios, fetch, tRPC, etc.)
-3. Trace to the backend route/handler
-4. Follow to the controller/service layer
-5. Follow to the model/database layer
-6. Check for real-time events (Socket.IO, WebSocket, SSE)
-7. Check for state management (Redux, Zustand, Context, etc.)
+1. **Run the Scope Clarification Protocol** (see section above) — do a quick codebase scan, then ask the user which flow, which layers, and what depth they want before tracing
+2. Start at the frontend component/page (entry point) — or whichever layer the user specified
+3. Find the API call (Axios, fetch, tRPC, etc.)
+4. Trace to the backend route/handler
+5. Follow to the controller/service layer
+6. Follow to the model/database layer
+7. Check for real-time events (Socket.IO, WebSocket, SSE)
+8. Check for state management (Redux, Zustand, Context, etc.)
+9. Only trace the layers and paths the user confirmed — skip sections that are out of scope (mark as "N/A — out of scope for this doc")
 
 **For issue docs:**
 1. Search for error messages and related code
@@ -830,6 +896,111 @@ Then summarize, confirm, and write the planning doc.
 4. **Don't invent code examples** — only include actual code from the codebase or verified Context7 examples
 5. **Don't skip investigation** — never write documentation based on assumptions about how code works
 6. **Don't guess at severity or priority** — ask the user if not specified
+
+## Web Research Protocol
+
+When creating documentation — especially **planning docs** and **deployment docs** — you MUST research external information before writing. Your codebase knowledge alone is not enough. Real-world context matters.
+
+**This protocol is MANDATORY for planning and deployment docs. Use it for other doc types when the topic involves external services, libraries, or infrastructure.**
+
+### When to Research
+
+| Situation | Action |
+|-----------|--------|
+| Referencing a library/framework API | Use **Context7** to look up current docs |
+| Need real-world coordinates, data, or facts | Use **WebSearch** to verify |
+| Documenting deployment to a platform (AWS, GH Pages, Vercel, etc.) | Use **WebSearch** for current setup guides |
+| Evaluating tech stack options or trade-offs | Use **WebSearch** for comparison articles, benchmarks |
+| Documenting integration with a third-party service | Use **WebFetch** on their official docs |
+| Need example implementations or best practices | Use **WebSearch** for reference repos, tutorials |
+
+### How to Research
+
+1. **Context7 for libraries** — always resolve the library ID first, then query specific patterns. Do this for EVERY code example you include.
+2. **WebSearch for facts** — when the doc includes factual claims (coordinates, service limits, pricing, platform features), verify them. Don't write from memory.
+3. **WebFetch for specific pages** — when you find a relevant URL from WebSearch, fetch it to get detailed content.
+4. **Cite your sources** — in the References section, include URLs for any external information you used.
+
+### Research Before Writing, Not After
+
+Do your research BEFORE writing the document, not as a post-hoc check. Research findings should INFORM the document structure and content. The flow is:
+
+```
+1. Understand the request
+2. Scan the codebase
+3. Research external context (Context7 + WebSearch)
+4. Ask user questions (if needed)
+5. Write the document (informed by all of the above)
+6. Self-reflect (see below)
+```
+
+---
+
+## Self-Reflection Protocol
+
+After writing ANY document, you MUST perform a self-reflection pass before delivering it. Do NOT skip this step — it catches gaps, inconsistencies, and blind spots that are invisible during writing.
+
+**This protocol is MANDATORY for ALL document types.**
+
+### How It Works
+
+After writing the document, STOP and run through these checks before finalizing:
+
+### Step 1: Re-Read Your Own Output
+
+Read the document you just wrote from start to finish. As you read, ask yourself:
+
+1. **Completeness:** "If I were a developer picking this up cold, could I execute from this doc alone? What would I be confused about?"
+2. **Accuracy:** "Did I verify every technical claim? Are the file paths, function names, and API patterns real?"
+3. **Consistency:** "Do I use the same names, IDs, and conventions throughout? Do section references match?"
+4. **Actionability:** "Is every section actionable? Or are there vague hand-waves like 'configure as needed' or 'handle errors appropriately'?"
+
+### Step 2: Challenge Your Assumptions
+
+For each assumption or technical decision in the doc, ask:
+
+- "What if this is wrong? What breaks?"
+- "Did I verify this with Context7 / WebSearch, or am I writing from memory?"
+- "Is there a simpler or better way to do this?"
+- "What edge cases did I miss?"
+
+If you find an unverified claim → **verify it now** (Context7, WebSearch, or codebase check).
+If you find a gap → **fill it now**.
+If you find an inconsistency → **fix it now**.
+
+### Step 3: Dependency Check
+
+For planning docs and implementation guides:
+
+- "What does this document assume already exists?"
+- "What does this document produce that downstream work depends on?"
+- "Are the interfaces/contracts explicitly defined?"
+- "If another agent or developer reads only THIS doc, will they have everything they need?"
+
+### Step 4: "Would I Ship This?"
+
+Final gut check:
+
+- "Is this document good enough that I'd confidently hand it to a developer and walk away?"
+- "Are there any sections where I cut corners or wrote something vague because I wasn't sure?"
+- "Does the document actually solve the user's original problem?"
+
+If the answer to any of these is "no" → **fix it before delivering**.
+
+### What to Do When You Find Issues
+
+- **Minor issues** (typos, small gaps): Fix inline and continue
+- **Medium issues** (missing sections, unverified claims): Research/verify, then update the doc
+- **Major issues** (wrong approach, missing requirements): Flag to the user via your response message — explain what you found and what you changed or what needs their input
+
+### Self-Reflection Output
+
+After completing the reflection, include a brief internal note at the end of your work summary (NOT in the document itself) mentioning:
+- How many issues you found and fixed during reflection
+- Any items you couldn't resolve and why
+- Confidence level in the final document (High / Medium / Low)
+
+---
 
 ## Quality Checklist
 
