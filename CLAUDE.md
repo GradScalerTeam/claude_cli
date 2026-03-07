@@ -43,6 +43,7 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 - **[agents/global-doc-master/](agents/global-doc-master/)** — Agent that creates all technical documentation (planning, feature flows, deployment, issues, resolved, debug)
 - **[skills/global-review-doc/](skills/global-review-doc/)** — Skill that reviews documents against the codebase (9-phase review, 11-section report)
 - **[skills/global-review-code/](skills/global-review-code/)** — Skill that audits code and hunts bugs (12-phase audit + bug hunt mode)
+- **[hooks/doc-scanner/](hooks/doc-scanner/)** — SessionStart hook that scans for `.md` files and gives Claude a documentation index at conversation start
 
 ## Project Structure
 
@@ -55,6 +56,10 @@ claude_cli/
 ├── HOW_TO_START_EXISTING_PROJECT.md   # Guide: using Claude in an existing project
 ├── HOW_TO_CREATE_AGENTS.md            # Guide: creating custom agents
 ├── HOW_TO_CREATE_SKILLS.md            # Guide: creating custom skills
+├── hooks/
+│   └── doc-scanner/                   # SessionStart hook — doc awareness at conversation start
+│       ├── doc-scanner.sh             # The hook script
+│       └── README.md                  # Setup guide and explanation
 ├── scripts/
 │   └── statusline-command.sh          # Custom status line script for Claude Code
 ├── agents/

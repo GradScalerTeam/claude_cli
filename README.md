@@ -40,6 +40,10 @@ Want to build your own agents and skills?
 
 5. **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** — Learn what skills are, how they differ from agents, and how to create custom skills using the skill-development plugin.
 
+Want Claude to automatically know about your existing docs?
+
+6. **[Doc Scanner Hook](hooks/doc-scanner/)** — A SessionStart hook that scans your project for `.md` files and gives Claude a documentation index at the start of every conversation. No more "read the planning doc" — Claude already knows it exists.
+
 ---
 
 ## The Workflow
@@ -78,6 +82,14 @@ Skills are specialized capabilities you invoke with slash commands or natural la
 | **[Global Review Doc](skills/global-review-doc/)** | Reviews any technical document against your actual codebase. 9-phase review covering codebase verification, completeness, security, bug prediction, edge cases, and agent readiness. Produces an 11-section report with a READY / REVISE / REWRITE verdict. | `skills/global-review-doc/` |
 | **[Global Review Code](skills/global-review-code/)** | Reviews actual code with a 12-phase audit covering architecture, security (OWASP + domain-specific), performance, error handling, dependencies, testing, and framework best practices. Also has a bug hunt mode that traces bugs from symptom to root cause. Adapts all checks to your detected tech stack. | `skills/global-review-code/` |
 
+### Hooks
+
+Hooks are scripts that run automatically in response to Claude CLI events — like starting a session, using a tool, or finishing a task. They live at `~/.claude/` and are registered in `~/.claude/settings.json`.
+
+| Hook | What It Does | Folder |
+|---|---|---|
+| **[Doc Scanner](hooks/doc-scanner/)** | SessionStart hook that scans your project for `.md` files and outputs a documentation index at the start of every conversation. Claude immediately knows what planning docs, feature specs, flow docs, and agent definitions exist — and reads the relevant ones before starting work. | `hooks/doc-scanner/` |
+
 ### Status Line
 
 | Script | What It Does | Folder |
@@ -98,17 +110,18 @@ Skills are specialized capabilities you invoke with slash commands or natural la
 
 ## Setup
 
-Each agent and skill has its own README with full setup instructions. Navigate to the folder, read the README, and paste the setup prompt into your Claude CLI.
+Each component has its own README with full setup instructions. Navigate to the folder, read the README, and paste the setup prompt into your Claude CLI.
 
 - **[Global Doc Master](agents/global-doc-master/)** — the documentation agent. Go to [agents/global-doc-master/README.md](agents/global-doc-master/README.md) for setup.
 - **[Global Review Doc](skills/global-review-doc/)** — the document review skill. Go to [skills/global-review-doc/README.md](skills/global-review-doc/README.md) for setup.
 - **[Global Review Code](skills/global-review-code/)** — the code review & bug hunt skill. Go to [skills/global-review-code/README.md](skills/global-review-code/README.md) for setup.
+- **[Doc Scanner](hooks/doc-scanner/)** — the documentation awareness hook. Go to [hooks/doc-scanner/README.md](hooks/doc-scanner/README.md) for setup.
 
 > **Important:** After installing agents or skills, quit your current Claude CLI session and start a new one. Claude only loads agents and skills at session startup — so newly installed tools won't appear in `/help` or respond to `/slash-commands` until you restart.
 
 ### Install Everything
 
-To install all agents, skills, and the status line at once, paste this into your Claude CLI:
+To install all agents, skills, hooks, and the status line at once, paste this into your Claude CLI:
 
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install everything:
@@ -119,9 +132,11 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install e
 
 3. Read all files in skills/global-review-code/ (SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md) — create the same structure at ~/.claude/skills/global-review-code/ with exact content.
 
-4. Read scripts/statusline-command.sh — save it to ~/.claude/statusline-command.sh with the exact same content.
+4. Read hooks/doc-scanner/doc-scanner.sh — save it to ~/.claude/doc-scanner.sh with the exact same content. Make it executable (chmod +x).
 
-5. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add the statusLine config: { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } }. Merge it with any existing settings — don't overwrite them.
+5. Read scripts/statusline-command.sh — save it to ~/.claude/statusline-command.sh with the exact same content.
+
+6. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add: the statusLine config { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } } AND a SessionStart hook that runs "bash ~/.claude/doc-scanner.sh". Merge with any existing settings — don't overwrite them.
 
 After installing everything, read the README.md in each folder and give me a summary of what was installed and how to use each one.
 ```
@@ -152,6 +167,20 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install t
 After installing, read the README.md in each skill folder and give me a summary of what was installed and how to use each one.
 ```
 
+### Install Doc Scanner Hook Only
+
+To install just the doc scanner SessionStart hook:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the doc scanner hook:
+
+1. Read hooks/doc-scanner/doc-scanner.sh — save it to ~/.claude/doc-scanner.sh with the exact same content. Make it executable (chmod +x).
+
+2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add a SessionStart hook that runs "bash ~/.claude/doc-scanner.sh". Merge it with any existing hooks — don't overwrite them.
+
+After installing, start a new session in a project that has .md files and confirm the doc scanner runs.
+```
+
 ### Install Status Line Only
 
 To install just the custom git status line:
@@ -179,7 +208,9 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for
 
 3. Compare all files in skills/global-review-code/ (SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md) with my local versions at ~/.claude/skills/global-review-code/
 
-4. Compare scripts/statusline-command.sh with my local ~/.claude/statusline-command.sh
+4. Compare hooks/doc-scanner/doc-scanner.sh with my local ~/.claude/doc-scanner.sh
+
+5. Compare scripts/statusline-command.sh with my local ~/.claude/statusline-command.sh
 
 For each component, tell me if there are any differences. If updates are found, ask me whether I want you to explain what changed first or directly pull the new updates into my local files.
 ```
