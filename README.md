@@ -44,6 +44,10 @@ Want Claude to automatically know about your existing docs?
 
 6. **[Doc Scanner Hook](hooks/doc-scanner/)** — A SessionStart hook that scans your project for `.md` files and gives Claude a documentation index at the start of every conversation. No more "read the planning doc" — Claude already knows it exists.
 
+Using Pencil for UI design?
+
+7. **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** — How to use [Pencil](https://www.pencil.dev/) with Claude Code for context-aware design sessions. Includes the Design Context Hook that bridges your codebase knowledge into the Pencil design environment.
+
 ---
 
 ## The Workflow
@@ -89,6 +93,7 @@ Hooks are scripts that run automatically in response to Claude CLI events — li
 | Hook | What It Does | Folder |
 |---|---|---|
 | **[Doc Scanner](hooks/doc-scanner/)** | SessionStart hook that scans your project for `.md` files and outputs a documentation index at the start of every conversation. Claude immediately knows what planning docs, feature specs, flow docs, and agent definitions exist — and reads the relevant ones before starting work. | `hooks/doc-scanner/` |
+| **[Design Context](hooks/design-context/)** | SessionStart hook for [Pencil](https://www.pencil.dev/) design sessions. Detects when Claude runs inside a `design/` subfolder, crawls the parent project, and generates a `design/CLAUDE.md` with project overview, routes, components, docs index, and auto-research rules — so Claude designs with full codebase awareness. | `hooks/design-context/` |
 
 ### Status Line
 
@@ -105,6 +110,7 @@ Hooks are scripts that run automatically in response to Claude CLI events — li
 | **[HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)** | Using Claude CLI in an existing project — feature flows, code review, issue docs, local tools, development agents |
 | **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** | What agents are, how they work, and how to create your own using the agent-development plugin |
 | **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** | What skills are, how they differ from agents, and how to create your own using the skill-development plugin |
+| **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** | Using [Pencil](https://www.pencil.dev/) with Claude Code for context-aware UI design — the context gap problem, the design context hook, and the full design workflow |
 
 ---
 
@@ -116,6 +122,7 @@ Each component has its own README with full setup instructions. Navigate to the 
 - **[Global Review Doc](skills/global-review-doc/)** — the document review skill. Go to [skills/global-review-doc/README.md](skills/global-review-doc/README.md) for setup.
 - **[Global Review Code](skills/global-review-code/)** — the code review & bug hunt skill. Go to [skills/global-review-code/README.md](skills/global-review-code/README.md) for setup.
 - **[Doc Scanner](hooks/doc-scanner/)** — the documentation awareness hook. Go to [hooks/doc-scanner/README.md](hooks/doc-scanner/README.md) for setup.
+- **[Design Context](hooks/design-context/)** — the Pencil design context hook. Go to [hooks/design-context/README.md](hooks/design-context/README.md) for setup. **Note:** This hook is specifically for the [Pencil](https://www.pencil.dev/) design app — it won't do anything unless you have Pencil installed and use `.pen` files for UI design. Install it separately if you use Pencil.
 
 > **Important:** After installing agents or skills, quit your current Claude CLI session and start a new one. Claude only loads agents and skills at session startup — so newly installed tools won't appear in `/help` or respond to `/slash-commands` until you restart.
 
@@ -137,6 +144,8 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install e
 5. Read scripts/statusline-command.sh — save it to ~/.claude/statusline-command.sh with the exact same content.
 
 6. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add: the statusLine config { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } } AND a SessionStart hook that runs "bash ~/.claude/doc-scanner.sh". Merge with any existing settings — don't overwrite them.
+
+Note: The Design Context Hook (for the Pencil design app) is NOT included here — it's a separate install for Pencil users only. See "Install Design Context Hook Only" below if you use Pencil.
 
 After installing everything, read the README.md in each folder and give me a summary of what was installed and how to use each one.
 ```
@@ -181,6 +190,20 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install t
 After installing, start a new session in a project that has .md files and confirm the doc scanner runs.
 ```
 
+### Install Design Context Hook Only
+
+To install just the Pencil design context SessionStart hook (for use with the [Pencil](https://www.pencil.dev/) design app):
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the design context hook:
+
+1. Read hooks/design-context/design-context-hook.sh — save it to ~/.claude/design-context-hook.sh with the exact same content. Make it executable (chmod +x).
+
+2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add a SessionStart hook that runs "bash ~/.claude/design-context-hook.sh". Merge it with any existing hooks — don't overwrite them.
+
+After installing, tell me it's done and explain what the hook does. Note: this hook only works if you have the Pencil design app (pencil.dev) installed — it bridges project context into Pencil's design sessions.
+```
+
 ### Install Status Line Only
 
 To install just the custom git status line:
@@ -211,6 +234,8 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for
 4. Compare hooks/doc-scanner/doc-scanner.sh with my local ~/.claude/doc-scanner.sh
 
 5. Compare scripts/statusline-command.sh with my local ~/.claude/statusline-command.sh
+
+6. If I have ~/.claude/design-context-hook.sh installed, compare hooks/design-context/design-context-hook.sh with my local version
 
 For each component, tell me if there are any differences. If updates are found, ask me whether I want you to explain what changed first or directly pull the new updates into my local files.
 ```
