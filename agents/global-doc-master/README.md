@@ -22,9 +22,8 @@ The workflow is:
 
 1. You describe what you want to build (can be vague — that's fine)
 2. The agent scans your codebase, asks clarifying questions, and writes the document
-3. You review the document using `global-review-doc`
-4. You iterate until the document is solid
-5. Only then do you start building — either manually or by handing the doc to a development agent
+3. You run `@global-doc-fixer` on the document — it reviews, fixes, and repeats until the doc is solid
+4. Only then do you start building — either manually or by handing the doc to a development agent
 
 **You should also use it when:**
 - A feature is built and you want to document how it works end-to-end (feature flow docs)

@@ -20,12 +20,10 @@ The **Global Review Doc** is a document review skill for Claude Code CLI. It's t
 
 1. You tell `global-doc-master` to create a planning doc (or feature flow, issue doc, etc.)
 2. The agent writes the document under `docs/`
-3. You immediately run `global-review-doc` on that document
-4. The skill reviews it, finds gaps, and gives you specific fixes
-5. You incorporate the feedback and re-review until the verdict is **READY**
-6. Only then do you hand the document to an agent for implementation
+3. You run `@global-doc-fixer` on the document — it uses this skill internally, fixes all findings, re-reviews, and repeats until the verdict is **READY**
+4. Only then do you hand the document to an agent for implementation
 
-This review-iterate loop is what separates a rough spec from an implementation-ready blueprint. Skipping it means your agents work from incomplete or inaccurate docs — and you spend more time debugging than building.
+The `global-doc-fixer` agent automates the review-fix loop — it calls this skill, fixes findings, re-reviews, and repeats. You can still run `/global-review-doc` manually if you want a one-off review without automatic fixes, but for the full iteration cycle, use the fixer agent.
 
 **You should also use it when:**
 - Reviewing any existing technical document before handing it to a development agent

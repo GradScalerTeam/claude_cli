@@ -66,24 +66,23 @@ Read the review carefully. It will tell you exactly what's missing, what's ambig
 
 ---
 
-## Step 4: Iterate Until the Doc is Solid
+## Step 4: Fix the Doc Until It's Implementation-Ready
 
-Based on the review findings, you have two options:
+Instead of manually reviewing, fixing, and re-reviewing (which often takes 5-10+ rounds), use the **Global Doc Fixer** agent to handle the entire cycle:
 
-**If you agree with all the suggestions:**
 ```
-@global-doc-master fix all the findings from the review in the planning doc
-```
-
-**If you want to pick and choose:**
-Type your specific feedback — tell Claude which findings to address and which to skip, or provide additional context the reviewer didn't have.
-
-After the doc is updated, **review again**:
-```
-/global-review-doc docs/planning/your-project-plan.md
+@global-doc-fixer docs/planning/your-project-plan.md
 ```
 
-**Repeat this loop** — review, fix, review, fix — until the verdict is **READY**. This usually takes 2-3 rounds. It feels slow, but it saves you hours of debugging and rework later. A solid plan means agents can build without guessing.
+The agent will:
+1. Run `global-review-doc` on your document
+2. Fix all factual issues automatically (wrong paths, line numbers, outdated references)
+3. Ask you MCQ questions for any business logic decisions it can't make on its own
+4. Re-review after fixes, then repeat until the verdict is **READY**
+
+This typically converges in 2-4 rounds. The agent handles it all — you just answer the occasional question when it needs your input.
+
+**Prefer manual control?** You can still do it step by step — run `/global-review-doc`, read the findings, fix them yourself, and re-review. But for most cases, the doc fixer agent is faster and catches more.
 
 ---
 
@@ -200,7 +199,7 @@ If tests reveal bugs or missing functionality:
 
 1. Describe the issue to Claude — it will fix it directly
 2. For bigger issues, create a new planning doc for the fix: `@global-doc-master there's a bug where...`
-3. Review, iterate, and rebuild — same cycle as before
+3. Run `@global-doc-fixer` on the new doc, then rebuild — same cycle as before
 
 This is the loop: **Plan → Review → Build → Test → Fix → Repeat**. Each cycle makes the project better.
 
@@ -301,7 +300,7 @@ Think of it this way: the global tools got you from zero to a working project. T
 2.  Write planning doc                   →  @global-doc-master [describe your project]
 3.  Answer the agent's questions         →  Be specific, cover edge cases
 4.  Review the doc                       →  /global-review-doc docs/planning/your-plan.md
-5.  Fix and re-review until READY        →  Iterate until verdict is READY
+5.  Fix until READY                      →  @global-doc-fixer handles the review-fix loop
 6.  Generate project-specific agents     →  /agent-development
 7.  Run agents in parallel               →  Tell Claude to run all agents and build
 8.  Review the code                      →  /global-review-code src/

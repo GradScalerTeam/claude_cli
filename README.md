@@ -56,11 +56,10 @@ This isn't just a collection of random tools. Everything here follows a specific
 
 ```
 1. PLAN        →  global-doc-master creates a planning doc
-2. REVIEW      →  global-review-doc reviews the doc, finds gaps
-3. ITERATE     →  fix findings, re-review until verdict is READY
-4. BUILD       →  hand the doc to agents or build manually
-5. CODE REVIEW →  global-review-code audits the implementation
-6. SHIP        →  fix findings, re-review, deploy
+2. FIX         →  global-doc-fixer reviews, fixes, and repeats until READY
+3. BUILD       →  hand the doc to agents or build manually
+4. CODE REVIEW →  global-review-code audits the implementation
+5. SHIP        →  fix findings, re-review, deploy
 ```
 
 Plan first. Review before building. Review after building. That's it. The agents and skills below are the tools that make each step fast and thorough.
@@ -76,6 +75,7 @@ Agents are autonomous workers that investigate your codebase, ask you questions,
 | Agent | What It Does | Folder |
 |---|---|---|
 | **[Global Doc Master](agents/global-doc-master/)** | Creates and organizes all technical documentation — planning specs, feature flows, deployment guides, issue reports, resolved postmortems, and debug runbooks. Scans your codebase first, asks clarifying questions, and writes structured docs under `docs/`. | `agents/global-doc-master/` |
+| **[Global Doc Fixer](agents/global-doc-fixer/)** | Autonomously reviews and fixes documents until they're implementation-ready. Runs `global-review-doc`, fixes all findings, re-reviews, and repeats — eliminating the manual review-fix loop. Asks MCQ questions only when a business logic decision is needed. | `agents/global-doc-fixer/` |
 
 ### Skills
 

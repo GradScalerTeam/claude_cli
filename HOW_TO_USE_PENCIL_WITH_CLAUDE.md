@@ -236,12 +236,11 @@ The design context hook extends the standard workflow into the design phase:
 
 ```
 1. PLAN        →  global-doc-master creates a planning doc
-2. REVIEW      →  global-review-doc reviews the doc
-3. ITERATE     →  fix findings, re-review until READY
-4. DESIGN      →  open Pencil, design screens with full context  ← NEW
-5. BUILD       →  hand the doc + designs to agents
-6. CODE REVIEW →  global-review-code audits the implementation
-7. SHIP        →  fix findings, re-review, deploy
+2. FIX         →  global-doc-fixer reviews, fixes, and repeats until READY
+3. DESIGN      →  open Pencil, design screens with full context  ← NEW
+4. BUILD       →  hand the doc + designs to agents
+5. CODE REVIEW →  global-review-code audits the implementation
+6. SHIP        →  fix findings, re-review, deploy
 ```
 
 The planning doc drives both the design and the code. Claude in Pencil reads the same planning docs that the development agents will follow, ensuring designs and implementations stay aligned.

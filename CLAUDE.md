@@ -20,7 +20,7 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 
 1. **Planning Phase** — Use `global-doc-master` agent to create detailed planning documents under `docs/planning/`. These are the blueprints that everything else builds on.
 
-2. **Review & Iterate** — Use the `global-review-doc` skill to review planning docs. Incorporate feedback, re-review, and repeat until the plan is solid. Good plans = good code.
+2. **Review & Fix** — Use the `global-doc-fixer` agent to autonomously review and fix planning docs. It runs `global-review-doc`, fixes all findings, re-reviews, and repeats until the plan is solid. No manual iteration needed. Good plans = good code.
 
 3. **Agent-Driven Development** — Use the `agent-development` skill to scan planning docs and generate project-specific agents. These agents live in the local project and are purpose-built for the work described in the plan.
 
@@ -42,6 +42,7 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 ### Tools
 
 - **[agents/global-doc-master/](agents/global-doc-master/)** — Agent that creates all technical documentation (planning, feature flows, deployment, issues, resolved, debug)
+- **[agents/global-doc-fixer/](agents/global-doc-fixer/)** — Agent that autonomously reviews and fixes docs — runs the review-fix loop until the document is implementation-ready
 - **[skills/global-review-doc/](skills/global-review-doc/)** — Skill that reviews documents against the codebase (9-phase review, 11-section report)
 - **[skills/global-review-code/](skills/global-review-code/)** — Skill that audits code and hunts bugs (12-phase audit + bug hunt mode)
 - **[hooks/doc-scanner/](hooks/doc-scanner/)** — SessionStart hook that scans for `.md` files and gives Claude a documentation index at conversation start
@@ -69,7 +70,8 @@ claude_cli/
 ├── scripts/
 │   └── statusline-command.sh          # Custom status line script for Claude Code
 ├── agents/
-│   └── global-doc-master/             # Doc master agent definition + README
+│   ├── global-doc-master/             # Doc master agent definition + README
+│   └── global-doc-fixer/              # Doc fixer agent definition + README
 └── skills/
     ├── global-review-doc/             # Doc review skill + references + README
     └── global-review-code/            # Code review skill + references + README

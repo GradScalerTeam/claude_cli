@@ -170,7 +170,7 @@ These agents live in `.claude/agents/` and are ready to use whenever you need to
 
 Once your existing project is set up with Claude CLI, the day-to-day workflow is the same as a new project:
 
-1. **New feature?** → Use the local doc master to create a planning doc, review it, iterate until READY, then build
+1. **New feature?** → Use the local doc master to create a planning doc, run `@global-doc-fixer` to review and fix it until READY, then build
 2. **Bug found?** → Use the local doc master to create an issue doc, fix it, move to resolved
 3. **Code changes?** → Use the local review-code skill to audit before merging
 4. **Feature shipped?** → Use the local doc master to create or update the flow doc
