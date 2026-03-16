@@ -128,6 +128,42 @@ Identify the target document:
 
 Read the document fully to understand its purpose and scope before starting the cycle.
 
+## Step 0.5: Ask Thoroughness Level (MANDATORY — Do This FIRST)
+
+**Before doing ANY review or scanning**, immediately ask the user how thorough the fix should be. This is the FIRST action after accepting the document — no exceptions.
+
+Use `AskUserQuestion` with exactly these options:
+
+```
+Question: How thorough should the doc fix be?
+
+Options:
+1. Quick Polish (1-2 rounds) — Fix obvious errors only (wrong paths, typos, broken references). Best for simple docs, READMEs, or minor updates. Fast.
+2. Standard (up to 4 rounds) — Fix all Critical and Important findings. Good balance of speed and quality. Best for most docs.
+3. Deep Clean (up to 8 rounds) — Full rigor. Fix everything including Minor findings, verify every code reference, ensure agent-readiness. Best for planning docs that agents will build from.
+4. Let me explain — I'll describe the doc and you decide.
+```
+
+**If the user picks option 4 ("Let me explain"):**
+1. Ask a follow-up with `AskUserQuestion` using a **free-text** prompt: `"Describe the doc briefly — what is it, how important is it, and what kind of fixes you're expecting."`
+2. Based on their response, auto-select the appropriate level using this logic:
+   - **Quick Polish** if: the doc is a README, changelog, minor guide, simple reference, or the user says things like "just clean it up", "small fixes", "nothing major", "quick pass"
+   - **Deep Clean** if: the doc is a planning spec that agents will implement from, the user says things like "this needs to be perfect", "agents will build from this", "critical doc", "production planning doc", "implementation-ready"
+   - **Standard** for everything else, or if you're unsure
+3. Tell the user which level you picked and why (one sentence), then proceed. Do NOT ask for confirmation — just go.
+
+**Apply the selected level to the entire session.** The level controls:
+
+| Setting | Quick Polish | Standard | Deep Clean |
+|---|---|---|---|
+| **Max rounds** | 2 | 4 | 8 |
+| **Stop when** | 0 Critical findings | 0 Critical + 0 Important | 0 Critical + 0 Important + Minors addressed |
+| **Fix scope** | Factual errors, broken refs, typos only | All Critical + Important findings | All findings including Minor |
+| **Verify code refs** | Only if obviously wrong | Spot-check key references | Verify every file path and line number |
+| **Business logic questions** | Always ask | Always ask | Always ask |
+
+**IMPORTANT for parallel runs:** When the parent conversation launches multiple doc-fixer agents in parallel, the thoroughness question is asked ONCE by the parent before spawning agents. The selected level is passed to each agent in the prompt. If you receive a thoroughness level in your prompt (e.g., "thoroughness: standard"), use it directly — do NOT ask again.
+
 ## Step 1: Run Review (using global-review-doc skill)
 
 Invoke the `global-review-doc` skill on the target document:
