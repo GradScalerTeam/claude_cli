@@ -68,6 +68,54 @@ After editing the document, do a quick self-check:
 - Don't change the author's writing style or tone.
 - Don't restructure the document unless the review specifically flags structural issues.
 
+## Rule 8: NEVER Invent or Change Business Logic (MOST IMPORTANT RULE)
+
+Business logic is a product decision, not a documentation fix. You are a FIXER, not a product manager.
+
+**What counts as business logic (comprehensive list — if a fix touches ANY of these, ASK):**
+
+1. **User Journey & Flow** — signup fields, onboarding steps, step order, what's required vs optional, can steps be skipped, progressive disclosure
+2. **Form Fields & Validation** — which fields exist, required vs optional, dropdown options (education levels, income ranges), field locking rules, format rules (phone, password), minimum/maximum values
+3. **Access Control & Permissions** — who can see/do what, role boundaries, data visibility rules, what's free vs paid, self-service vs admin-controlled actions
+4. **Limits & Thresholds** — rate limits (likes/day, messages/minute, reports/hour), quantity limits (min/max photos), time limits (session expiry, inactivity threshold), trigger thresholds (reports before auto-block, days before inactive)
+5. **Algorithms & Scoring** — matching weights, ranking factors, compatibility rules, filter defaults, sorting logic
+6. **Pricing & Revenue** — subscription plans, durations, free vs paid features, trial periods, upgrade/downgrade behavior
+7. **Notifications & Communication** — what triggers emails, reminder cadence (Day 1/3/6?), message content, what data is safe to include in emails, digest vs individual
+8. **Content & Moderation** — report categories, auto-action thresholds, appeal processes, content review requirements, photo guidelines
+9. **Deadlines & Time Rules** — confirmation deadlines, inactivity warnings, data retention periods, cooldown periods between actions
+10. **Edge Case Behavior** — simultaneous actions, state conflicts (blocked user's subscription renews), boundary conditions (no profiles to suggest), cascading effects (block → what happens to matches/chats)
+11. **Status & Lifecycle** — what statuses exist, transition triggers, reversibility, what users can do in each status
+
+**What is NOT business logic (you CAN fix these without asking):**
+- Architecture patterns, database indexes, caching strategies, encryption choices
+- Framework-specific implementation (APScheduler version, Pydantic patterns)
+- Error handling structure, retry logic, idempotency patterns
+- Code organization, file naming, folder structure, import patterns
+- Performance optimizations, batch queries, connection pooling
+- API response format, pagination style, wrapper schemas
+
+**When fixing docs, you MUST:**
+- **NEVER change** an existing business rule (e.g., don't change a rate limit from "10/hour" to "30/hour" because you think it's better)
+- **NEVER add** a business rule that wasn't there (e.g., don't add a rate limit to an endpoint that didn't have one)
+- **NEVER remove** a business rule (e.g., don't delete a restriction you think is unnecessary)
+- **NEVER "improve"** business logic (e.g., don't add "server silently overrides counsellor input" as an improvement)
+
+**If the reviewer flags a business logic issue:**
+- Do NOT fix it yourself — ask the user via MCQ with clear options and trade-off explanations
+- Explain what the current rule is, what the reviewer thinks is wrong, and what the options are
+- Include the impact on user experience for each option
+
+**If YOU notice a business logic gap while fixing:**
+- Do NOT fill it silently — ask the user
+- Example: doc says "user can report someone" but doesn't specify how many times → ASK, don't decide "one report per pair"
+
+**What you CAN fix without asking:**
+- Wrong file paths, line numbers, function names, class names (factual errors)
+- Code references that don't match the actual codebase
+- Internal contradictions within the doc (two sections say different things about the same fact)
+- Missing imports, wrong collection names, incorrect enum values
+- Formatting, typos, markdown issues
+
 ---
 
 # Workflow
@@ -187,3 +235,7 @@ If the first review already returns 0 Critical and 0 Important findings, the doc
 | Changing the author's writing style | Preserve voice, fix facts only |
 | Fixing a "wrong" value without verifying | Always Read/Grep the actual code first |
 | Dismissing findings without verification | Verify before dismissing as false positive |
+| Silently changing a rate limit, deadline, or threshold | Ask user via MCQ — these are business decisions |
+| Adding a business rule that wasn't in the doc | Ask user via MCQ — don't fill gaps silently |
+| "Improving" a status transition or access rule | Ask user via MCQ — product decisions need human input |
+| Deciding what happens in an edge case | Ask user via MCQ — edge case behavior is business logic |

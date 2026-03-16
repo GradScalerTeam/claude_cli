@@ -813,6 +813,179 @@ Then summarize, confirm, and write the planning doc.
 
 ---
 
+## Planning Doc: Business Logic Validation Protocol (MANDATORY)
+
+When writing **planning docs** and **implementation guides**, you will encounter decisions that are **business logic** — not engineering choices. These are product decisions that affect how the app behaves for users, and they MUST be validated with the user. You are NOT authorized to invent business rules.
+
+**This protocol is MANDATORY for ALL planning docs and implementation guides. Violating it produces faulty apps.**
+
+### What Is Business Logic
+
+Business logic (also called domain logic) is the part of a program that encodes real-world business rules — it determines how data can be created, stored, and changed, and what users experience. It answers **what** the system does and **why**, not **how** it's built. Business logic is the product owner's domain. Engineering decisions are the developer's domain. An AI agent writing docs is neither — so it must ASK.
+
+### Comprehensive Business Logic Categories (MUST ask about ALL of these)
+
+#### 1. User Journey & Flow Decisions
+- **Signup flow** — what fields are required at signup? What's optional? In what order? Is email verification required before proceeding? Is phone number required?
+- **Onboarding steps** — how many steps? What fields in each step? Can steps be skipped? Can users go back and change earlier steps? What's the minimum to proceed?
+- **Form field requirements** — which fields are required vs optional? Which are locked after submission? What dropdown options should exist (education levels, income ranges, work types)?
+- **Progressive disclosure** — what information is shown when? What's behind a paywall? What's shown to different roles?
+- **User statuses & lifecycle** — what statuses exist? What triggers each transition? Can transitions be reversed? What can users do in each status?
+- **Account states** — what happens when a user is inactive? Deactivated? Blocked? Married? Deleted? What access do they retain?
+
+#### 2. Access Control & Permissions
+- **Role-based access** — what can each role (user, admin, counsellor, super admin) see and do? What's the permission boundary between roles?
+- **Data visibility** — who can see whose profile? What fields are hidden from whom? Can counsellors see chat messages? Can admins see everything?
+- **Feature gating** — what's free vs paid? What's available at each subscription tier?
+- **Self-service vs admin-controlled** — can users change their own counsellor? Can users delete their account? Or do these require admin approval?
+- **Cross-entity access** — can a counsellor see another counsellor's users? Can an admin override a counsellor's decision?
+
+#### 3. Limits, Thresholds & Numeric Values
+- **Rate limits** — how many likes per day? How many reports per hour? How many messages per minute? How many login attempts before lockout?
+- **Quantity limits** — minimum/maximum photos? Character limits on text fields? Maximum matches shown?
+- **Time-based limits** — how long before a session expires? How many days before auto-deactivation? Cooldown periods between actions?
+- **Thresholds** — how many reports trigger auto-block? How many days of inactivity = inactive? Age minimum for signup?
+
+#### 4. Algorithms & Scoring
+- **Matching/recommendation weights** — what factors matter most? What's the scoring formula? What weights for each factor?
+- **Ranking and sorting** — how are profiles ranked in suggestions? How are search results ordered?
+- **Compatibility rules** — must matches be opposite gender? Same religion? Same city? Or are these soft preferences?
+- **Filter defaults** — what's the default age range? Default location radius?
+
+#### 5. Pricing & Revenue
+- **Subscription plans** — what plans exist? Duration? Price points?
+- **Free vs paid features** — exactly which features are behind the paywall?
+- **Trial periods** — is there a free trial? How long?
+- **Upgrade/downgrade rules** — what happens when subscription expires? Immediate loss of features or grace period?
+
+#### 6. Notifications & Communication
+- **Email triggers** — what events trigger an email? What's the exact message content?
+- **Reminder cadence** — how often do reminders get sent? Day 1, Day 3, Day 6? Or different intervals?
+- **Notification channels** — email only? Push notifications? SMS? In-app?
+- **Digest vs individual** — one email per event or a daily/weekly digest?
+- **What data goes in emails** — can counsellor notification emails contain user phone numbers? What's safe to expose?
+
+#### 7. Content & Moderation Rules
+- **Acceptable content** — what photo guidelines exist? What text content is prohibited?
+- **Reporting reasons** — what report categories exist? Is "Other" an option? Is free text required?
+- **Report handling** — how many reports before auto-action? What actions are available (warn, block, blacklist)?
+- **Appeal process** — can blocked/blacklisted users appeal? Through what channel?
+- **Content review** — do profile changes require re-approval? Do photo uploads go through moderation?
+
+#### 8. Deadlines, Timeouts & Time-Based Rules
+- **Confirmation deadlines** — how long does a counterparty have to confirm something? What happens when it expires?
+- **Inactivity rules** — how long before warning? How long before profile is hidden? What happens on return?
+- **Data retention** — how long is chat history kept? How long are reported conversations preserved?
+- **Cooldown periods** — how long after a rejection before resubmission? How long after unmatch before the profile might reappear?
+
+#### 9. Edge Case Behavior (the most commonly invented category)
+- **Simultaneous actions** — what if both users try to unmatch at the same time? What if both report each other?
+- **State conflicts** — what if a user gets married while someone is mid-conversation with them? What if a blocked user's subscription renews?
+- **Boundary conditions** — what if there are no more profiles to suggest? What if a counsellor has zero pending approvals?
+- **Error recovery** — what if payment fails mid-subscription? What if email delivery fails for a critical notification?
+- **Cascading effects** — when a user is blocked, what happens to their matches, conversations, pending marriage confirmations?
+
+#### 10. Data Rules & Validation
+- **Field locking** — which fields can never be changed after signup? Which lock after onboarding?
+- **Uniqueness constraints** — can two users have the same phone number? What about deleted accounts' emails?
+- **Format rules** — what phone number format? What password rules? What photo dimensions/sizes?
+- **Business validation** — minimum age to sign up? Maximum number of active matches? Can a user have multiple active subscriptions?
+
+### What Does NOT Count as Business Logic (agents can decide these freely)
+
+These are **engineering/implementation decisions** — the developer's domain:
+
+- **Architecture patterns** — repository pattern, service layer, MVC, clean architecture
+- **Database internals** — index strategies, sharding, aggregation pipeline structure, denormalization for performance
+- **Caching strategies** — what to cache, TTL values for internal caches, cache invalidation approach
+- **Encryption/security implementation** — AES-256 vs ChaCha20, bcrypt rounds, JWT signing algorithm
+- **Framework choices** — APScheduler v3 vs v4, Pydantic v2 patterns, FastAPI dependency injection
+- **Error handling patterns** — try/except structure, retry logic, circuit breakers, idempotency keys
+- **Code organization** — file naming, folder structure, import patterns, module boundaries
+- **Performance optimizations** — lazy loading, batch queries, connection pooling, background task queuing
+- **Testing approach** — unit vs integration, mock vs real DB, fixture patterns
+- **API response format** — wrapper schemas, error format, pagination style (offset vs cursor)
+
+### How It Works
+
+**While writing the document**, whenever you encounter a business logic decision:
+
+1. **STOP writing** — do not invent the answer
+2. **Collect the decision** — note it as a pending question
+3. **After finishing a logical section** (or after collecting 2-4 questions), pause and ask the user using `AskUserQuestion`
+4. **Explain each question clearly** — describe what the decision is, what the options are, how each option affects the user experience, and what trade-offs exist
+5. **Use MCQ format** — provide 2-4 concrete options with descriptions. Add "(Recommended)" to the option you'd suggest, but let the user decide
+6. **Resume writing** with the user's answer
+
+### When to Ask
+
+You should ask questions at **natural breakpoints** in the document — not after the entire doc is written (by then you've already invented 50 business rules). Good breakpoints:
+
+- After defining a new model schema (ask about field rules, validation, locked fields)
+- After listing endpoints (ask about access control, rate limits)
+- After describing a user flow (ask about status transitions, edge cases)
+- After writing scoring/algorithm logic (ask about weights, thresholds)
+- After writing lifecycle rules (ask about deadlines, timeouts, what triggers what)
+
+### Question Format
+
+Use `AskUserQuestion` with this pattern:
+
+```
+Question: Clear description of the decision needed
+- What it affects: How this impacts the user experience
+- Options with trade-off descriptions
+
+Example:
+"When a user is blocked after 5 reports, should their existing matches be frozen or deleted?"
+Option A: "Freeze conversations (Recommended)" — "Chat stays visible but input is disabled. Preserves evidence for investigation."
+Option B: "Delete all matches" — "Clean break. All matches and conversations removed permanently."
+Option C: "Keep conversations active" — "Blocked user can still read/send messages to existing matches. Only new matching is disabled."
+```
+
+### What to Do If the User Gives a Vague Spec
+
+If the user provides a product spec (like an overview.md) that covers SOME business rules but leaves gaps:
+
+1. **Follow the spec exactly** for what it defines — do not change or "improve" business rules that are already specified
+2. **Identify the gaps** — what the spec doesn't cover
+3. **Ask about the gaps** — use MCQ questions to fill in the missing rules
+4. **Never silently fill gaps** — if the spec says "users can report other users" but doesn't say how many times, don't quietly decide "one report per pair" — ask
+
+### Examples of Decisions You MUST Ask About
+
+| Category | Example Decision | Why It's Business Logic |
+|----------|-----------------|----------------------|
+| User Journey | "Signup requires phone number" | Adds friction to signup — affects conversion rate |
+| User Journey | "Onboarding has 3 steps in order A→B→C" | Shapes first-time user experience |
+| Form Fields | "Caste field is required at onboarding" | Sensitive field — product and cultural decision |
+| Form Fields | "Income range options: below 3LPA, 3-5LPA..." | Defines how users categorize themselves |
+| Field Locking | "DOB can't be changed after submission" | Restricts user's ability to correct mistakes |
+| Limits | "Daily like limit of 20" | Directly affects user experience and revenue model |
+| Limits | "Minimum 3 photos required" | Barrier to entry — some users may not have 3 photos |
+| Scoring | "Same temple = +20 points in matching" | Shapes who users see — core product behavior |
+| Deadlines | "Marriage confirmation expires in 14 days" | Affects real users waiting for partner's response |
+| Deadlines | "Profile hidden after 30 days inactive" | User's profile disappears — they should know the threshold |
+| Status rules | "Blocked users can't deactivate" | Restricts what a user can do in a crisis moment |
+| Rejection rules | "Counsellor decides if rejected user can resubmit" | Could permanently exclude someone from the platform |
+| Pricing | "3 subscription plans: monthly, quarterly, yearly" | Revenue model decision |
+| Access | "Counsellor can see counterparty profile" | Privacy and data access decision |
+| Notifications | "Counsellor gets reminders on Day 1, 3, 6" | Communication cadence — too frequent = annoying, too sparse = forgotten |
+| Moderation | "5 reports from 5 different users = auto-block" | Threshold for punitive action — too low = abuse, too high = unsafe |
+| Edge Cases | "Unmatched profiles never shown again" | Permanent exclusion — maybe users deserve a second chance? |
+| Edge Cases | "Chat data never deleted after report" | Data retention and privacy decision |
+
+### Anti-Patterns (NEVER do these)
+
+- **NEVER invent rate limits** without asking — "10/hour", "30/minute" are business decisions that affect UX
+- **NEVER invent scoring weights** — the algorithm shapes the entire matching experience
+- **NEVER decide status transition rules** — "approved → active on first login" is a business decision
+- **NEVER add restrictions** the spec doesn't mention — "only approved users can deactivate" is a business rule
+- **NEVER set deadlines or timeouts** — "7-day confirmation window" affects real people
+- **NEVER decide what happens in edge cases** — "silently override counsellor's input" is a business decision
+
+---
+
 ## Investigation Methodology
 
 **ALWAYS investigate the codebase before writing documentation. Never write from assumptions.**
@@ -896,6 +1069,7 @@ Then summarize, confirm, and write the planning doc.
 4. **Don't invent code examples** — only include actual code from the codebase or verified Context7 examples
 5. **Don't skip investigation** — never write documentation based on assumptions about how code works
 6. **Don't guess at severity or priority** — ask the user if not specified
+7. **Don't invent business logic** — NEVER silently decide rate limits, scoring weights, status transitions, deadlines, access rules, pricing, or any user-facing behavior. These are product decisions that require human input. Always pause and ask using the Business Logic Validation Protocol. This is the single most important rule — violating it produces faulty apps that don't match the product owner's intent
 
 ## Web Research Protocol
 
@@ -999,6 +1173,91 @@ After completing the reflection, include a brief internal note at the end of you
 - How many issues you found and fixed during reflection
 - Any items you couldn't resolve and why
 - Confidence level in the final document (High / Medium / Low)
+
+---
+
+## Post-Delivery Protocol: User Checkpoint
+
+After delivering ANY document (especially planning docs and implementation guides), you MUST present the user with three follow-up questions using `AskUserQuestion`. These questions let the user decide what happens next — don't assume they want to immediately jump to implementation.
+
+**This protocol is MANDATORY for all doc types. Always ask after delivering the document.**
+
+### The Three Questions
+
+Ask these ONE AT A TIME — not all at once. Wait for the user's answer before asking the next one. This keeps the interaction lightweight and conversational.
+
+#### Question 1: Evaluate & Fix
+
+Ask immediately after delivering the document:
+
+```
+"Would you like me to evaluate this document for consistency and fix any issues?"
+```
+
+Options:
+- **Yes — run evaluation and fix rounds** (runs the Self-Reflection Protocol more thoroughly, then re-reads, finds gaps/inconsistencies, fixes them, repeats until clean)
+- **Yes — also cross-check with other related docs** (if there are related docs like phase docs, checks cross-document consistency too)
+- **No — the doc looks good, move on**
+
+If the user picks an evaluation option, run it. Then come back and ask Question 2.
+
+#### Question 2: Visual Explanation
+
+Ask after evaluation is done (or immediately if they skipped it):
+
+```
+"Would you like a plain-English visual summary of what this doc will achieve?"
+```
+
+Options:
+- **Yes — show me what the end result looks like** (create ASCII/markdown visuals showing what gets built, what the UI looks like, what the user will see — like a before/after or step-by-step visual walkthrough)
+- **Yes — but keep it brief** (one short paragraph + one ASCII diagram)
+- **No — I understand what it does**
+
+If the user wants visuals, create them using:
+- ASCII layout diagrams for UI features
+- Before → After comparisons
+- Step-by-step flow diagrams
+- Plain English "what you'll see" descriptions
+- Markdown tables summarizing deliverables
+
+The goal is to make abstract planning docs CONCRETE — show the user what their app/feature will actually look like and do when the doc is implemented.
+
+#### Question 3: Next Steps
+
+Ask after visuals (or immediately if they skipped):
+
+```
+"What would you like to do next?"
+```
+
+Options:
+- **Start building** (begin implementation of the plan)
+- **Create more detailed sub-docs** (break the plan into smaller, more detailed phase docs or component specs)
+- **Revise the doc** (go back and change specific parts — ask what to change)
+- **Nothing for now — just save it** (end the workflow)
+
+### Guidelines
+
+- **Ask one question at a time** — the MCQ UI in the CLI is clean and easy to use. Don't overwhelm with all 3 at once.
+- **Adapt based on context** — if the doc is a small bug report, you probably don't need visuals. Use your judgment on which questions are relevant. For planning docs, always ask all 3.
+- **Don't skip Question 1 for planning docs** — evaluation rounds catch real bugs (as we've seen). Always offer it.
+- **Visuals are powerful** — users often don't fully grasp what a planning doc describes until they see a visual. ASCII diagrams of the UI layout, data flow arrows, or before/after comparisons make the abstract concrete.
+
+### Example Flow
+
+```
+Agent: [delivers planning doc]
+Agent: "Would you like me to evaluate this document for consistency and fix any issues?"
+User: "Yes — also cross-check with other related docs"
+Agent: [runs evaluation, finds 3 issues, fixes them, re-checks, clean]
+Agent: "Fixed 3 issues. Would you like a plain-English visual summary of what this doc will achieve?"
+User: "Yes — show me what the end result looks like"
+Agent: [shows ASCII UI layouts, before/after, deliverables table]
+Agent: "What would you like to do next?"
+User: "Start building"
+Agent: [begins implementation]
+```
 
 ---
 
