@@ -20,12 +20,15 @@ The **Global Doc Master** is a documentation agent for Claude Code CLI. It is th
 
 The workflow is:
 
-1. You describe what you want to build (can be vague — that's fine)
-2. The agent scans your codebase, asks clarifying questions, and writes the document
-3. You run `@global-doc-fixer` on the document — it reviews, fixes, and repeats until the doc is solid
-4. Only then do you start building — either manually or by handing the doc to a development agent
+1. **For new projects:** Start with a project overview (`docs/overview.md`) — the agent interviews you extensively to capture the entire project vision, business logic, and user journeys
+2. You describe what you want to build (can be vague — that's fine)
+3. The agent scans your codebase, asks clarifying questions, and writes the document
+4. You run `@global-doc-fixer` on the document — it reviews, fixes, and repeats until the doc is solid
+5. Only then do you start building — either manually or by handing the doc to a development agent
 
 **You should also use it when:**
+- You're starting a new project and want to capture the full vision before writing any code (project overview)
+- You have an existing project and want a comprehensive overview document so Claude understands the whole picture
 - A feature is built and you want to document how it works end-to-end (feature flow docs)
 - You need deployment documentation for your infrastructure, CI/CD, and environment setup
 - A bug is discovered and you want a structured investigation before jumping into code
@@ -51,6 +54,7 @@ All documents live under `docs/` in your project root:
 
 ```
 docs/
+├── overview.md      # Project overview — what the project is, user roles, journeys, business logic, rules
 ├── planning/        # Feature specs and project plans — BEFORE coding starts
 ├── feature_flow/    # End-to-end flow docs — AFTER a feature is built
 ├── deployment/      # Deployment guides, CI/CD, server infrastructure
@@ -62,6 +66,29 @@ docs/
 ---
 
 ## Document Types
+
+### Project Overview (`docs/overview.md`)
+
+**When to use:** At the very start of any project — before planning docs, before code, before anything. This is the first document you create. It captures what the project IS: the problem it solves, who it's for, user roles, user journeys, business rules, revenue model, and platform rules.
+
+Also use it for existing projects that don't have an overview yet — the agent investigates the codebase first, then asks you questions about the business context that code can't reveal.
+
+**How it works:**
+1. Tell the agent you want a project overview (new project or existing)
+2. For **new projects**: the agent asks you 4-8 rounds of detailed questions covering everything — what the project does, user roles, the complete user journey step by step, business rules, limits, safety, notifications, admin features, and revenue model
+3. For **existing projects**: the agent scans the codebase first, presents what it found, then asks targeted questions to fill in the business context
+4. It writes a comprehensive `docs/overview.md` that becomes the single source of truth for the entire project
+5. It updates `CLAUDE.md` to reference the docs folder so Claude always knows where to find project context
+
+**Why it matters:** Every planning doc, every feature spec, every agent that builds your project will reference this overview. Getting it right means everything built from it is right. Getting it wrong means everything is wrong.
+
+**Example:**
+```
+@global-doc-master I'm starting a new project — it's a matrimonial platform for ISKCON devotees. Can you help me document what this is about?
+```
+The agent will ask: What problem does this solve? Who are the users? Walk me through signup. What happens after signup? Is there an approval process? How does matching work? Free vs paid features? Reporting system? — round after round until the full vision is captured.
+
+---
 
 ### Planning Docs (`docs/planning/`)
 
