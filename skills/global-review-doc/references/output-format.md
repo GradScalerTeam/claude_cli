@@ -1,6 +1,8 @@
 # Output Format — Document Review
 
-**CRITICAL: Always present ALL findings as a detailed numbered list to the user. Never summarize or omit findings — the full All Findings section (section 4) MUST appear in your response.**
+**CRITICAL: Always present ALL Critical and Important findings as a detailed numbered list. Never summarize or omit Critical/Important findings — the full All Findings section (section 4) MUST appear in your response.**
+
+**Minor Findings Cap:** When there are more than 10 Minor findings, list the first 5 in full detail and summarize the rest as a count with one-line descriptions (e.g., "Plus 8 additional Minor findings: 3 formatting, 3 wording, 2 typos"). This prevents token bloat on docs with many cosmetic issues while preserving full detail for findings that matter.
 
 Structure the review with ALL sections below. Every section is mandatory.
 
@@ -145,3 +147,36 @@ Exact text blocks to add to the document:
 **Recommendation**: [Ready to hand to agent / Revise and re-review / Major rewrite needed]
 
 **Summary**: [2-3 sentence final assessment]
+
+---
+
+# Delta Output Format (Rounds 2+)
+
+**Use this format when the review is invoked with `round:N` where N > 1.** This is a re-review after fixes — the full 11-section report is unnecessary. Only output these 3 sections:
+
+### 1. Delta Summary
+
+```
+ROUND: N (delta review — checking fixes from round N-1)
+FINDINGS: X remaining — Critical: N | Important: N | Minor: N
+PREVIOUS ROUND: Y findings → now X findings
+TREND: [Converging ✓ / Stable / Oscillating ✗]
+VERDICT: [READY / REVISE / REWRITE]
+```
+
+### 2. Remaining Findings
+
+Only list findings that **still exist** or were **newly introduced** by the fixes. Do not re-list findings that were fixed.
+
+- **New findings** (introduced by fixes): mark with `[NEW]`
+- **Persisting findings** (not fixed from prior round): mark with `[PERSISTS]`
+
+Use the same format as section 4 of the full review (severity-grouped, with ID/Issue/Evidence/Recommendation). Apply the Minor Findings Cap here too.
+
+If no findings remain, write: "All prior findings resolved. No new issues introduced."
+
+### 3. Verdict
+
+**Recommendation**: [Ready / Revise / Rewrite]
+
+**Summary**: [1-2 sentences — what's left, if anything]
