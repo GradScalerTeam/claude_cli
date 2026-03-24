@@ -19,8 +19,9 @@
 5. **[assistant-os 起步模板](docs/assistant-os-starter/README_CN.md)** — 直接复制 `reference_manifest.md` 和 3 份 protocol 模板开始跑最小系统。
 6. **[创建子代理](HOW_TO_CREATE_AGENTS_CN.md)** — 用 `/agents` 创建项目专属专家。
 7. **[创建技能](HOW_TO_CREATE_SKILLS_CN.md)** — 用 `SKILL.md` 封装可复用的流程和命令。
-8. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
-9. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
+8. **[OpenClaw 与 Claude agent 对比](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)** — 专门解释 OpenClaw agent、OpenClaw subagent 和 Claude CLI 子代理的异同，以及如何分层互补。
+9. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
+10. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
 
 ---
 
@@ -185,5 +186,6 @@
 - [HOW_TO_START_ASSISTANT_SYSTEM_CN.md](HOW_TO_START_ASSISTANT_SYSTEM_CN.md)
 - [HOW_TO_CREATE_AGENTS_CN.md](HOW_TO_CREATE_AGENTS_CN.md)
 - [HOW_TO_CREATE_SKILLS_CN.md](HOW_TO_CREATE_SKILLS_CN.md)
+- [docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)
 - [docs/ASSISTANT_TEAM_PATTERNS_CN.md](docs/ASSISTANT_TEAM_PATTERNS_CN.md)
 - [docs/OFFICIAL_REFERENCE_MAP_CN.md](docs/OFFICIAL_REFERENCE_MAP_CN.md)
