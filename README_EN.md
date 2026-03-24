@@ -15,10 +15,11 @@ Pick the path that matches where you are right now:
 1. **[10-minute setup](CLAUDE_SETUP.md)** — install Claude Code, log in, create your first `CLAUDE.md`, learn the few commands that matter most.
 2. **[New project workflow](HOW_TO_START_NEW_PROJECT.md)** — go from idea to plan to implementation using the tools in this repository.
 3. **[Existing project workflow](HOW_TO_START_EXISTING_PROJECT.md)** — retrofit Claude Code into a codebase that already exists.
-4. **[Create subagents](HOW_TO_CREATE_AGENTS.md)** — build project-specific specialists with `/agents`.
-5. **[Create skills](HOW_TO_CREATE_SKILLS.md)** — package repeatable prompts and workflows in `SKILL.md`.
-6. **[Assistant team patterns](docs/ASSISTANT_TEAM_PATTERNS.md)** — practical patterns for splitting work, life, and reflection assistants.
-7. **[Official reference map](docs/OFFICIAL_REFERENCE_MAP.md)** — see which Anthropic docs back each guide in this repo.
+4. **[Personal assistant / knowledge system workflow](HOW_TO_START_ASSISTANT_SYSTEM.md)** — use Claude Code for a personal assistant, reflection system, or knowledge workflow instead of only software delivery.
+5. **[Create subagents](HOW_TO_CREATE_AGENTS.md)** — build project-specific specialists with `/agents`.
+6. **[Create skills](HOW_TO_CREATE_SKILLS.md)** — package repeatable prompts and workflows in `SKILL.md`.
+7. **[Assistant team patterns](docs/ASSISTANT_TEAM_PATTERNS.md)** — practical patterns for splitting work, life, and reflection assistants.
+8. **[Official reference map](docs/OFFICIAL_REFERENCE_MAP.md)** — see which Anthropic docs back each guide in this repo.
 
 ---
 
@@ -90,6 +91,14 @@ This repository's agents and skills work best on top of that baseline.
 2. Read [HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)
 3. Study the examples in `agents/`, `skills/`, and `hooks/`
 4. Version project-level tools with the repo and keep user-level tools personal
+
+### Path D — You Want A Personal Assistant Or Knowledge System
+
+1. Read [CLAUDE_SETUP.md](CLAUDE_SETUP.md)
+2. Read [HOW_TO_START_ASSISTANT_SYSTEM.md](HOW_TO_START_ASSISTANT_SYSTEM.md)
+3. Then read [docs/ASSISTANT_TEAM_PATTERNS.md](docs/ASSISTANT_TEAM_PATTERNS.md)
+4. Start with a small working system, not a mega-assistant
+5. Add subagents and skills only after the rhythm becomes stable
 
 ---
 
@@ -171,6 +180,7 @@ Each component has its own README with setup instructions and copy-ready install
 - [CLAUDE_SETUP.md](CLAUDE_SETUP.md)
 - [HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)
 - [HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)
+- [HOW_TO_START_ASSISTANT_SYSTEM.md](HOW_TO_START_ASSISTANT_SYSTEM.md)
 - [HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)
 - [HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)
 - [docs/ASSISTANT_TEAM_PATTERNS.md](docs/ASSISTANT_TEAM_PATTERNS.md)

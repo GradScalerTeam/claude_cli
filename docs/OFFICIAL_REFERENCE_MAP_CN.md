@@ -15,6 +15,7 @@
 | `CLAUDE_SETUP.md` / `CLAUDE_SETUP_CN.md` | Claude Code overview、Getting started、Quickstart、CLI reference、Built-in commands、Memory、Settings、Troubleshooting | 用来确定当前的安装、登录、命令、记忆和配置模型 |
 | `HOW_TO_START_NEW_PROJECT.md` / `_CN` | Common workflows、Memory、Settings、Subagents、Skills | 支撑“先记忆、先规划、分片实现”的新项目工作流 |
 | `HOW_TO_START_EXISTING_PROJECT.md` / `_CN` | Common workflows、Plan Mode guidance、Memory、Git worktree workflow | 支撑只读摸底、流程文档化，以及安全并行的既有项目工作流 |
+| `HOW_TO_START_ASSISTANT_SYSTEM.md` / `_CN` | Common workflows、Memory、Settings、Subagents、Skills | 把官方的记忆、规划、子代理和技能能力改写到个人助理 / 知识系统场景里 |
 | `HOW_TO_CREATE_AGENTS.md` / `_CN` | Subagents | 用当前 `/agents` 工作流替换旧的插件式说明 |
 | `HOW_TO_CREATE_SKILLS.md` / `_CN` | Extend Claude with skills、Slash commands | 让仓库里的技能教程和当前 `SKILL.md` 模型保持一致 |
 | `hooks/*` 文档 | Hooks guide、Hooks reference | 用来确认 hook 事件、matcher、配置结构以及安全注意事项 |

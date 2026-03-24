@@ -15,6 +15,7 @@ This file shows which Anthropic Claude Code docs informed the refreshed tutorial
 | `CLAUDE_SETUP.md` / `CLAUDE_SETUP_CN.md` | Claude Code overview, Getting started, Quickstart, CLI reference, Built-in commands, Memory, Settings, Troubleshooting | Establishes the current install, login, command, memory, and config model |
 | `HOW_TO_START_NEW_PROJECT.md` / `_CN` | Common workflows, Memory, Settings, Subagents, Skills | Supports the updated plan-first, memory-first, slice-based build workflow |
 | `HOW_TO_START_EXISTING_PROJECT.md` / `_CN` | Common workflows, Plan Mode guidance, Memory, Git worktree workflow | Justifies read-only exploration, flow documentation, and safe parallelism |
+| `HOW_TO_START_ASSISTANT_SYSTEM.md` / `_CN` | Common workflows, Memory, Settings, Subagents, Skills | Adapts the official Claude Code primitives to personal assistant and knowledge-system projects |
 | `HOW_TO_CREATE_AGENTS.md` / `_CN` | Subagents | Replaces older plugin-centric explanations with the current `/agents` workflow |
 | `HOW_TO_CREATE_SKILLS.md` / `_CN` | Extend Claude with skills, Slash commands | Aligns repo guidance with the modern `SKILL.md` model |
 | `hooks/*` docs | Hooks guide, Hooks reference | Confirms hook events, matchers, config shape, and security cautions |
