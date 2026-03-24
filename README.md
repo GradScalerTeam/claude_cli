@@ -18,7 +18,7 @@
 4. **[创建子代理](HOW_TO_CREATE_AGENTS_CN.md)** — 用 `/agents` 创建项目专属专家。
 5. **[创建技能](HOW_TO_CREATE_SKILLS_CN.md)** — 用 `SKILL.md` 封装可复用的流程和命令。
 6. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
-7. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
+7. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
 
 ---
 
@@ -174,4 +174,4 @@
 - [HOW_TO_CREATE_AGENTS_CN.md](HOW_TO_CREATE_AGENTS_CN.md)
 - [HOW_TO_CREATE_SKILLS_CN.md](HOW_TO_CREATE_SKILLS_CN.md)
 - [docs/ASSISTANT_TEAM_PATTERNS_CN.md](docs/ASSISTANT_TEAM_PATTERNS_CN.md)
-- [docs/OFFICIAL_REFERENCE_MAP.md](docs/OFFICIAL_REFERENCE_MAP.md)
+- [docs/OFFICIAL_REFERENCE_MAP_CN.md](docs/OFFICIAL_REFERENCE_MAP_CN.md)

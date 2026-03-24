@@ -1,5 +1,7 @@
 # Official Reference Map
 
+English | **[中文](OFFICIAL_REFERENCE_MAP_CN.md)**
+
 This file shows which Anthropic Claude Code docs informed the refreshed tutorials in this repository.
 
 更新时间 / Last reviewed: **2026-03-24**
