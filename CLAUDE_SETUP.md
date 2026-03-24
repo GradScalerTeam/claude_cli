@@ -454,7 +454,129 @@ Example:
 - handoffs must include `State / Alerts / Follow-up / Evidence`
 ```
 
+If this feels abstract at first, a simple way to read `Output Protocol` is:
+
+"When Claude finishes a chunk of work and hands it back to you, or to a future session, it should report in a fixed structure instead of a loose paragraph."
+
+The point is not to sound formal. The point is to prevent the most common handoff failures:
+
+- nobody can quickly tell what is actually done
+- risks are buried inside long prose
+- the next step is missing or vague
+- readers cannot tell whether a claim is grounded in evidence or just inferred
+
+Without a format like this, Claude may:
+
+- write a narrative summary one time
+- say only "done" the next time
+- forget to mention risks or sources later
+
+That means the information may exist, but the handoff quality stays inconsistent.
+
+### In plain English, these four fields mean:
+
+#### `State`
+
+Plain English:
+
+"Where do things stand right now?"
+
+Use it for:
+
+- what is done
+- what is not done
+- what is currently blocked
+
+Example:
+
+- `State: The first draft is written, but the calendar sync step is not connected yet.`
+
+#### `Alerts`
+
+Plain English:
+
+"What should I be careful about?"
+
+Use it for:
+
+- risks
+- unresolved questions
+- assumptions that may be wrong
+
+Example:
+
+- `Alerts: Calendar permissions are not verified yet, so automatic sync may fail.`
+
+#### `Follow-up`
+
+Plain English:
+
+"What should happen next?"
+
+Use it for:
+
+- the next recommended action
+- who or what still needs confirmation
+- unfinished tasks that should be picked up next
+
+Example:
+
+- `Follow-up: Verify permissions tomorrow, then decide whether to enable auto-send.`
+
+#### `Evidence`
+
+Plain English:
+
+"What is this conclusion based on?"
+
+Use it for:
+
+- files reviewed
+- logs, command output, screenshots, or data checked
+- the concrete basis behind the summary
+
+Example:
+
+- `Evidence: Based on memory/2026-03-24.md, today's task list, and the latest sync log.`
+
+### Why these four sections specifically
+
+Because they cover the four things that most often get lost in a handoff:
+
+- `State` answers "where are we now?"
+- `Alerts` answers "what could go wrong or be misunderstood?"
+- `Follow-up` answers "what should the next person do?"
+- `Evidence` answers "what supports this summary?"
+
+You can think of it as a minimum viable handoff template.
+
+Not every summary needs to be long, but these four ideas should usually be present if you want the next session to stay reliable.
+
+### A copyable beginner version
+
+```md
+# Output Protocol
+- for handoffs, always include:
+  - State: current progress
+  - Alerts: risks, problems, or unknowns
+  - Follow-up: recommended next step
+  - Evidence: files, notes, logs, or results used
+```
+
+An actual handoff could look like this:
+
+```md
+State: The travel budget and hotel shortlist are done, and the draft itinerary is in `plans/japan-trip.md`.
+Alerts: Return flight prices are still moving, so the current budget may be optimistic.
+Follow-up: Confirm travel dates next, then lock flights and hotel.
+Evidence: Based on `plans/japan-trip.md`, flight comparison results, and the saved hotel list.
+```
+
 The short version is: software projects often document how to build and test; life systems are often better served by documenting what to read first, where to write, how to route work, and which information is sensitive.
+
+If you want to turn that into a durable operating system instead of a one-off setup, read next:
+
+- [HOW_TO_START_ASSISTANT_SYSTEM.md](HOW_TO_START_ASSISTANT_SYSTEM.md)
 
 ---
 
