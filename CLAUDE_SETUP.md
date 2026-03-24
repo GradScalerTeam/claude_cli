@@ -228,6 +228,121 @@ Those lines are not just for humans reading the file. They change Claude's defau
 
 You can think of `CLAUDE.md` as the file that helps Claude guess less and follow the real project rules more often.
 
+### If You Are New, Translate These Terms Like This
+
+- `Build`: turn source code into something ready to run, deploy, or release. A simple mental model is "the official packaging step."
+- `Test`: automatically check whether your change broke existing behavior. A simple mental model is "automated acceptance checking."
+- `Lint`: inspect the code without running it to catch obvious mistakes, style problems, or risky patterns. A simple mental model is "a code health check."
+- `apps/web`: usually the directory for the user-facing frontend.
+- `packages/api`: usually the directory for shared API-related code used across parts of the app.
+- `API client`: code that calls backend endpoints, such as fetching a profile or submitting an order.
+- `schema`: a description of what data should look like, such as required fields and expected types.
+- `infra/production`: production infrastructure config. A simple mental model is "live deployment and operations settings," where mistakes can affect the real system.
+
+If that still feels abstract, think of `CLAUDE.md` as a short onboarding note for a new teammate:
+
+- which commands the project really uses
+- which directories matter for which kind of work
+- which areas are dangerous
+- how to check that a change did not break anything
+
+Claude reads that note before it starts making decisions.
+
+### Translate The Table Into Plain Language
+
+#### `Build: pnpm build`
+
+Plain language:
+
+"When this project does its real build, the command is `pnpm build`."
+
+Why that matters:
+
+- many repos have `npm`, `pnpm`, or `yarn` somewhere
+- if Claude does not know the real tool, it may guess wrong
+- once the command is wrong, validation and debugging drift off course
+
+Think of it as telling Claude: "Use this door, do not guess another route."
+
+#### `Test: pnpm test`
+
+Plain language:
+
+"After you change code, use `pnpm test` to check that old behavior still works."
+
+Why that matters:
+
+- beginners often assume "the page looks fine" means the change is done
+- real projects often break in ways that are not obvious by sight
+- if Claude knows the test command, it is more likely to do proper regression checks
+
+Think of it as telling Claude: "Do not just look at the surface. Run the automatic check."
+
+#### `Lint: pnpm lint`
+
+Plain language:
+
+"Before calling the change done, run `pnpm lint` to catch simple mistakes and team-rule violations."
+
+Why that matters:
+
+- some problems can be found before the code even runs
+- for example: unused variables, bad imports, inconsistent formatting, or forbidden patterns
+- if Claude knows the lint command, it is more likely to treat it as a baseline self-check
+
+Think of it as telling Claude: "Do a health check before saying the code is clean."
+
+#### `` `apps/web` contains the customer-facing app ``
+
+Plain language:
+
+"If I want to change pages, buttons, forms, or layout, `apps/web` is probably the first place to look."
+
+Why that matters:
+
+- large repos usually contain many directories
+- if you say "change the homepage button color" without a location hint, Claude may search everywhere
+- if you name the right directory, Claude can start in the right place immediately
+
+Think of it as telling Claude: "The frontend entrance is here. Do not get lost."
+
+#### `` `packages/api` contains shared API clients and schemas ``
+
+Plain language, split into two parts:
+
+1. `packages/api` contains code for calling backend endpoints
+2. it also contains rules for what request and response data should look like
+
+Why that matters:
+
+- changing an API often affects more than one place
+- if Claude knows this is the shared interface layer, it is more likely to check downstream impact
+
+Example:
+
+- maybe the login API used to return `{ id, name }`
+- now you want it to return `{ id, nickname }`
+- if Claude knows `packages/api` is the shared interface layer, it is more likely to ask:
+  - should the frontend display logic change too?
+  - should the type definitions change too?
+  - should the tests change too?
+
+Think of it as telling Claude: "This is the seam between frontend and backend. Changes here can ripple outward."
+
+#### `Do not edit infra/production/ without confirmation`
+
+Plain language:
+
+"This directory is dangerous. Do not touch it without checking first."
+
+Why that matters:
+
+- `infra/production` often controls live deploys, databases, networking, or environment settings
+- a mistake here can affect the running system, not just one page
+- once Claude sees that rule, it is more likely to stop and confirm before editing
+
+Think of it as drawing a high-voltage danger zone on the project map.
+
 ### A More Realistic Starting Template
 
 If you are in a monorepo, this is the kind of starting detail that is usually enough for a beginner:
