@@ -19,6 +19,42 @@ Anthropic's current docs also note that custom commands have effectively merged 
 
 ---
 
+## What "A Reusable Slash Command" Actually Means
+
+This does not mean "make a shell alias." It means packaging a prompt workflow you repeat often into a Claude command you can reuse.
+
+For example, imagine you keep typing:
+
+```text
+Review the API routes in src/routes for validation, auth, error handling, and missing tests. Output findings by severity.
+```
+
+If you say that all the time, it is already a good skill candidate. Once you turn it into a skill, you can just write:
+
+```text
+/review-api src/routes
+```
+
+What you are reusing is not just a short command. You are reusing:
+
+- a stable goal: review API routes
+- a stable checklist: validation, auth, error handling, tests
+- a stable output format: findings by severity
+- a variable input: which path to inspect this time
+
+The easiest confusion is between these four things:
+
+| Problem you are solving | Better fit |
+|---|---|
+| I keep repeating a long prompt | Skill |
+| I need a specialist with its own role and tool scope | Subagent |
+| I need something to happen every time automatically | Hook |
+| I only want to shorten a shell command | shell alias or script |
+
+So a "reusable slash command" is better understood as a Claude workflow command, not an operating-system command alias.
+
+---
+
 ## When To Use A Skill vs A Subagent vs A Hook
 
 | Use this | When you need |
@@ -64,6 +100,29 @@ When explaining code:
 ```
 
 This already gives you a `/explain-code` skill.
+
+### A More Realistic Example
+
+You can think of a skill as the upgrade path from a repeated prompt to a reusable slash command.
+
+Handwritten prompt:
+
+```text
+Check the routes in src/api for input validation, auth, error handling, and missing tests.
+```
+
+Skill invocation:
+
+```text
+/review-api src/api
+```
+
+The `SKILL.md` is doing two jobs for you:
+
+1. It freezes the review standard that should stay the same every time.
+2. It leaves only the changing input, such as the target path, as an argument.
+
+That is the biggest value of a skill: it turns repeated thinking into a reusable team workflow.
 
 ---
 
@@ -192,6 +251,14 @@ Output findings by severity with file references.
 ```
 
 This is a strong pattern for project skills because it is reusable, reviewable, and explicit.
+
+If you look back at the earlier example, this is just a formalized version of a sentence you might say all the time:
+
+```text
+Review these API routes for me.
+```
+
+The difference is that it becomes a shared, auditable, parameterized `/review-api` command instead of a one-off chat instruction.
 
 ---
 

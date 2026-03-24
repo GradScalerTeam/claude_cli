@@ -25,29 +25,17 @@ According to Anthropic's Claude Code docs, the current baseline is:
 - Bash, Zsh, or Fish recommended
 - Network access for authentication and model calls
 
-If your team uses Bedrock or Vertex, Claude Code can be configured for those too, but the simplest path is to start with a Claude.ai or Anthropic Console account.
+If your team uses Bedrock, Vertex, or Microsoft Foundry, Claude Code can be configured for those too, but the simplest path for most individuals is still a paid Claude.ai account or Anthropic Console.
 
 ---
 
 ## Installation Options
 
-### Option 1: Standard npm install
+Anthropic now recommends the native installer first. npm installation still works, but it is better treated as a compatibility path for people who already manage developer CLIs through Node.
 
-```bash
-npm install -g @anthropic-ai/claude-code
-```
+### Option 1: Recommended native installer
 
-Use this if you already manage developer tooling through Node.
-
-Important:
-
-- Do **not** use `sudo npm install -g`
-- If global npm permissions are messy on your machine, expect friction later
-- Run `claude doctor` after install
-
-### Option 2: Native installer
-
-Anthropic also documents a native installer flow for macOS, Linux, and Windows via WSL/PowerShell.
+Anthropic documents a native installer flow for macOS, Linux, and Windows via WSL/PowerShell.
 
 macOS / Linux / WSL:
 
@@ -61,7 +49,31 @@ Windows PowerShell:
 irm https://claude.ai/install.ps1 | iex
 ```
 
-This path is useful when npm permissions are painful or you want a cleaner standalone install.
+This is the better default if you want a cleaner install path, fewer npm permission problems, and easier updates.
+
+### Option 2: Compatibility npm install
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Use this if you already work like this:
+
+- you manage Node versions with tools like `nvm`, `fnm`, `Volta`, or `asdf`
+- you already install CLIs globally with npm or pnpm, such as `typescript`, `pnpm`, `prettier`, or `tsx`
+- you are comfortable with `PATH`, global package locations, upgrades, and uninstall flows
+- you want Claude Code to behave like one more Node-based CLI in that toolkit
+
+A simple gut check:
+
+- if global developer CLIs through Node already feel normal to you, npm install will feel normal too
+- if phrases like "global install", "PATH", or "npm permissions" already sound annoying, use the native installer instead
+
+Important:
+
+- Do **not** use `sudo npm install -g`
+- If global npm permissions are messy on your machine, expect friction later
+- Run `claude doctor` after install
 
 ### Verify installation
 
@@ -85,13 +97,56 @@ claude
 
 On first launch, Claude Code will ask you to authenticate.
 
+According to the current docs, Claude Code requires a `Pro`, `Max`, `Teams`, `Enterprise`, or Anthropic Console account. The free Claude.ai plan does not include Claude Code access.
+
 Typical account paths:
 
-- **Claude.ai account**: easiest for individual use
+- **Paid Claude.ai account**: easiest for individual use
 - **Anthropic Console**: usage billed by API consumption
-- **AWS Bedrock / Google Vertex AI**: common in enterprise environments
+- **AWS Bedrock / Google Vertex AI / Microsoft Foundry**: common in enterprise environments
 
 Once login succeeds, you are in the interactive REPL.
+
+---
+
+## If Your Team Uses GLM Or A Shared Model Gateway
+
+The easiest mistake here is mixing up the Claude Code client with the model or gateway behind it.
+
+The more stable pattern is usually not "turn Claude Code directly into a GLM client." It is:
+
+1. install and run Claude Code normally
+2. put an LLM gateway in front of your model providers
+3. let that gateway handle auth, budget controls, audit, and routing
+4. connect Claude Code to the gateway through an Anthropic-compatible endpoint
+
+Think of it like this:
+
+```text
+Claude Code -> your LLM gateway -> Claude / GLM / other models
+```
+
+A minimal shape often looks like:
+
+```bash
+export ANTHROPIC_BASE_URL="https://your-llm-gateway.example.com"
+export ANTHROPIC_AUTH_TOKEN="your-token"
+claude
+```
+
+Why teams do this:
+
+- centralized auth, budget, and audit
+- the ability to route different projects to different backend models
+- less provider-specific setup on each developer machine
+
+Important caveats:
+
+- the official direct-provider paths documented for Claude Code are Anthropic, Bedrock, Vertex AI, and Microsoft Foundry; GLM is not listed as a direct provider
+- if your gateway is only OpenAI-compatible rather than Anthropic-compatible, do not assume Claude Code will work correctly
+- if your actual goal is "mostly run GLM," validate tool use, long-context behavior, and agentic workflows in a small pilot first
+
+The practical summary is that GLM is usually safer as a model behind your team's gateway than as an assumed drop-in replacement for the Claude experience.
 
 ---
 
@@ -158,6 +213,47 @@ Good example:
 
 Anthropic's memory docs also support `@path/to/file` imports inside `CLAUDE.md`, which is often cleaner than duplicating long docs.
 
+### Why These Lines Matter
+
+Those lines are not just for humans reading the file. They change Claude's default behavior.
+
+| What you write | Why it matters | What Claude is more likely to do |
+|---|---|---|
+| `Build: pnpm build` | Tells Claude the real build command instead of letting it guess `npm run build` | When you say "verify the project still builds," it is more likely to run the correct command |
+| `Test: pnpm test` | Tells Claude which regression command to use after a change | After a bug fix or feature, it is more likely to run the right test baseline |
+| `Lint: pnpm lint` | Tells Claude the team's static-check entry point | It is more likely to treat lint as part of the normal validation path |
+| `` `apps/web` contains the customer-facing app `` | Tells Claude where frontend work primarily lives | When you ask for a UI change, it is more likely to start in the right place |
+| `` `packages/api` contains shared API clients and schemas `` | Tells Claude where the shared interface boundary lives | When you change an API, it is more likely to consider cross-package impact |
+| `Do not edit infra/production/ without confirmation` | Defines a risk boundary | Claude is more likely to stop and ask before touching sensitive paths |
+
+You can think of `CLAUDE.md` as the file that helps Claude guess less and follow the real project rules more often.
+
+### A More Realistic Starting Template
+
+If you are in a monorepo, this is the kind of starting detail that is usually enough for a beginner:
+
+```md
+# Project Commands
+- Install: `pnpm install`
+- Dev: `pnpm dev`
+- Build: `pnpm build`
+- Test: `pnpm test`
+- Lint: `pnpm lint`
+
+# Architecture
+- `apps/web` contains the customer-facing frontend
+- `apps/admin` contains the internal operations UI
+- `packages/api` contains shared API clients, schemas, and types
+- `packages/ui` contains reusable UI components
+
+# Rules
+- Confirm before changes involving billing, auth, or production deploys
+- Prefer Zod validation for external input
+- When changing an API, check callers and tests too
+```
+
+It does not need to be huge on day one, but it should contain things that genuinely change Claude's decisions.
+
 ---
 
 ## Daily Commands You Should Actually Know
@@ -182,6 +278,40 @@ These are the most useful built-in commands for everyday work:
 | `/statusline` | Configure the terminal status line |
 
 The biggest onboarding mistake is memorizing too many commands. For most developers, `/init`, `/memory`, `/permissions`, `/agents`, `/mcp`, `/hooks`, `/compact`, and `/doctor` cover most of the workflow.
+
+### Do Not Memorize Commands. Memorize 4 Workflows Instead
+
+#### Scenario 1: First time in a repository
+
+1. If the install feels suspicious, run `claude doctor`
+2. Run `/init`
+3. Ask Claude for the real commands, risky directories, and a repo overview
+4. Use `/memory` to tighten the generated `CLAUDE.md`
+
+The point is not "learn `/init`." The point is to establish durable memory early.
+
+#### Scenario 2: You are about to let Claude edit files
+
+1. Start with one small safe task
+2. Watch which permissions Claude asks for
+3. Use `/permissions` only for the high-frequency safe operations
+
+That is much safer than opening everything up on day one.
+
+#### Scenario 3: You keep repeating the same kind of request
+
+- If it is a repeated workflow, use a skill
+- If it is a repeated specialist role, use `/agents`
+- If it needs an external system, use `/mcp`
+- If it must happen every time, use `/hooks`
+
+So the real skill is not memorizing the command names. It is recognizing whether you have a workflow problem, a role problem, or a tool-integration problem.
+
+#### Scenario 4: The session is getting long and context is drifting
+
+That is when `/compact` matters.
+
+It does not make Claude smarter. It helps compress the current conversation so the next stretch of work has less context bloat.
 
 ---
 
@@ -270,6 +400,24 @@ Use `/agents` and prefer project-level subagents for team workflows.
 - the process benefits from reference files or a checklist
 
 Store skills in `.claude/skills/<name>/SKILL.md`.
+
+Here, "reusable slash command" does not mean a shell alias or a built-in Claude command.
+
+It is closer to packaging a prompt you repeat often, plus its checklist and supporting files, into a command you define.
+
+For example, if you keep saying:
+
+```text
+Review src/routes for validation, auth, error handling, and missing tests, then output findings by severity.
+```
+
+That is already a strong skill candidate. After packaging it, you can just write:
+
+```text
+/review-api src/routes
+```
+
+What you are reusing is not a short nickname. You are reusing a stable workflow. For the deeper version of this idea, continue with [HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md).
 
 ### Add a hook when...
 
