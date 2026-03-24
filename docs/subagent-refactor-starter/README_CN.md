@@ -18,6 +18,10 @@
 docs/subagent-refactor-starter/
 ├── README.md
 ├── README_CN.md
+├── scenarios/
+│   ├── frontend/
+│   ├── backend/
+│   └── monorepo/
 └── .claude/
     ├── agents/
     │   ├── code-reviewer.md
@@ -80,6 +84,14 @@ docs/subagent-refactor-starter/
 - [review-api/checklist.md](.claude/skills/review-api/checklist.md)
 - [check-migration-safety/SKILL.md](.claude/skills/check-migration-safety/SKILL.md)
 - [check-migration-safety/checklist.md](.claude/skills/check-migration-safety/checklist.md)
+
+## 场景化版本
+
+如果你不想从通用版自己改，可以直接看场景化样板：
+
+- [frontend](scenarios/frontend/README_CN.md)
+- [backend](scenarios/backend/README_CN.md)
+- [monorepo](scenarios/monorepo/README_CN.md)
 
 ## 对应文档
 
