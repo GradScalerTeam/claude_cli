@@ -225,6 +225,10 @@ and inbox triage protocol for my assistant-os.
 
 The point is not to produce lots of docs. It is to make the system rules legible.
 
+If you want copy-ready starter files instead of drafting these from scratch, see:
+
+- [docs/assistant-os-starter/README.md](docs/assistant-os-starter/README.md)
+
 ---
 
 ## Step 5: Use Plan Mode To Design The Three Core Flows
