@@ -410,6 +410,52 @@ Claude 每次进入项目时，都会优先读这张“便签”。
 - 哪些地方不能想改就改
 - 改完以后要怎么自检
 
+### 如果你的项目不是“产出程序”，而是一套个人助理 / 知识系统
+
+这时不要机械照抄 `Build / Test / Lint`。
+
+更好的做法是：把 `CLAUDE.md` 写成“这个系统平时怎么读、怎么写、怎么分工”的说明。
+
+这类项目更值得长期写进去的内容通常是：
+
+- `Project Purpose`：这是什么系统，默认输出语言是什么
+- `Read Order`：主会话先读哪些文件，哪些是单一事实来源
+- `Agent Routing`：什么问题交给什么子代理
+- `Write Destinations`：思绪、反思、计划分别写到哪里
+- `Privacy Rules`：哪些信息默认高敏感，哪些动作必须先确认
+- `Output Protocol`：总结、复盘、交接时必须包含哪些字段
+
+示例：
+
+```md
+# Project Purpose
+- 这是一个个人生活助理与反思系统，默认输出中文
+
+# Read Order
+- 先读 `MEMORY.md`
+- 再读 `context/user_profile/profile.md`
+- 需要路径时读 `context/reference_manifest.md`
+
+# Agent Routing
+- 思绪记录 -> `@thought-recorder`
+- 每日复盘 -> `@daily-reflection-mentor`
+- 旅行规划 -> `@travel-assistant`
+
+# Write Destinations
+- 碎碎念写入 `context/ideas/`
+- 每日复盘写入 `memory/{YYYY-MM-DD}.md`
+- 长期稳定规律再写进 `MEMORY.md`
+
+# Privacy Rules
+- 健康、关系、财务默认高敏感
+- 未经确认不外发、不分享
+
+# Output Protocol
+- 交接时输出 `State / Alerts / Follow-up / Evidence`
+```
+
+一句话理解：程序项目常写“怎么 build / test”；生活型项目更该写“先读什么、写到哪、怎么分工、哪些信息不能乱动”。
+
 ---
 
 ## 日常最该掌握的命令
@@ -546,6 +592,10 @@ claude --permission-mode plan
 - 你希望某个角色有更小的工具权限范围
 
 优先用 `/agents` 创建，团队流程优先建项目级子代理。
+
+Claude Code 原生项目级子代理文件放在 `.claude/agents/*.md`，用户级子代理放在 `~/.claude/agents/*.md`。
+
+如果你把文件放在自定义的 `.agents/` 目录里，Claude Code 不会按官方原生规则自动发现它们。
 
 ### 该加技能的时候
 

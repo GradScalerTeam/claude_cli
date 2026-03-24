@@ -410,6 +410,52 @@ So `CLAUDE.md` does not need to look professional on day one. It just needs to t
 - which areas are dangerous
 - how to self-check a change
 
+### If Your Project Is Not Shipping Software
+
+Do not mechanically copy `Build / Test / Lint` into every `CLAUDE.md`.
+
+For a personal assistant system, reflection vault, or knowledge workflow, it is usually better to describe how the system reads, writes, and routes work.
+
+The sections that matter more in that kind of project are:
+
+- `Project Purpose`: what the system is for and what language it should default to
+- `Read Order`: which files are read first and which ones are the single source of truth
+- `Agent Routing`: which kinds of requests go to which subagents
+- `Write Destinations`: where thoughts, reflections, and plans should be stored
+- `Privacy Rules`: which topics are high-sensitivity by default
+- `Output Protocol`: what a summary, handoff, or reflection must include
+
+Example:
+
+```md
+# Project Purpose
+- This is a personal life assistant and reflection system. Default output is Chinese.
+
+# Read Order
+- Read `MEMORY.md` first
+- Then read `context/user_profile/profile.md`
+- Read `context/reference_manifest.md` when paths are needed
+
+# Agent Routing
+- thought capture -> `@thought-recorder`
+- daily review -> `@daily-reflection-mentor`
+- travel planning -> `@travel-assistant`
+
+# Write Destinations
+- quick thoughts go to `context/ideas/`
+- daily reflections go to `memory/{YYYY-MM-DD}.md`
+- stable long-term patterns go to `MEMORY.md`
+
+# Privacy Rules
+- health, relationships, and finances are high-sensitivity by default
+- do not share or send externally without confirmation
+
+# Output Protocol
+- handoffs must include `State / Alerts / Follow-up / Evidence`
+```
+
+The short version is: software projects often document how to build and test; life systems are often better served by documenting what to read first, where to write, how to route work, and which information is sensitive.
+
 ---
 
 ## Daily Commands You Should Actually Know
@@ -548,6 +594,10 @@ For teams, project memory should hold shared conventions; personal preferences s
 - you want different tool access for a specialist
 
 Use `/agents` and prefer project-level subagents for team workflows.
+
+Claude Code's native project-scoped subagents live in `.claude/agents/*.md`, while user-scoped subagents live in `~/.claude/agents/*.md`.
+
+If you put agent files in a custom `.agents/` directory, Claude Code will not auto-discover them through the standard native path.
 
 ### Add a skill when...
 
