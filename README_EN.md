@@ -19,9 +19,10 @@ Pick the path that matches where you are right now:
 5. **[assistant-os starter templates](docs/assistant-os-starter/README.md)** — copy-ready `reference_manifest.md` and protocol templates for the smallest usable system.
 6. **[Create subagents](HOW_TO_CREATE_AGENTS.md)** — build project-specific specialists with `/agents`.
 7. **[Create skills](HOW_TO_CREATE_SKILLS.md)** — package repeatable prompts and workflows in `SKILL.md`.
-8. **[OpenClaw vs Claude agents](docs/OPENCLAW_AND_CLAUDE_AGENTS.md)** — a detailed comparison of OpenClaw agents, OpenClaw subagents, and Claude CLI subagents, plus recommended complementarity patterns.
-9. **[Assistant team patterns](docs/ASSISTANT_TEAM_PATTERNS.md)** — practical patterns for splitting work, life, and reflection assistants.
-10. **[Official reference map](docs/OFFICIAL_REFERENCE_MAP.md)** — see which Anthropic docs back each guide in this repo.
+8. **[Refactor rough existing subagents](docs/REFACTOR_EXISTING_SUBAGENTS.md)** — shows how to split old mega-agents into narrow roles and move repeated procedures into skills.
+9. **[OpenClaw vs Claude agents](docs/OPENCLAW_AND_CLAUDE_AGENTS.md)** — a detailed comparison of OpenClaw agents, OpenClaw subagents, and Claude CLI subagents, plus recommended complementarity patterns.
+10. **[Assistant team patterns](docs/ASSISTANT_TEAM_PATTERNS.md)** — practical patterns for splitting work, life, and reflection assistants.
+11. **[Official reference map](docs/OFFICIAL_REFERENCE_MAP.md)** — see which Anthropic docs back each guide in this repo.
 
 ---
 
