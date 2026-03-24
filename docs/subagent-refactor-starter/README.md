@@ -20,6 +20,10 @@ It is intentionally small:
 docs/subagent-refactor-starter/
 ├── README.md
 ├── README_CN.md
+├── scenarios/
+│   ├── frontend/
+│   ├── backend/
+│   └── monorepo/
 └── .claude/
     ├── agents/
     │   ├── code-reviewer.md
@@ -80,6 +84,14 @@ In other words:
 - [review-api/checklist.md](.claude/skills/review-api/checklist.md)
 - [check-migration-safety/SKILL.md](.claude/skills/check-migration-safety/SKILL.md)
 - [check-migration-safety/checklist.md](.claude/skills/check-migration-safety/checklist.md)
+
+## Scenario Variants
+
+If you do not want to adapt the generic version by hand, start from one of these:
+
+- [frontend](scenarios/frontend/README.md)
+- [backend](scenarios/backend/README.md)
+- [monorepo](scenarios/monorepo/README.md)
 
 ## Related Guides
 
