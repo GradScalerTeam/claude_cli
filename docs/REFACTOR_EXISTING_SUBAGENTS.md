@@ -330,6 +330,23 @@ If you already have a pile of old subagents, run through this list:
 
 ---
 
+## If You Want Copy-Ready Templates
+
+The repository now includes a minimal starter pack here:
+
+- [subagent-refactor-starter/README.md](subagent-refactor-starter/README.md)
+
+It includes copy-ready examples for:
+
+- `.claude/agents/code-reviewer.md`
+- `.claude/agents/test-runner.md`
+- `.claude/skills/review-api/SKILL.md`
+- `.claude/skills/check-migration-safety/SKILL.md`
+
+The point is not to copy them unchanged. The point is to give you a small but realistic reference for the "roles + procedures" split.
+
+---
+
 ## How to tell the refactor worked
 
 You are probably moving in the right direction if:

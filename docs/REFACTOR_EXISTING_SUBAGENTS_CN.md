@@ -329,6 +329,23 @@ Do not edit code unless explicitly asked.
 
 ---
 
+## 如果你想直接抄样板
+
+仓库里已经补了一套最小可用的 starter：
+
+- [subagent-refactor-starter/README_CN.md](subagent-refactor-starter/README_CN.md)
+
+里面包含可直接复制的：
+
+- `.claude/agents/code-reviewer.md`
+- `.claude/agents/test-runner.md`
+- `.claude/skills/review-api/SKILL.md`
+- `.claude/skills/check-migration-safety/SKILL.md`
+
+这套样板的目的不是让你原封不动照搬，而是给你一个“角色 + 流程下沉”的最小参考。
+
+---
+
 ## 什么时候说明你已经重构成功了
 
 如果出现下面这些变化，说明方向对了：

@@ -20,9 +20,10 @@
 6. **[创建子代理](HOW_TO_CREATE_AGENTS_CN.md)** — 用 `/agents` 创建项目专属专家。
 7. **[创建技能](HOW_TO_CREATE_SKILLS_CN.md)** — 用 `SKILL.md` 封装可复用的流程和命令。
 8. **[重构已有粗糙子代理](docs/REFACTOR_EXISTING_SUBAGENTS_CN.md)** — 讲清楚怎么把旧的万能 agent 拆成窄职责角色，并把重复流程下沉成技能。
-9. **[OpenClaw 与 Claude agent 对比](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)** — 专门解释 OpenClaw agent、OpenClaw subagent 和 Claude CLI 子代理的异同，以及如何分层互补。
-10. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
-11. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
+9. **[子代理重构起步样板](docs/subagent-refactor-starter/README_CN.md)** — 直接抄一套 `.claude/agents/` 和 `.claude/skills/` 样板，跑最小角色拆分方案。
+10. **[OpenClaw 与 Claude agent 对比](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)** — 专门解释 OpenClaw agent、OpenClaw subagent 和 Claude CLI 子代理的异同，以及如何分层互补。
+11. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
+12. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
 
 ---
 
