@@ -369,6 +369,47 @@ If you are in a monorepo, this is the kind of starting detail that is usually en
 
 It does not need to be huge on day one, but it should contain things that genuinely change Claude's decisions.
 
+### A Copy-Paste Starter Template
+
+If you still do not know how to begin, copy this into the `CLAUDE.md` at the project root and replace the angle-bracket placeholders with your real project details:
+
+```md
+# Project Commands
+- Install: `<your install command, for example pnpm install>`
+- Dev: `<your dev command, for example pnpm dev>`
+- Build: `<your build command, for example pnpm build>`
+- Test: `<your test command, for example pnpm test>`
+- Lint: `<your lint command, for example pnpm lint>`
+
+# Architecture
+- `<frontend directory>` contains `<what it is responsible for>`
+- `<backend directory>` contains `<what it is responsible for>`
+- `<shared directory>` contains `<shared types, APIs, components, or utilities>`
+
+# Docs
+- Start with `README.md`
+- Feature docs live in `<your docs directory>`
+
+# Rules
+- Do not edit `<high-risk directory>` without confirmation
+- When changing an API, also check `<callers / types / tests>`
+- After changes, run at least `<your minimum validation command>`
+```
+
+If you have no idea how to fill it in yet, use this order:
+
+1. ask Claude to find the real project commands
+2. put those commands into `Project Commands`
+3. ask Claude which directories matter most
+4. fill in `Rules` with the risky paths and minimum validation steps
+
+So `CLAUDE.md` does not need to look professional on day one. It just needs to tell Claude:
+
+- which commands are real
+- which directories matter
+- which areas are dangerous
+- how to self-check a change
+
 ---
 
 ## Daily Commands You Should Actually Know
