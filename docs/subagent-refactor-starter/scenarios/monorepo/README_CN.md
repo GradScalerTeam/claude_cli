@@ -21,6 +21,7 @@
 scenarios/monorepo/
 ├── README.md
 ├── README_CN.md
+├── CLAUDE.md
 └── .claude/
     ├── agents/
     │   └── workspace-boundary-reviewer.md
@@ -32,6 +33,17 @@ scenarios/monorepo/
 
 ## 文件入口
 
+- [CLAUDE.md](CLAUDE.md)
 - [workspace-boundary-reviewer.md](.claude/agents/workspace-boundary-reviewer.md)
 - [summarize-cross-package-impact/SKILL.md](.claude/skills/summarize-cross-package-impact/SKILL.md)
 - [summarize-cross-package-impact/checklist.md](.claude/skills/summarize-cross-package-impact/checklist.md)
+
+## `CLAUDE.md` 在这里负责什么
+
+这份样板里的 `CLAUDE.md` 主要负责 monorepo 最容易混乱的项目记忆：
+
+- workspace 结构
+- package / app 边界
+- 公共 contract 的稳定性要求
+- validation scope 的收敛规则
+- agent / skill 路由

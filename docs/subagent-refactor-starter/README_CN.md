@@ -93,6 +93,8 @@ docs/subagent-refactor-starter/
 - [backend](scenarios/backend/README_CN.md)
 - [monorepo](scenarios/monorepo/README_CN.md)
 
+这三套场景版现在都额外带了一份示例 `CLAUDE.md`，方便你把 agent / skill 和项目记忆一起配起来。
+
 ## 对应文档
 
 - [REFACTOR_EXISTING_SUBAGENTS_CN.md](../REFACTOR_EXISTING_SUBAGENTS_CN.md)

@@ -21,6 +21,7 @@
 scenarios/backend/
 ├── README.md
 ├── README_CN.md
+├── CLAUDE.md
 └── .claude/
     ├── agents/
     │   └── api-builder.md
@@ -32,6 +33,17 @@ scenarios/backend/
 
 ## 文件入口
 
+- [CLAUDE.md](CLAUDE.md)
 - [api-builder.md](.claude/agents/api-builder.md)
 - [review-background-job/SKILL.md](.claude/skills/review-background-job/SKILL.md)
 - [review-background-job/checklist.md](.claude/skills/review-background-job/checklist.md)
+
+## `CLAUDE.md` 在这里负责什么
+
+这份样板里的 `CLAUDE.md` 主要补后端项目最常见的项目记忆：
+
+- 项目命令
+- API / service / data 层分工
+- contract、auth、validation 的基本规则
+- validation 策略
+- agent / skill 路由

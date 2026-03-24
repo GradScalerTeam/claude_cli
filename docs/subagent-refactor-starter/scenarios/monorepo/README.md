@@ -21,6 +21,7 @@ Good fit for:
 scenarios/monorepo/
 ├── README.md
 ├── README_CN.md
+├── CLAUDE.md
 └── .claude/
     ├── agents/
     │   └── workspace-boundary-reviewer.md
@@ -32,6 +33,17 @@ scenarios/monorepo/
 
 ## Files
 
+- [CLAUDE.md](CLAUDE.md)
 - [workspace-boundary-reviewer.md](.claude/agents/workspace-boundary-reviewer.md)
 - [summarize-cross-package-impact/SKILL.md](.claude/skills/summarize-cross-package-impact/SKILL.md)
 - [summarize-cross-package-impact/checklist.md](.claude/skills/summarize-cross-package-impact/checklist.md)
+
+## What `CLAUDE.md` Covers Here
+
+This sample `CLAUDE.md` provides the minimal monorepo memory these agents and skills depend on:
+
+- workspace structure
+- package and app boundaries
+- public contract stability expectations
+- validation scope rules
+- agent and skill routing
