@@ -32,6 +32,16 @@ This is the native installer — no Node.js required, automatic updates built in
 irm https://claude.ai/install.ps1 | iex
 ```
 
+### Optional: npm Install For Node-Based Toolchains
+
+If you already manage developer CLIs through Node, npm installation is also a valid path:
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Use this if global Node-based tools already feel normal on your machine. Do **not** use `sudo npm install -g`, and run `claude doctor` after install.
+
 ### Verify Installation
 
 After installing, run:
@@ -52,11 +62,13 @@ claude doctor
 
 When you run `claude` for the first time, it will ask you to authenticate. You have a few options:
 
-1. **Claude Pro/Max Subscription** — log in with your claude.ai account. Your subscription includes Claude Code access. This is the simplest option for individual developers.
+1. **Claude Pro/Max Subscription** — log in with your claude.ai account. A paid Claude plan includes Claude Code access. This is the simplest option for individual developers. The free Claude plan does not include Claude Code access.
 
 2. **Anthropic Console (API Billing)** — connects to your Anthropic Console account at console.anthropic.com. You pay per usage based on API billing.
 
 3. **Enterprise** — configure Claude Code to use Amazon Bedrock, Google Vertex AI, or Microsoft Foundry if your organization uses those.
+
+For most individual users, the simplest starting point is a paid Claude.ai account or Anthropic Console.
 
 ---
 
