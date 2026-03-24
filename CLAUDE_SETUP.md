@@ -79,6 +79,118 @@ That's it. You're now in a Claude Code session. Type what you want in plain Engl
 
 ---
 
+## First 10 Minutes That Actually Matter
+
+Most setup guides jump straight into plugins and advanced automation. Do this first instead:
+
+1. Start Claude in a real project
+2. Run `/init`
+3. Improve the generated `CLAUDE.md`
+4. Ask Claude for a repo overview
+5. Run one small safe task
+
+Useful first prompts:
+
+- "Give me an overview of this repository."
+- "What are the real build, test, and lint commands here?"
+- "Which directories are risky to edit?"
+
+The point of `/init` is not just to create a file. It gives Claude durable project memory instead of making it rediscover the same rules every session.
+
+---
+
+## What To Put In `CLAUDE.md`
+
+A good `CLAUDE.md` should reduce repeated explanation, not become a dumping ground.
+
+For a normal software project, include:
+
+- real build, test, lint, format, and dev commands
+- architecture notes
+- naming conventions
+- critical docs
+- risky or protected directories
+- deployment caveats
+
+Example:
+
+```md
+# Project Commands
+- Build: `pnpm build`
+- Test: `pnpm test`
+- Lint: `pnpm lint`
+
+# Architecture
+- `apps/web` contains the customer-facing frontend
+- `packages/api` contains shared API clients and schemas
+
+# Rules
+- Do not edit `infra/production/` without confirmation
+- Prefer Zod validation for external input
+```
+
+Why these lines matter:
+
+- `Build/Test/Lint` tell Claude which commands are real instead of forcing it to guess
+- architecture notes tell Claude where to look first
+- risk rules tell Claude where to stop and confirm
+
+Anthropic's memory docs also support `@path/to/file` imports inside `CLAUDE.md`, which is often cleaner than copying long documents into one file.
+
+### If Your Project Is Not Shipping Software
+
+Do not mechanically copy `Build / Test / Lint` into every `CLAUDE.md`.
+
+For a personal assistant system, reflection vault, or knowledge workflow, it is usually better to describe how the system reads, writes, and routes work.
+
+In that kind of project, sections like these matter more:
+
+- `Project Purpose`
+- `Read Order`
+- `Agent Routing`
+- `Write Destinations`
+- `Privacy Rules`
+- `Output Protocol`
+
+Example:
+
+```md
+# Project Purpose
+- This is a personal life assistant and reflection system. Default output is Chinese.
+
+# Read Order
+- Read `MEMORY.md` first
+- Then read `context/user_profile/profile.md`
+- Read `context/reference_manifest.md` when paths are needed
+
+# Agent Routing
+- thought capture -> `@thought-recorder`
+- daily review -> `@daily-reflection-mentor`
+- travel planning -> `@travel-assistant`
+
+# Write Destinations
+- quick thoughts go to `context/ideas/`
+- daily reflections go to `memory/{YYYY-MM-DD}.md`
+- stable long-term patterns go to `MEMORY.md`
+
+# Privacy Rules
+- health, relationships, and finances are high-sensitivity by default
+- do not share or send externally without confirmation
+
+# Output Protocol
+- handoffs must include `State / Alerts / Follow-up / Evidence`
+```
+
+The short version is: software projects often document how to build and test; life systems are often better served by documenting what to read first, where to write, how to route work, and which information is sensitive.
+
+### Where Native Subagents Live
+
+Claude Code's native project-scoped subagents live in `.claude/agents/*.md`, while user-scoped subagents live in `~/.claude/agents/*.md`.
+
+If you put agent files in a custom `.agents/` directory, Claude Code will not auto-discover them through the standard native path.
+
+---
+
 ## Claude Code in VS Code
 
 You don't have to use Claude Code only in the terminal. There's an official VS Code extension that puts it right in your editor.
