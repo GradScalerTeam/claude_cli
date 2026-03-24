@@ -22,8 +22,9 @@ Pick the path that matches where you are right now:
 8. **[Refactor rough existing subagents](docs/REFACTOR_EXISTING_SUBAGENTS.md)** — shows how to split old mega-agents into narrow roles and move repeated procedures into skills.
 9. **[Subagent refactor starter](docs/subagent-refactor-starter/README.md)** — copy-ready `.claude/agents/` and `.claude/skills/` examples for a minimal role split.
 10. **[OpenClaw vs Claude agents](docs/OPENCLAW_AND_CLAUDE_AGENTS.md)** — a detailed comparison of OpenClaw agents, OpenClaw subagents, and Claude CLI subagents, plus recommended complementarity patterns.
-11. **[Assistant team patterns](docs/ASSISTANT_TEAM_PATTERNS.md)** — practical patterns for splitting work, life, and reflection assistants.
-12. **[Official reference map](docs/OFFICIAL_REFERENCE_MAP.md)** — see which Anthropic docs back each guide in this repo.
+11. **[OpenClaw + Claude CLI integration guide](docs/OPENCLAW_CLAUDE_INTEGRATION.md)** — explains how OpenClaw hands work into Claude CLI repo workflows and what “sharing MCP” should mean in practice.
+12. **[Assistant team patterns](docs/ASSISTANT_TEAM_PATTERNS.md)** — practical patterns for splitting work, life, and reflection assistants.
+13. **[Official reference map](docs/OFFICIAL_REFERENCE_MAP.md)** — see which Anthropic docs back each guide in this repo.
 
 ---
 
@@ -122,6 +123,23 @@ This is intentionally documentation-first. Claude gets better when the project h
 
 ---
 
+## If You Want A More Detailed Workflow
+
+If the direction is clear but the exact operating flow still feels too abstract, go straight to one of these:
+
+1. **Existing repo workflow**: read [HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)
+   Best when you already have a codebase and want to add `CLAUDE.md`, flow docs, review loops, skills, and subagents gradually.
+2. **New project workflow**: read [HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)
+   Best when you are still in planning and want to go documentation first, then review, then implement in slices.
+3. **OpenClaw outer loop + Claude CLI inner loop**: read [docs/OPENCLAW_CLAUDE_INTEGRATION.md](docs/OPENCLAW_CLAUDE_INTEGRATION.md)
+   Best when you want a long-lived assistant to handle intake, reminders, and routing, while Claude CLI handles concrete repo execution.
+
+If your main question is simply whether OpenClaw agents and Claude CLI subagents are the same thing, read:
+
+- [docs/OPENCLAW_AND_CLAUDE_AGENTS.md](docs/OPENCLAW_AND_CLAUDE_AGENTS.md)
+
+---
+
 ## What's In This Repo
 
 ### Agents
@@ -189,5 +207,6 @@ Each component has its own README with setup instructions and copy-ready install
 - [HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)
 - [HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)
 - [docs/OPENCLAW_AND_CLAUDE_AGENTS.md](docs/OPENCLAW_AND_CLAUDE_AGENTS.md)
+- [docs/OPENCLAW_CLAUDE_INTEGRATION.md](docs/OPENCLAW_CLAUDE_INTEGRATION.md)
 - [docs/ASSISTANT_TEAM_PATTERNS.md](docs/ASSISTANT_TEAM_PATTERNS.md)
 - [docs/OFFICIAL_REFERENCE_MAP.md](docs/OFFICIAL_REFERENCE_MAP.md)
