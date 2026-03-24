@@ -93,6 +93,8 @@ If you do not want to adapt the generic version by hand, start from one of these
 - [backend](scenarios/backend/README.md)
 - [monorepo](scenarios/monorepo/README.md)
 
+Each scenario variant now also includes a sample `CLAUDE.md` so you can wire project memory and routing rules together with the starter agents and skills.
+
 ## Related Guides
 
 - [REFACTOR_EXISTING_SUBAGENTS.md](../REFACTOR_EXISTING_SUBAGENTS.md)

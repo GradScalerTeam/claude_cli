@@ -21,6 +21,7 @@ Good fit for:
 scenarios/backend/
 ├── README.md
 ├── README_CN.md
+├── CLAUDE.md
 └── .claude/
     ├── agents/
     │   └── api-builder.md
@@ -32,6 +33,17 @@ scenarios/backend/
 
 ## Files
 
+- [CLAUDE.md](CLAUDE.md)
 - [api-builder.md](.claude/agents/api-builder.md)
 - [review-background-job/SKILL.md](.claude/skills/review-background-job/SKILL.md)
 - [review-background-job/checklist.md](.claude/skills/review-background-job/checklist.md)
+
+## What `CLAUDE.md` Covers Here
+
+This sample `CLAUDE.md` provides the minimum backend project memory these agents and skills depend on:
+
+- project commands
+- API / service / data boundaries
+- contract, auth, and validation rules
+- validation strategy
+- agent and skill routing

@@ -21,6 +21,7 @@
 scenarios/frontend/
 ├── README.md
 ├── README_CN.md
+├── CLAUDE.md
 └── .claude/
     ├── agents/
     │   └── frontend-builder.md
@@ -38,6 +39,19 @@ scenarios/frontend/
 
 ## 文件入口
 
+- [CLAUDE.md](CLAUDE.md)
 - [frontend-builder.md](.claude/agents/frontend-builder.md)
 - [review-component-contract/SKILL.md](.claude/skills/review-component-contract/SKILL.md)
 - [review-component-contract/checklist.md](.claude/skills/review-component-contract/checklist.md)
+
+## `CLAUDE.md` 在这里负责什么
+
+这份样板里的 `CLAUDE.md` 不是完整项目文档，而是最小项目记忆：
+
+- 项目命令
+- 前端目录约定
+- UI / 状态 / 可访问性边界
+- 验证策略
+- agent / skill 路由
+
+也就是说，子代理和技能不是孤立工作的，它们默认依赖 `CLAUDE.md` 给出的项目边界。
