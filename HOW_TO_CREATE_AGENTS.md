@@ -1,195 +1,234 @@
-# How to Create Agents in Claude CLI
+# How to Create Subagents in Claude Code
 
-A guide to understanding what agents are, why they matter, and how to create your own.
-
----
-
-## What is an Agent?
-
-An agent in Claude CLI is an autonomous worker that does a specific job for you. You describe the task, and the agent handles it — reading files, writing code, running commands, asking you questions when needed, and producing a complete result.
-
-Think of agents like specialists on a team. You don't explain the entire project to each person every time — you hire a frontend developer who already knows frontend, a database engineer who already knows databases, and a QA tester who already knows testing. Each one has their own expertise, tools, and approach. That's what agents are.
-
-**In short: an agent is someone who does a task for you. Multiple agents can run at the same time to get work done faster.**
-
-When you tell Claude to "run all agents in parallel", it spins up multiple agents simultaneously — one might be writing API routes while another is setting up the database while another is building the frontend. Each agent works independently, following its own instructions, and they all finish their parts of the project in parallel.
+This guide uses the current Claude Code model: specialized **subagents** managed through `/agents` and stored as Markdown files with YAML frontmatter.
 
 ---
 
-## Where Agents Live
+## What A Subagent Is
 
-Agents are markdown files with YAML frontmatter that define the agent's name, behavior, and capabilities.
+A subagent is a specialist Claude can delegate to for a certain kind of task.
 
-- **Global agents** live at `~/.claude/agents/` — available in every project
-- **Local agents** live at `.claude/agents/` inside a specific project — only available in that project
+Use a subagent when you want:
 
-Local agents are project-specific. They know your tech stack, folder structure, and coding conventions. Global agents are general-purpose — they work anywhere.
+- a focused role
+- a reusable system prompt
+- narrower tool access
+- cleaner main-session context
 
----
+Examples:
 
-## How to Invoke an Agent
+- code reviewer
+- test runner
+- migration reviewer
+- frontend builder
+- release manager
 
-Once an agent exists, you invoke it by typing `@` followed by the agent name:
-
-```
-@my-agent-name do this task for me
-```
-
-Claude recognizes the `@` mention, loads the agent's instructions, and runs it.
-
----
-
-## Prerequisites
-
-To create agents easily, install the **plugin-dev** plugin which includes the agent-development skill. Inside a Claude CLI session:
-
-```
-/plugin
-```
-
-Browse the marketplace and install **plugin-dev**. This gives you the `/agent-development` skill that guides you through creating agents.
+A subagent is **not** the right tool for every repeated prompt. If the problem is a reusable workflow or command, a skill is often better.
 
 ---
 
-## Creating an Agent
+## When To Use A Subagent vs A Skill vs A Hook
 
-### Step 1: Decide What the Agent Should Do
+| Use this | When you need |
+|---|---|
+| Subagent | a specialist role with its own prompt, context, and optional tool limits |
+| Skill | a repeatable workflow, custom command, or knowledge playbook |
+| Hook | deterministic automation that must run every time |
 
-Before you type anything, be clear about:
-- What specific task does this agent handle?
-- What files or areas of the codebase does it work on?
-- What tools does it need? (reading files, writing code, running commands, searching the web)
-- Should it ask you questions or work fully autonomously?
-- What does the output look like when it's done?
+Rule of thumb:
 
-### Step 2: Use /agent-development
-
-Inside your Claude CLI session, type:
-
-```
-/agent-development
-```
-
-Then describe what you want the agent to do in detail. The more specific you are, the better the agent will be.
-
-**Example — creating a frontend agent:**
-```
-/agent-development
-
-Create an agent called frontend-builder. It should build React components for this
-project. It knows we use React with TypeScript, Tailwind CSS for styling, and Zustand
-for state management. Components go in src/components/ organized by feature. It
-should follow our existing patterns — functional components, custom hooks for logic,
-and barrel exports from each feature folder. It should write tests for each component
-using Vitest and React Testing Library.
-```
-
-**Example — creating a database agent:**
-```
-/agent-development
-
-Create an agent called db-architect. It should handle all database work for this
-project. We use PostgreSQL with Prisma as the ORM. It should create and update the
-Prisma schema, generate migrations, seed data, and write efficient queries. It knows
-our naming conventions — snake_case for table names, camelCase for Prisma models.
-It should always add proper indexes and handle relationships correctly.
-```
-
-**Example — creating a testing agent:**
-```
-/agent-development
-
-Create an agent called test-writer. It should write tests for this project. We use
-Jest for unit tests and Supertest for API integration tests. It should read the
-existing code, understand what each function and endpoint does, and write thorough
-tests covering happy paths, edge cases, and error scenarios. Tests go in __tests__/
-folders next to the code they test.
-```
-
-**Example — creating a documentation agent:**
-```
-/agent-development
-
-Create an agent called api-documenter. It should read our Express API routes and
-generate OpenAPI/Swagger documentation. It should trace each route, extract the
-request body schema, response format, status codes, and middleware chain, then
-produce a complete OpenAPI spec file at docs/api-spec.yaml.
-```
-
-### Step 3: Review and Refine
-
-The skill will generate an agent definition file — a markdown file with YAML frontmatter and a system prompt. Review it:
-
-- Does the name make sense?
-- Is the description accurate? (The description tells Claude when to suggest using this agent)
-- Does the system prompt cover everything you want?
-- Are the right tools listed?
-- Is the model appropriate? (Sonnet for most tasks, Opus for complex reasoning)
-
-If something's off, tell Claude what to adjust. Iterate until you're happy.
-
-### Step 4: Use It
-
-Once the agent file is created in `.claude/agents/`, you can immediately use it:
-
-```
-@frontend-builder create a dashboard page with a sidebar, header, and main content area
-```
-
-```
-@db-architect add a notifications table with user_id, type, message, read status, and timestamps
-```
-
-```
-@test-writer write tests for the authentication module in src/auth/
-```
+- **role** -> subagent
+- **workflow** -> skill
+- **guarantee** -> hook
 
 ---
 
-## Agent File Structure
+## Recommended Path: Use `/agents`
 
-For reference, here's what an agent definition file looks like:
+Anthropic's current subagent docs recommend `/agents` as the main management interface.
+
+Inside Claude Code:
+
+```text
+/agents
+```
+
+From there you can:
+
+- create a new subagent
+- choose user scope or project scope
+- edit the system prompt
+- configure tool access
+- delete or update existing subagents
+
+This is better than manually hand-editing files for most people because the interface makes tool configuration and scope more obvious.
+
+---
+
+## Choose The Right Scope
+
+| Scope | Location | Use it for |
+|---|---|---|
+| Project | `.claude/agents/` | team-shared specialists for one repo |
+| User | `~/.claude/agents/` | personal specialists you want everywhere |
+
+Project subagents take precedence when names conflict.
+
+If a subagent encodes project architecture or conventions, it should usually be project-scoped and committed to git.
+
+---
+
+## Step-By-Step: Create A Good Subagent
+
+### Step 1: Define One Clear Responsibility
+
+Bad:
+
+- "does frontend, backend, testing, and deployment"
+
+Good:
+
+- "reviews changed code for correctness and maintainability"
+- "runs tests after meaningful code changes"
+- "implements React UI that matches our design system"
+
+Focused subagents are easier to trust and easier for Claude to delegate correctly.
+
+### Step 2: Write A Strong Description
+
+The description tells Claude when the subagent should be used.
+
+Good description qualities:
+
+- names the job clearly
+- says when to use it
+- says what it optimizes for
+- can include phrases like "use proactively" if you want automatic delegation to happen more often
+
+Example:
+
+```yaml
+description: Reviews recent code changes for correctness, security, and maintainability. Use proactively after any meaningful code change.
+```
+
+### Step 3: Limit Tools To What It Needs
+
+If the subagent only reviews code, it might only need:
+
+- `Read`
+- `Grep`
+- `Glob`
+- `Bash`
+
+If it edits files, then add edit tools deliberately.
+
+Smaller tool sets improve safety and reduce unnecessary behavior.
+
+### Step 4: Put Project Context In The Prompt
+
+A good subagent prompt includes:
+
+- what the role is
+- where to look first
+- what standards matter most
+- how to report results
+- what not to do
+
+Example guidance:
+
+- read `CLAUDE.md` first
+- focus on changed files before broad exploration
+- preserve existing architecture patterns
+- do not change deployment files without explicit confirmation
+
+### Step 5: Test Both Invocation Paths
+
+A subagent should work:
+
+- when Claude chooses it automatically
+- when you invoke it explicitly
+
+Example explicit invocation:
+
+```text
+Use the code-reviewer subagent to inspect my recent auth changes.
+```
+
+If automatic delegation never happens, the description is usually too vague.
+
+---
+
+## Example Subagent File
+
+You can manage subagents through `/agents`, but it helps to understand the file format.
 
 ```markdown
 ---
-name: frontend-builder
-description: "Builds React components for this project using TypeScript, Tailwind CSS, and Zustand. Use when you need to create or modify frontend components."
-model: sonnet
-tools: Read, Write, Edit, Glob, Grep, Bash
+name: code-reviewer
+description: Reviews changed code for correctness, security, and maintainability. Use proactively after meaningful code changes.
+tools: Read, Grep, Glob, Bash
 ---
 
-# Frontend Builder Agent
+You are a senior code review specialist for this project.
 
-You are a frontend development agent for [project name].
+Always:
+1. Read `CLAUDE.md` first if present
+2. Check the changed files before broadening scope
+3. Look for correctness, security, edge cases, and missing tests
+4. Report findings in priority order with file references
 
-## Tech Stack
-- React with TypeScript
-- Tailwind CSS for styling
-- Zustand for state management
-- Vitest + React Testing Library for tests
-
-## Conventions
-- Components in src/components/ organized by feature
-- Functional components only
-- Custom hooks for business logic
-- Barrel exports from each feature folder
-
-## Your Job
-When asked to build a component or page:
-1. Read existing components to understand patterns
-2. Create the component following project conventions
-3. Write tests for the component
-4. Export it from the feature's index file
+Do not make code changes unless explicitly asked.
 ```
 
-You don't have to write this manually — `/agent-development` generates it for you. But understanding the structure helps you refine it.
+---
+
+## Best Practices That Actually Matter
+
+- Start with one specialist, not ten
+- Use project subagents for project-specific conventions
+- Keep responsibilities narrow
+- Keep descriptions action-oriented and specific
+- Limit tool access where practical
+- Check subagents into version control if the team should share them
+- Revisit prompts after real use, not just after initial creation
 
 ---
 
-## Tips
+## Common Mistakes
 
-- **Be specific about conventions** — the more your agent knows about your project's patterns, the less you have to correct later
-- **Start with one agent, then add more** — don't try to create 10 agents at once. Create one, use it, see what's missing, then create the next
-- **Local agents > global agents for project work** — local agents know your specific codebase. Use global agents only for things that truly work across all projects (like the global doc master)
-- **Run agents in parallel for speed** — when building a feature that touches frontend, backend, and database, run all three agents at the same time
-- **Agents can reference docs** — if you have planning docs or flow docs, mention them in the agent's system prompt so it reads them before working
+### Making a "god agent"
+
+One giant agent that supposedly does everything is harder to trigger correctly and harder to trust.
+
+### Writing a vague description
+
+If the description is generic, Claude will not know when to delegate.
+
+### Forgetting `CLAUDE.md`
+
+Subagents work much better when the project memory is already strong.
+
+### Giving unnecessary tools
+
+Don't hand edit or shell access to an agent that only needs to review.
+
+---
+
+## Good Starter Subagents For Most Teams
+
+If you are not sure where to start, these usually pay off first:
+
+1. `code-reviewer`
+2. `test-runner`
+3. `frontend-builder` or `api-builder`
+4. `debugger`
+
+Create them only after you see the repeated need in real sessions.
+
+---
+
+## Next Guide
+
+Once you have a few roles in place, create skills for the workflows that repeat inside those roles:
+
+- [HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)

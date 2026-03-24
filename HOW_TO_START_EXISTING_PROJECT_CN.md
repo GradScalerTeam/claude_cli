@@ -1,193 +1,274 @@
-# 如何在现有项目中使用 Claude CLI
+# 如何在现有项目里使用 Claude Code
 
-一步步指南：将 Claude CLI 引入你已经在做的项目 —— 让 Claude 理解你的代码库并有效地处理它。
+这是一套把 Claude Code 稳定接入真实代码库的工作流，目标不是“让 Claude 自己去看仓库”，而是避免它每天都重新摸索同样的上下文、踩同样的坑。
 
 ---
 
-## 步骤 1：在项目中打开 Claude
+## 核心思路
 
-导航到你现有的项目目录并启动 Claude：
+现有项目已经有历史包袱、约定、潜在 bug、没写清楚的流程，以及运维层面的雷区。
+
+所以真正要做的不是“让 Claude 把仓库读一遍”，而是：
+
+1. 固化项目的长期上下文
+2. 把关键流程画清楚
+3. 审查风险区和技术债
+4. 只在真正有收益的地方创建本地工具
+5. 让文档和记忆持续跟着代码更新
+
+---
+
+## 步骤 1：从真实项目根目录启动 Claude
 
 ```bash
 cd my-existing-project
 claude
 ```
 
-Claude 现在在你的项目内运行。它可以读取每个文件、理解你的文件夹结构、查看你的 git 历史。但它还没有对事物如何工作的结构化理解 —— 这正是接下来的步骤要解决的。
+如果是 monorepo，除非你明确只想做某个包的会话，否则优先从根目录启动。
 
 ---
 
-## 步骤 2：创建功能流程文档
+## 步骤 2：尽早建立项目记忆
 
-对现有项目要做的第一件事是 **记录它如何工作**。使用 global doc master 为你代码库中的每个主要功能创建功能流程文档。这些文档追踪每个功能如何端到端地通过你的实际代码工作 —— 从用户操作到数据库并返回。
+先执行：
 
-这是最重要的一步。流程文档给 Claude（以及任何未来的代理）一个你代码库的结构化地图。没有它们，Claude 每次你要求它做某事时都必须重新读取和重新追踪代码。有了它们，它已经知道一切如何连接。
-
-**从你的核心功能开始：**
-
-```
-@global-doc-master 记录认证流程 —— 从登录到令牌刷新
-到登出，包括中间件和令牌存储
+```text
+/init
 ```
 
-```
-@global-doc-master 记录用户注册流程 —— 从注册表单到邮箱
-验证到首次登录
-```
+然后把 `CLAUDE.md` 真正写成一份能给人看、也能给 Claude 用的项目说明。
 
-```
-@global-doc-master 记录数据库模式 —— 所有模型、关系、索引
-和迁移历史
-```
+建议补上：
 
-```
-@global-doc-master 记录 API 结构 —— 所有端点、中间件链、
-请求验证和响应格式
-```
+- build、test、lint、format 命令
+- 服务边界与模块划分
+- 包结构 / 应用结构
+- 环境与密钥注意事项
+- 高风险目录
+- 关键外部依赖
+- 发布流程说明
 
-```
-@global-doc-master 记录前端路由和状态管理 —— 页面如何
-组织、状态如何流动、组件如何通信
-```
-
-代理读取你的实际代码、追踪每一层，并在 `docs/feature_flow/` 下生成带有真实 `file:line` 引用的流程文档。为每个主要功能这样做 —— 你记录的越多，Claude 就越了解你的项目。
+如果你已经有高质量文档，优先在 `CLAUDE.md` 里导入它们，而不是整段重复抄写。
 
 ---
 
-## 步骤 3：审查代码并记录问题
+## 步骤 3：先让 Claude 做只读地图，不要急着改代码
 
-现在代码库已记录，审查实际代码以发现现有问题。在你的项目上运行代码审查技能：
+在让 Claude 动手之前，先让它解释项目。
 
+适合开局的提示词：
+
+```text
+先给我一个这个仓库的高层架构概览。
 ```
+
+```text
+哪些目录风险最高，不应该轻易修改？
+```
+
+```text
+这里真实可用的 build、test、lint、dev 命令分别是什么？
+```
+
+如果仓库大、历史复杂，建议直接进 Plan Mode：
+
+```text
+/plan
+```
+
+这能让 Claude 在不改文件的前提下，先把上下文摸清楚。
+
+---
+
+## 步骤 4：为关键流程创建 feature flow 文档
+
+接下来，用本仓库里的文档代理把系统真正重要的流程记录下来。
+
+例如：
+
+```text
+@global-doc-master 记录认证流程，从登录到 token refresh。
+```
+
+```text
+@global-doc-master 记录 checkout 流程，从购物车到支付确认。
+```
+
+```text
+@global-doc-master 记录发票生成的后台任务流水线。
+```
+
+优先记录那些：
+
+- 对线上稳定性影响大
+- 变更频率高
+- 新人最难快速看懂
+
+好的 flow doc，能让 Claude 不需要每次都从头追整条代码路径。
+
+---
+
+## 步骤 5：审查代码库里的风险与技术债
+
+关键流程文档有了之后，再审查真实代码：
+
+```text
 /global-review-code
 ```
 
-或审查特定区域：
+也可以针对热点区域：
 
-```
+```text
+/global-review-code apps/web/
+/global-review-code packages/api/
 /global-review-code src/auth/
-/global-review-code src/api/
-/global-review-code src/components/
 ```
 
-Claude 将运行 12 阶段审计 —— 架构、安全、性能、错误处理、依赖、测试和框架最佳实践。它生成报告，发现按严重性分组。
+如果某个问题值得长期追踪，就不要让它只留在聊天记录里，直接生成结构化 issue doc：
 
-**对于每个重要发现**，使用 doc master 创建问题文档：
-
-```
-@global-doc-master 有一个安全问题 —— 搜索端点的用户输入
-没有清理，登录路由没有速率限制
+```text
+@global-doc-master 认证流程里有安全问题，请创建 issue doc。
 ```
 
-```
-@global-doc-master 有一个性能问题 —— 仪表板页面进行 12 个单独的
-API 调用，可以批量处理，产品列表有 N+1 查询问题
-```
-
-这在 `docs/issues/` 下创建结构化问题文档。你现在有一个清晰的待办事项列表，包含根因分析和推荐修复 —— 全部已记录。
-
-当你修复每个问题时，告诉 doc master 将其移至已解决：
-
-```
-@global-doc-master 搜索清理问题已解决 —— 添加了使用 Zod 的输入验证
-和使用 express-rate-limit 的速率限制
+```text
+@global-doc-master dashboard 查询链路有性能问题，请创建 issue doc。
 ```
 
-这在 `docs/resolved/` 下构建可搜索的历史。
+这样你得到的是一个可搜索、可追踪的问题库，而不是一次性的对话输出。
 
 ---
 
-## 步骤 4：为你的项目创建本地工具
+## 步骤 6：根据真实情况再逐步放开权限
 
-现在 Claude 通过流程文档和代码审查理解了你的代码库，创建针对你特定项目定制的工具本地版本。
+第一天不要急着把权限开太大。
 
-### 本地 Doc Master 代理
+更稳的做法是：
 
-使用 agent-development 插件生成本地 doc master：
+1. 先观察哪些授权请求反复出现
+2. 用 `/permissions` 放开那些安全且高频的操作
+3. 对生产敏感命令继续保留确认
+4. 随着熟悉度提升再逐步调整
 
-```
-/agent-development
-
-Create a local doc master agent for this project. It should work like the global
-doc-master agent but be aware of this project's tech stack, folder structure,
-database schema, API patterns, and coding conventions. Refer to the feature flow
-docs in docs/feature_flow/ and the existing code to understand the project.
-```
-
-这会在 `.claude/agents/` 中创建一个项目专用代理，它知道你的路由、模型、服务和约定 —— 所以它从现在开始编写的每个文档都准确地引用你的实际代码。
-
-### 本地审查技能
-
-使用 skill-development 插件创建两个审查技能的本地版本：
-
-```
-/skill-development
-
-Create a local review-doc skill for this project. It should work like the global
-global-review-doc skill but be adapted to this project's tech stack, architecture,
-and conventions. Refer to the existing code and flow docs to understand what patterns
-and security domains are relevant.
-```
-
-```
-/skill-development
-
-Create a local review-code skill for this project. It should work like the global
-global-review-code skill but be tailored to this project's framework, folder structure,
-and coding patterns. It should know the project's architecture and check against
-the actual conventions used here.
-```
-
-从现在开始，使用 **本地** 工具而不是全局工具。它们产生更快、更准确的结果，因为它们已经知道你的项目。
+Claude 在授权噪音降低后会更顺手，但前提是你已经知道项目的风险边界在哪里。
 
 ---
 
-## 推荐：创建开发代理
+## 步骤 7：只有在模式稳定后，才创建本地子代理
 
-现在 Claude 完全理解了你的代码库，创建帮助你开发新功能的专用代理。使用 agent-development 插件基于你的实际代码结构生成代理：
+如果项目反复需要同样的“专家角色”，再用 `/agents` 创建项目级子代理。
 
-```
-/agent-development
+常见候选：
 
-Look at this project's codebase and create development agents that will help build
-new features. Create agents based on what the project actually needs — for example
-a frontend agent, a backend agent, a database agent, a testing agent, etc. Each
-agent should understand the project's patterns and conventions.
-```
+- frontend-agent
+- backend-agent
+- db-agent
+- test-agent
+- release-agent
 
-插件扫描你的代码并生成适合你项目的代理。例如：
+这些应该放在 `.claude/agents/` 里，让整个团队都能共享。
 
-- **前端代理** —— 知道你的组件结构、状态管理、样式模式和路由
-- **后端代理** —— 知道你的 API 模式、中间件链、服务层和数据库查询
-- **数据库代理** —— 知道你的模式、迁移、ORM 模式和查询优化
-- **测试代理** —— 知道你的测试框架、夹具、模拟模式和覆盖率缺口
-
-这些代理存在于 `.claude/agents/` 中，随时可以在你需要构建新东西时使用。当你开始一个新功能时，不用从头解释你项目的约定，你只需告诉相关代理要构建什么，它已经知道怎么做。
+不要一开始就造十个代理。先从一两个真正能节省重复沟通的角色开始。
 
 ---
 
-## 持续工作流
+## 步骤 8：把重复流程沉淀成本地技能
 
-一旦你的现有项目设置了 Claude CLI，日常工作流与新项目相同：
+如果你发现某种流程不断重复，就该把它做成技能。
 
-1. **新功能？** → 使用本地 doc master 创建规划文档、运行 `@global-doc-fixer` 审查并修复直到 READY，然后构建
-2. **发现 bug？** → 使用本地 doc master 创建问题文档、修复它、移至已解决
-3. **代码更改？** → 使用本地 review-code 技能在合并前审计
-4. **功能发布？** → 使用本地 doc master 创建或更新流程文档
+典型例子：
 
-区别在于一切都更快，因为你的本地工具已经知道项目。
+- `/review-api`
+- `/release-checklist`
+- `/migrate-config`
+- `/triage-bug`
+
+项目级技能放在 `.claude/skills/`，并让它们紧贴项目里的真实约定。
+
+和一次性 prompt 相比，技能让团队拥有可复用、可审查、可演进的流程定义。
+
+---
+
+## 步骤 9：大量使用 `@file` 与记忆，保持上下文收敛
+
+在现有项目里，上下文膨胀是隐形杀手。
+
+尽量写这种提示词：
+
+```text
+更新 @src/auth/login.ts 里的校验逻辑，并确认它仍然符合
+@docs/feature_flow/authentication.md 的约束。
+```
+
+而不是：
+
+```text
+把认证相关的东西修一下。
+```
+
+`@file` 引用、`CLAUDE.md` 和记录下来的 flow docs 一起使用，才能让 Claude 始终站在正确的上下文里工作。
+
+---
+
+## 步骤 10：高风险并行工作优先用 Git worktree
+
+Anthropic 的工作流文档很明确推荐在并行 Claude 会话中使用 Git worktree。
+
+在现有项目里，这更重要，因为你经常需要：
+
+- 一边修线上 bug，一边推进功能开发
+- 比较两条不同的解决方案
+- 隔离一个风险较高的迁移任务
+
+示例：
+
+```bash
+git worktree add ../project-hotfix -b hotfix/auth-timeout
+git worktree add ../project-refactor -b refactor/session-model
+```
+
+分别在不同 worktree 里启动 Claude，而不是把所有事情混进同一个分支和同一个会话。
+
+---
+
+## 步骤 11：让文档和记忆持续活着
+
+现有项目最怕的不是没文档，而是文档失效。
+
+继续用 doc master 维护：
+
+- feature flow docs
+- issue docs
+- resolved docs
+- deployment docs
+- debug docs
+
+示例：
+
+```text
+@global-doc-master 更新支付流程文档，补上新的重试逻辑。
+```
+
+```text
+@global-doc-master webhook 重复消费问题已修复，请移到 resolved。
+```
+
+这一步决定了 Claude 是“这次会话很好用”，还是“这个项目长期都很好用”。
 
 ---
 
 ## 总结
 
-```
-1. 在项目中打开 Claude                  →  cd my-project && claude
-2. 创建功能流程文档                     →  @global-doc-master document [每个功能]
-3. 审查代码                             →  /global-review-code
-4. 记录发现的问题                       →  @global-doc-master [描述每个问题]
-5. 创建本地 doc master 代理             →  /agent-development
-6. 创建本地审查技能                     →  /skill-development (review-doc + review-code)
-7. 创建开发代理                         →  /agent-development (frontend, backend, 等)
-8. 对所有未来工作使用本地工具
+```text
+1. 在仓库里启动 Claude             -> claude
+2. 建立长期项目记忆                 -> /init + CLAUDE.md
+3. 先安全摸清代码库                 -> 概览提示词 + /plan
+4. 记录关键流程                     -> @global-doc-master
+5. 审查风险区域                     -> /global-review-code
+6. 把重要问题做成 issue docs        -> issue docs
+7. 用子代理承载专项角色             -> /agents
+8. 用技能承载重复流程               -> .claude/skills
+9. 用文档和 @file 把上下文钉牢       -> @file + docs + memory
+10. 用 worktree 安全并行             -> git worktree
+11. 持续更新文档                    -> flow docs + resolved docs
 ```

@@ -1,157 +1,115 @@
-# Design Context — SessionStart Hook for Pencil
+# Design Context
 
-A **SessionStart hook** that automatically bridges your project's codebase knowledge into [Pencil](https://www.pencil.dev/) design sessions. When you open a `.pen` file in Pencil, Claude Code starts with full awareness of your project — routes, components, docs, API shapes — without you reading anything manually.
+A Claude Code `SessionStart` hook for Pencil that gives design sessions awareness of the parent application's routes, docs, components, and architectural context.
 
 ---
 
-## Why Use It
+## What It Is
 
-Pencil is a Mac-native design app that runs Claude Code via MCP (Model Context Protocol). You design on a visual canvas using `.pen` files, and Claude generates UI components, layouts, and screens using Pencil's design tools.
+When Claude Code runs inside a Pencil `.pen` workspace, the working directory is usually `design/`, not the project root.
 
-The problem: Pencil's `.pen` files typically live in a `design/` subfolder of your project. When Claude Code starts inside Pencil, the working directory is `design/` — not the project root. That means:
+That causes a context gap:
 
-- `CLAUDE.md` doesn't auto-load (it's in the parent directory)
-- The doc-scanner hook finds nothing (no `.md` files in `design/`)
-- Claude has zero knowledge of your routes, components, data models, or planning docs
-- Every design session starts with 5-10 manual `Read` calls to understand the project
+- the parent `CLAUDE.md` may not auto-load
+- planning docs may not be visible
+- component and route context may be missing
+- Claude may waste the first part of the session rediscovering the app
 
-**This hook fixes that.** It detects the `design/` directory, crawls the parent project, and generates a `design/CLAUDE.md` with everything Claude needs — project overview, user flows, routes, file indexes, and auto-research rules. Claude starts every Pencil session fully context-aware.
+`design-context-hook.sh` bridges that gap by generating a `design/CLAUDE.md` from the parent project context.
+
+---
+
+## Who This Is For
+
+Use this hook if:
+
+- you use [Pencil](https://www.pencil.dev/)
+- your `.pen` files live in a `design/` folder inside an app repo
+- you want Claude to design with knowledge of the actual product instead of designing in isolation
+
+If you do not use Pencil, you can safely skip this hook.
 
 ---
 
 ## What It Does
 
-When Claude Code starts inside a `design/` directory, the hook:
+When Claude Code starts inside a qualifying `design/` directory, the hook:
 
-1. **Detects** that the working directory is a `design/` subfolder of a project
-2. **Verifies** the parent directory is a real project (has `CLAUDE.md` or `.git`)
-3. **Extracts** key sections from the parent project's `CLAUDE.md` — overview, user flow, routes, roles, conventions
-4. **Indexes** file paths from `docs/`, `frontend/src/Pages/`, `frontend/src/Components/`, and `backend/api/`
-5. **Generates** `design/CLAUDE.md` with all collected context + auto-research rules
-6. **Outputs** a summary showing what was injected
+1. detects the parent project
+2. verifies the parent looks like a real repo
+3. reads key context from the parent `CLAUDE.md`
+4. indexes important docs and source locations
+5. writes a generated `design/CLAUDE.md`
+6. prints a short summary of what context was injected
 
-If the working directory is NOT a `design/` folder, the hook silently exits — safe to run globally.
-
----
-
-## What It Looks Like
-
-When you open a `.pen` file in Pencil, Claude sees:
-
-```
-Design Context Hook
-===================
-Project: my-app
-Parent: /Users/you/projects/my-app
-
-Injected into design/CLAUDE.md:
-  - Project overview, user flow, routes, roles from CLAUDE.md
-  - 6 planning doc(s) indexed
-  - 30 frontend page(s) listed
-  - 8 frontend component(s) listed
-  - 6 backend API route file(s) listed
-
-  Auto-research rules active: Claude will read relevant
-  docs and code automatically before designing screens.
-```
-
-And the generated `design/CLAUDE.md` becomes part of Claude's system prompt — always available, never compacted.
+If the session is not inside a Pencil design workspace, the hook exits quietly.
 
 ---
 
-## The Context Window Trade-Off
+## Why It Matters
 
-This is the key design decision behind the hook. `CLAUDE.md` content loads into the **system prompt**, which has different properties than conversation context:
+Without this hook, a design session often starts with avoidable exploratory reads just to answer:
 
-| Memory Space | Behavior | Used By |
+- what routes exist?
+- what screens already exist?
+- which docs describe this flow?
+- what backend APIs or data shapes matter?
+
+With the hook, Claude begins the session with a compact but durable context layer and can spend more of the session actually designing.
+
+---
+
+## Safety Boundary
+
+This hook is most useful when it preserves a clear boundary:
+
+- read parent-project context for research
+- write only inside the `design/` workspace
+- do not silently edit the application code outside `design/`
+
+That boundary keeps Pencil sessions useful without turning them into uncontrolled app-wide coding sessions.
+
+---
+
+## Recommended Project Layout
+
+```text
+my-project/
+├── CLAUDE.md
+├── docs/
+├── frontend/
+├── backend/
+└── design/
+    └── screens.pen
+```
+
+The hook assumes a design workspace nested inside a real project.
+
+---
+
+## Recommended Scope
+
+| Scope | File | When to use it |
 |---|---|---|
-| System Prompt | Fixed size, never compacted, always present | `CLAUDE.md` files |
-| Conversation Context | Grows with each message, periodically compacted | Tool results, messages |
+| User | `~/.claude/settings.json` | you use Pencil across many projects |
+| Project | `.claude/settings.json` | your team shares a Pencil-based design workflow in one repo |
 
-The generated `design/CLAUDE.md` costs ~1,600 tokens in the system prompt. Without the hook, Claude does 5-10 `Read` calls at the start of each session, dumping ~15,000+ tokens into conversation context that eventually gets compacted.
-
-**With the hook**: ~1,600 tokens (fixed, permanent) replaces ~15,000+ tokens (temporary, compactable). Claude also only reads specific files on-demand when a task requires deep detail — targeted 2-3K reads instead of exploratory 15K dumps.
+If Pencil is central to the repo's workflow, a project-level hook can make sense. If it is a personal tool, user-level is usually cleaner.
 
 ---
 
-## Before vs After
-
-### Without Hook
-
-```
-User: "Design the product comparison view"
-
-Claude: Let me check what routes exist...
-        *reads ../CLAUDE.md*                         → 3,000 tokens
-        Let me find the comparison component...
-        *reads ../frontend/src/Pages/Comparison/*    → 4,000 tokens
-        What data does it show?
-        *reads ../backend/api/products.py*           → 2,000 tokens
-        What's the Redux state?
-        *reads ../frontend/src/store/slices/*        → 3,000 tokens
-
-        Total research cost: ~12,000 tokens in conversation context
-        Time before designing: several minutes
-```
-
-### With Hook
-
-```
-User: "Design the product comparison view"
-
-Claude: *already knows from system prompt:
-         - route is /products/comparison/:id
-         - uses ProductComparisonView.jsx
-         - has 3 categories: specs/pricing/reviews
-         - planning docs available at ../docs/planning/*
-
-        *auto-research rule triggers:
-         reads ComparisonView.jsx for data flow*     → 2,000 tokens
-
-        *starts designing immediately with accurate data*
-
-        Total research cost: ~2,000 tokens (targeted read)
-        Time before designing: seconds
-```
-
----
-
-## How the Auto-Research Rules Work
-
-The most powerful feature is the auto-research rules baked into the generated `CLAUDE.md`. These are behavioral instructions that Claude follows automatically:
-
-When you say "design the onboarding page," Claude doesn't wait for you to say "read the onboarding code first." The rules instruct Claude to:
-
-1. Match "onboarding" to the screen-to-research mapping
-2. Automatically read `../frontend/src/Pages/Onboarding/OnboardingPage.jsx`
-3. Automatically check if `../docs/planning/` has a relevant planning doc
-4. Use the actual field names, state shapes, and validation rules from the code
-5. Then design with full knowledge
-
-This creates a **research-first design workflow** that's automatic, not manual.
-
-The rules also enforce **read-only access** — Claude can read any parent project file for research, but is forbidden from writing, editing, or running git operations outside `design/`. If a design task reveals code changes are needed, Claude tells you instead of making them.
-
----
-
-## Setup
-
-### Prerequisites
-
-- macOS with [Pencil](https://www.pencil.dev/) installed
-- Claude Code configured (`~/.claude/` directory exists)
-- A project with a `design/` subfolder containing `.pen` files
+## Install It Manually
 
 ### Step 1: Copy the script
 
 ```bash
-cp design-context-hook.sh ~/.claude/design-context-hook.sh
+cp hooks/design-context/design-context-hook.sh ~/.claude/design-context-hook.sh
 chmod +x ~/.claude/design-context-hook.sh
 ```
 
 ### Step 2: Register the hook
 
-Open `~/.claude/settings.json` (create it if it doesn't exist) and add the `SessionStart` hook:
+Add this to your Claude Code settings:
 
 ```json
 {
@@ -171,137 +129,80 @@ Open `~/.claude/settings.json` (create it if it doesn't exist) and add the `Sess
 }
 ```
 
-If you already have a `hooks` section in your settings, just add a new entry to the `SessionStart` array alongside your existing hooks. Don't replace them.
+Merge it into any existing hooks configuration.
 
-### Step 3: Set up your project
+### Step 3: Open a Pencil design session
 
-Make sure your project has a `design/` subfolder:
-
-```
-my-project/
-├── CLAUDE.md           ← project context lives here
-├── docs/               ← planning docs, feature specs
-├── frontend/src/       ← React/Next.js pages and components
-├── backend/            ← API routes
-└── design/             ← your .pen files go here
-    └── screens.pen
-```
-
-### Step 4: (Optional) Add to .gitignore
-
-Since `design/CLAUDE.md` is auto-generated every session, you may want to gitignore it:
-
-```
-design/CLAUDE.md
-```
-
-Or commit it so team members without the hook can still benefit from the context.
-
-### Step 5: Test
-
-Open any `.pen` file in Pencil. You should see the "Design Context Hook" summary in the session output, and `design/CLAUDE.md` should appear in your `design/` folder.
+On the next qualifying session, the hook should generate `design/CLAUDE.md` automatically.
 
 ---
 
-## Install via Claude CLI
+## Install It Via Claude Code
 
-Paste this into your Claude CLI to install automatically:
+Paste this into Claude Code:
 
-```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the design context hook:
+```text
+Visit the GitHub repo https://github.com/srxly888-creator/claude_cli and install the
+Design Context hook.
 
-1. Read hooks/design-context/design-context-hook.sh — save it to ~/.claude/design-context-hook.sh with the exact same content. Make it executable (chmod +x).
-
-2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add a SessionStart hook that runs "bash ~/.claude/design-context-hook.sh". Merge it with any existing hooks — don't overwrite them.
-
-After installing, tell me it's done and explain what the hook does.
+1. Read `hooks/design-context/design-context-hook.sh`.
+2. Save it as `~/.claude/design-context-hook.sh`.
+3. Make it executable.
+4. Merge a `SessionStart` hook into my Claude Code settings that runs
+   `bash ~/.claude/design-context-hook.sh`.
+5. After installing, explain what parent-project context the hook injects and what
+   write boundary it should respect.
 ```
 
 ---
 
-## Customization
+## What To Customize
 
-### Adapting to Your Project Structure
+You may want to adapt:
 
-The hook looks for these directories by default:
+| Area | Why customize it |
+|---|---|
+| parent source directories | your frontend/backend folders use different names |
+| extracted `CLAUDE.md` sections | your headings differ from the script's assumptions |
+| indexed source file types | you use different extensions or extra directories |
+| gitignore behavior | you want `design/CLAUDE.md` committed or ignored |
 
-| Variable | Default Path | What It Indexes |
-|---|---|---|
-| `DOCS_DIR` | `$PROJECT_ROOT/docs` | Planning docs, feature specs (`.md` files) |
-| `FRONTEND_DIR` | `$PROJECT_ROOT/frontend/src` | Pages and components (`.jsx`/`.tsx` files) |
-| `BACKEND_DIR` | `$PROJECT_ROOT/backend` | API routes (`.py`/`.js`/`.ts` files) |
-| `CLAUDE_MD` | `$PROJECT_ROOT/CLAUDE.md` | Project overview, flows, routes, roles |
-
-If your project uses different paths (e.g., `src/` instead of `frontend/src/`, or `server/` instead of `backend/`), edit the variables at the top of the script.
-
-### Extracting Different CLAUDE.md Sections
-
-The hook uses `awk` to extract sections by heading name. If your `CLAUDE.md` uses different heading names (e.g., `## Routes` instead of `## Frontend Routes`), update the `awk` patterns in the script to match.
-
-### Adding More Source Directories
-
-To index additional directories (e.g., `shared/`, `lib/`, `mobile/`), add a new block following the same pattern as the existing frontend/backend blocks:
-
-```bash
-if [ -d "$PROJECT_ROOT/mobile/src" ]; then
-  MOBILE_FILES=$(find "$PROJECT_ROOT/mobile/src" \( -name "*.jsx" -o -name "*.tsx" \) -print 2>/dev/null | sort)
-  if [ -n "$MOBILE_FILES" ]; then
-    echo "## Mobile Screens" >> "$DESIGN_CLAUDE_MD"
-    echo "" >> "$DESIGN_CLAUDE_MD"
-    echo "$MOBILE_FILES" | while read -r file; do
-      REL_PATH="${file#$PROJECT_ROOT/}"
-      echo "- \`../$REL_PATH\`" >> "$DESIGN_CLAUDE_MD"
-    done
-    echo "" >> "$DESIGN_CLAUDE_MD"
-  fi
-fi
-```
+If your repo structure differs from the default assumptions, edit the variables near the top of the script before rolling it out widely.
 
 ---
 
 ## Pair It With Doc Scanner
 
-This hook works alongside the [Doc Scanner hook](../doc-scanner/). When both are registered:
+These two hooks do different jobs:
 
-1. **Doc Scanner** indexes `.md` files in the current directory (useful when `design/` has its own docs)
-2. **Design Context Hook** bridges the parent project's full context into `design/CLAUDE.md`
+- `doc-scanner` helps ordinary coding sessions discover docs
+- `design-context` helps Pencil sessions inherit app context from the parent project
 
-They complement each other — doc scanner handles local awareness, design context handles cross-project awareness.
+If you use both, Claude is much less likely to design screens that ignore existing implementation reality.
+
+See [hooks/doc-scanner/README.md](/Volumes/PS1008/Github/claude_cli/hooks/doc-scanner/README.md).
 
 ---
 
-## How It Fits the Workflow
+## Check For Updates
 
+Paste this into Claude Code:
+
+```text
+Visit the GitHub repo https://github.com/srxly888-creator/claude_cli and compare the
+latest `hooks/design-context/design-context-hook.sh` with my local
+`~/.claude/design-context-hook.sh`.
+
+If they differ:
+1. show me the meaningful changes,
+2. update my local script,
+3. explain whether the injected context, project detection, or safety boundary changed.
 ```
-Open .pen file in Pencil
-    │
-    ▼
-Claude Code starts (pwd = design/)
-    │
-    ▼
-SessionStart event fires
-    │
-    ├──→ doc-scanner.sh (indexes local .md files)
-    │
-    └──→ design-context-hook.sh
-          │
-          ├── Detects design/ subfolder
-          ├── Crawls parent project
-          ├── Generates design/CLAUDE.md
-          └── Prints summary
-    │
-    ▼
-Claude reads design/CLAUDE.md into system prompt
-    │
-    ▼
-Claude has full project context + auto-research rules
-    │
-    ▼
-User: "Design the dashboard"
-    │
-    ▼
-Claude auto-reads dashboard component + planning doc
-    │
-    ▼
-Designs with accurate data, real field names, correct flows
-```
+
+---
+
+## Final Advice
+
+Install this only if Pencil is part of your real workflow.
+
+When it is, this hook removes a large amount of repetitive context gathering from every design session.

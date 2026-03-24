@@ -1,126 +1,194 @@
-# Global Doc Fixer Agent
+# Global Doc Fixer
 
-The **Global Doc Fixer** is an autonomous doc-fixing agent for Claude Code CLI. It eliminates the manual review-fix loop — instead of you running `global-review-doc`, reading findings, fixing them, re-reviewing, fixing again (often 5-10+ times per document), this agent does the entire cycle for you. You point it at a document and it reviews, fixes, re-reviews, and repeats until the document is implementation-ready.
-
----
-
-## Why Use It
-
-- **Eliminates manual iteration** — No more running `/global-review-doc`, reading findings, manually editing, then reviewing again. The agent handles the full cycle autonomously.
-- **Knows when to ask** — Auto-fixes factual errors (wrong file paths, line numbers, function names, outdated references) without bothering you. Only asks when there's a real decision to make — business logic, scope, architecture trade-offs.
-- **MCQ-only questions** — When the agent does need your input, it asks structured multiple-choice questions with clear options and a "Let me explain" escape hatch. No vague open-ended questions.
-- **Self-correcting** — After every fix, it verifies the edit didn't introduce new issues. It tracks whether each round has fewer findings than the last and stops if it detects oscillation.
-- **Handles cascading fixes** — When one fix (e.g., removing a file reference) means updating tables, dependency sections, and commands throughout the doc, the agent catches all of them in one pass.
+A global Claude Code subagent that turns document review from a manual loop into an automated convergence cycle.
 
 ---
 
-## When to Use It
+## What It Is
 
-**After `global-doc-master` creates a document.** The workflow is:
+`global-doc-fixer` is the document-hardening companion to `global-doc-master`.
 
-1. You tell `global-doc-master` to create a planning doc (or feature flow, issue doc, etc.)
-2. The agent writes the document under `docs/`
-3. You run `global-doc-fixer` on that document
-4. The fixer agent reviews it, fixes all issues, re-reviews, and repeats until the verdict is **READY**
-5. Only then do you hand the document to an agent for implementation
+Instead of manually repeating this loop:
 
-Previously, steps 3-4 were manual — you'd run `/global-review-doc`, read the findings, fix them yourself or ask `global-doc-master` to fix them, then re-review. This agent automates that entire loop.
+1. run `/global-review-doc`
+2. read findings
+3. edit the doc
+4. review again
+5. repeat until it is finally READY
 
-**You should also use it when:**
-- You have an existing doc that needs to be brought up to date before handing it to a development agent
-- A doc was written by someone else and you want to verify and fix it against the codebase without doing it manually
-- You want to make a doc "implementation-ready" — meaning an AI agent can build from it without asking questions
+this subagent handles the loop for you.
+
+It repeatedly reviews, fixes, re-reviews, and asks you only when a real decision boundary appears.
 
 ---
 
-## How to Use It
+## Where It Fits In The Workflow
 
-There are two ways to invoke the agent:
-
-1. **Using `@` mention** — type `@global-doc-fixer` followed by the document path
-2. **Natural language** — say "use global doc fixer" and describe which document to fix
-
-**Examples:**
-
+```text
+@global-doc-master   -> create the document
+/global-review-doc   -> evaluate quality and correctness
+@global-doc-fixer    -> drive the document to READY
+build the feature    -> implement from the approved doc
+/global-review-code  -> review the implementation
 ```
+
+This agent is most useful **after** the first draft of a document exists and **before** implementation begins.
+
+---
+
+## When To Use It
+
+Use `global-doc-fixer` when:
+
+- a planning doc exists but is not implementation-ready yet
+- a feature flow doc is missing detail or contains stale references
+- an issue doc needs to be grounded in the real codebase
+- a doc written by another teammate needs structured correction
+- you want Claude to converge on a READY verdict without manual babysitting
+
+This is especially valuable when the doc will later be consumed by another Claude subagent or skill.
+
+---
+
+## What It Does Automatically
+
+`global-doc-fixer` is good at fixing:
+
+- stale file paths
+- wrong file references
+- outdated function or module names
+- internal contradictions inside a doc
+- missing implementation detail that can be inferred from the codebase
+- wording that is too vague for an implementation agent
+- copy drift after refactors
+
+---
+
+## What It Should Ask You About
+
+This subagent should still pause for decisions like:
+
+- ambiguous business logic
+- version or scope choices
+- conflicting product behaviors
+- unresolved architecture tradeoffs
+- unclear rollout or migration strategy
+
+That is an important boundary. The fixer should close factual gaps on its own, but it should not invent business decisions silently.
+
+---
+
+## Good Prompts
+
+```text
 @global-doc-fixer docs/planning/payment-system.md
 ```
 
-```
-@global-doc-fixer fix up the auth migration plan
-```
-
-```
-@global-doc-fixer make docs/planning/user-analytics.md implementation-ready
+```text
+@global-doc-fixer Make `docs/planning/auth-migration.md` implementation-ready.
 ```
 
-The agent handles everything — runs the review, categorizes findings, fixes what it can, asks you MCQ questions for decisions, re-reviews, and repeats until done.
+```text
+@global-doc-fixer Review and fix the checkout flow doc until the verdict is READY.
+```
 
 ---
 
-## How It Works
+## What A Good Fix Cycle Looks Like
 
-### The Review-Fix Cycle
+Typical convergence:
 
+```text
+Round 1 -> many findings, broad cleanup
+Round 2 -> fewer findings, sharper corrections
+Round 3 -> only edge cases or missing decisions
+Round 4 -> READY, or blocked on one real product choice
 ```
-Round 1: Review → 10-20 findings → fix most → re-review
-Round 2: Review → 3-8 findings (some new from shifted content) → fix → re-review
-Round 3: Review → 0-3 findings → fix → re-review
-Round 4: Review → 0 Critical/Important → done
-```
 
-Typical documents converge in 2-4 rounds. The agent caps at 8 rounds — if it hasn't converged by then, something is structurally wrong and it flags it to you.
-
-### What It Fixes Automatically
-
-- Wrong file paths, line numbers, function names, class names, import paths
-- Outdated code references (files that were renamed, functions that changed)
-- Internal contradictions within the document
-- Formatting issues and typos
-- Missing guards or validations that the codebase already has
-
-### What It Asks You About
-
-- Business logic decisions (e.g., "should this endpoint require auth?")
-- Architectural trade-offs (e.g., "REST vs WebSocket for notifications?")
-- Scope decisions (e.g., "should admin dashboard be in v1 or v2?")
-- Feature behavior choices where the doc is ambiguous
-
-Every question is structured as multiple-choice with a "Let me explain" option so you can provide context the agent didn't anticipate.
-
-### Completion Report
-
-When done, the agent reports:
-- Total rounds completed
-- Summary of what was fixed (grouped by type)
-- Any business logic decisions you made during the process
-- Any remaining Minor items left as-is
-- Final verdict: "Document is implementation-ready" or "Document needs X more decisions"
+If the document keeps oscillating or new findings keep replacing old ones, that usually means the document itself is structurally confused or missing a product decision.
 
 ---
 
-## Setup
+## What Makes It Effective
 
-### Prerequisite
+This subagent works best when:
 
-The Global Doc Fixer depends on the **Global Review Doc** skill (`global-review-doc`). It uses this skill internally to run the 9-phase review on each cycle. Without it, the agent has nothing to review with and will not work.
+- `global-review-doc` is installed and available
+- the repo has a useful `CLAUDE.md`
+- the source document is already in roughly the right place under `docs/`
+- the feature scope is not changing wildly every round
 
-Make sure you have it installed first — see the [Global Review Doc setup](../../skills/global-review-doc/README.md) for instructions.
+---
 
-### Fresh Install
+## Relationship To `global-review-doc`
 
-To set up the Global Doc Fixer as a global agent in your Claude Code CLI, paste this prompt directly into your Claude CLI:
+`global-review-doc` is the reviewer.
+`global-doc-fixer` is the closer.
 
+Use the skill alone when you want a one-off review report.
+Use the fixer when you want Claude to keep going until the document is genuinely usable.
+
+---
+
+## Installation Scope
+
+| Scope | Location | When to choose it |
+|---|---|---|
+| User | `~/.claude/agents/global-doc-fixer.md` | you want it available everywhere |
+| Project | `.claude/agents/global-doc-fixer.md` | you want a repo-specific version committed to git |
+
+For most people, this works well as a **user-level global subagent**.
+
+---
+
+## Prerequisite
+
+Install `global-review-doc` first.
+
+This subagent depends on that skill to run the actual document review loop.
+
+See [skills/global-review-doc/README.md](/Volumes/PS1008/Github/claude_cli/skills/global-review-doc/README.md).
+
+---
+
+## Install It
+
+Paste this into Claude Code:
+
+```text
+Visit the GitHub repo https://github.com/srxly888-creator/claude_cli and install the
+Global Doc Fixer subagent.
+
+1. Read `agents/global-doc-fixer/global-doc-fixer.md`.
+2. Create `~/.claude/agents/global-doc-fixer.md` with the exact same content.
+3. Create the `~/.claude/agents/` directory if it does not exist.
+4. After installing, read `agents/global-doc-fixer/README.md` and summarize what the
+   subagent does, when to use it, and its dependency on `global-review-doc`.
 ```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and read the file at agents/global-doc-fixer/global-doc-fixer.md — copy its entire content and create a new agent file at ~/.claude/agents/global-doc-fixer.md with the exact same content. Create the ~/.claude/agents/ directory if it doesn't exist. After installing, read the README.md in the same folder (agents/global-doc-fixer/README.md) and give me a summary of what this agent does and how to use it.
+
+Restart Claude Code after installation so the subagent is loaded in new sessions.
+
+---
+
+## Check For Updates
+
+Paste this into Claude Code:
+
+```text
+Visit the GitHub repo https://github.com/srxly888-creator/claude_cli and compare the
+latest `agents/global-doc-fixer/global-doc-fixer.md` with my local
+`~/.claude/agents/global-doc-fixer.md`.
+
+If they differ:
+1. show me the important changes,
+2. update my local file,
+3. explain whether the review/fix workflow changed.
 ```
 
-That's it. The agent is now available in every project you work on with Claude Code CLI.
+---
 
-### Check for Updates
+## Final Advice
 
-Already have the Global Doc Fixer set up and want to check if there's a newer version? Paste this into your Claude CLI:
+If `global-doc-master` creates the first draft, let `global-doc-fixer` be the quality gate before implementation.
 
-```
-Fetch the latest version of global-doc-fixer.md from the GitHub repo https://github.com/GradScalerTeam/claude_cli at agents/global-doc-fixer/global-doc-fixer.md — compare it with my local version at ~/.claude/agents/global-doc-fixer.md. If there are any differences, show me what changed, update my local file to match the latest version, and give me a summary of what was updated and why it matters.
-```
+That pairing is one of the most valuable workflow upgrades in this repository.

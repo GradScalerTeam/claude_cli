@@ -1,195 +1,234 @@
-# 如何在 Claude CLI 中创建代理
+# 如何在 Claude Code 中创建子代理
 
-理解什么是代理、为什么它们很重要以及如何创建自己的代理的指南。
-
----
-
-## 什么是代理？
-
-Claude CLI 中的代理是为您做特定工作的自主工作者。你描述任务，代理处理它 —— 读取文件、编写代码、运行命令、在需要时向你提问，并产生完整结果。
-
-把代理想象成团队中的专家。你不必每次都向每个人解释整个项目 —— 你雇佣一个已经知道前端的前端开发者、一个已经知道数据库的数据库工程师、一个已经知道测试的 QA 测试员。每个人都有自己的专业知识、工具和方法。这就是代理。
-
-**简而言之：代理是为您完成任务的人。多个代理可以同时运行以更快完成工作。**
-
-当你告诉 Claude "并行运行所有代理" 时，它会同时启动多个代理 —— 一个可能正在编写 API 路由，另一个正在设置数据库，另一个正在构建前端。每个代理独立工作，遵循自己的指令，它们都并行完成项目的各自部分。
+这篇指南基于当前官方 Claude Code 模型：通过 `/agents` 管理专项 **子代理**，并以带 YAML frontmatter 的 Markdown 文件形式存放。
 
 ---
 
-## 代理存在哪里
+## 什么是子代理
 
-代理是带有 YAML 前置内容的 markdown 文件，定义了代理的名称、行为和能力。
+子代理就是 Claude 可以委派出去的专项角色。
 
-- **全局代理** 存在于 `~/.claude/agents/` —— 在每个项目中可用
-- **本地代理** 存在于特定项目内的 `.claude/agents/` —— 仅在该项目中可用
+适合用子代理的场景：
 
-本地代理是项目专用的。它们知道你的技术栈、文件夹结构和编码约定。全局代理是通用目的的 —— 它们到处工作。
+- 你想要一个聚焦的专家角色
+- 你希望复用一段稳定的系统提示词
+- 你希望它有更窄的工具权限
+- 你不想让主会话上下文越来越脏
 
----
+常见例子：
 
-## 如何调用代理
+- 代码审查员
+- 测试执行者
+- 迁移审查员
+- 前端构建者
+- 发布负责人
 
-一旦代理存在，你通过输入 `@` 后跟代理名称来调用它：
-
-```
-@my-agent-name do this task for me
-```
-
-Claude 识别 `@` 提及、加载代理的指令并运行它。
-
----
-
-## 前提条件
-
-要轻松创建代理，安装 **plugin-dev** 插件，其中包括 agent-development 技能。在 Claude CLI 会话中：
-
-```
-/plugin
-```
-
-浏览市场并安装 **plugin-dev**。这给你 `/agent-development` 技能，引导你创建代理。
+如果你的需求本质上是“一个可复用流程”而不是“一个角色”，那更可能应该做成技能，而不是子代理。
 
 ---
 
-## 创建代理
+## 子代理、技能、Hook 怎么选
 
-### 步骤 1：决定代理应该做什么
+| 用这个 | 当你需要 |
+|---|---|
+| 子代理 | 一个带专属 prompt、上下文和可选工具限制的专家角色 |
+| 技能 | 一个可反复执行的流程、命令或知识手册 |
+| Hook | 一个必须每次都发生的确定性自动化 |
 
-在你输入任何内容之前，要清楚：
-- 这个代理处理什么具体任务？
-- 它处理代码库的哪些文件或区域？
-- 它需要什么工具？（读取文件、编写代码、运行命令、搜索网络）
-- 它应该问你问题还是完全自主工作？
-- 完成时输出是什么样的？
+经验法则：
 
-### 步骤 2：使用 /agent-development
-
-在 Claude CLI 会话中，输入：
-
-```
-/agent-development
-```
-
-然后详细描述你想让代理做什么。你越具体，代理就越好。
-
-**示例 —— 创建前端代理：**
-```
-/agent-development
-
-Create an agent called frontend-builder. It should build React components for this
-project. It knows we use React with TypeScript, Tailwind CSS for styling, and Zustand
-for state management. Components go in src/components/ organized by feature. It
-should follow our existing patterns — functional components, custom hooks for logic,
-and barrel exports from each feature folder. It should write tests for each component
-using Vitest and React Testing Library.
-```
-
-**示例 —— 创建数据库代理：**
-```
-/agent-development
-
-Create an agent called db-architect. It should handle all database work for this
-project. We use PostgreSQL with Prisma as the ORM. It should create and update the
-Prisma schema, generate migrations, seed data, and write efficient queries. It knows
-our naming conventions — snake_case for table names, camelCase for Prisma models.
-It should always add proper indexes and handle relationships correctly.
-```
-
-**示例 —— 创建测试代理：**
-```
-/agent-development
-
-Create an agent called test-writer. It should write tests for this project. We use
-Jest for unit tests and Supertest for API integration tests. It should read the
-existing code, understand what each function and endpoint does, and write thorough
-tests covering happy paths, edge cases, and error scenarios. Tests go in __tests__/
-folders next to the code they test.
-```
-
-**示例 —— 创建文档代理：**
-```
-/agent-development
-
-Create an agent called api-documenter. It should read our Express API routes and
-generate OpenAPI/Swagger documentation. It should trace each route, extract the
-request body schema, response format, status codes, and middleware chain, then
-produce a complete OpenAPI spec file at docs/api-spec.yaml.
-```
-
-### 步骤 3：审查和完善
-
-技能将生成代理定义文件 —— 一个带有 YAML 前置内容和系统提示的 markdown 文件。审查它：
-
-- 名称有意义吗？
-- 描述准确吗？（描述告诉 Claude 何时建议使用此代理）
-- 系统提示涵盖你想要的所有内容吗？
-- 列出了正确的工具吗？
-- 模型合适吗？（Sonnet 用于大多数任务，Opus 用于复杂推理）
-
-如果有什么不对，告诉 Claude 调整什么。迭代直到你满意。
-
-### 步骤 4：使用它
-
-一旦代理文件在 `.claude/agents/` 中创建，你可以立即使用它：
-
-```
-@frontend-builder create a dashboard page with a sidebar, header, and main content area
-```
-
-```
-@db-architect add a notifications table with user_id, type, message, read status, and timestamps
-```
-
-```
-@test-writer write tests for the authentication module in src/auth/
-```
+- **角色** -> 子代理
+- **流程** -> 技能
+- **保证执行** -> Hook
 
 ---
 
-## 代理文件结构
+## 推荐方式：直接用 `/agents`
 
-作为参考，这是代理定义文件的样子：
+Anthropic 当前官方子代理文档明确推荐用 `/agents` 作为主入口。
+
+在 Claude Code 里执行：
+
+```text
+/agents
+```
+
+然后你可以：
+
+- 创建新子代理
+- 选择用户级或项目级作用域
+- 编辑系统提示词
+- 配置工具权限
+- 删除或更新已有子代理
+
+对大多数人来说，这比手改文件更稳，因为界面会把作用域和工具权限讲得更清楚。
+
+---
+
+## 先选对作用域
+
+| 作用域 | 位置 | 适合什么 |
+|---|---|---|
+| 项目级 | `.claude/agents/` | 某个仓库团队共享的专项角色 |
+| 用户级 | `~/.claude/agents/` | 你想在所有项目里复用的个人角色 |
+
+如果同名，项目级优先。
+
+只要子代理里面写了项目架构、目录结构或团队规范，通常就应该是项目级，并提交到 git。
+
+---
+
+## 一步一步创建靠谱的子代理
+
+### 步骤 1：只定义一个清晰职责
+
+不好的定义：
+
+- “负责前端、后端、测试和部署”
+
+好的定义：
+
+- “审查最近改动的代码，关注正确性和可维护性”
+- “在关键改动后负责执行测试并协助修复失败项”
+- “按设计系统实现 React 界面”
+
+职责越聚焦，越容易触发正确，越容易建立信任。
+
+### 步骤 2：写好 description
+
+`description` 决定 Claude 在什么时候应该使用这个子代理。
+
+好的 description 应该：
+
+- 说清楚它的工作是什么
+- 说清楚什么时候该用它
+- 说清楚它优化什么目标
+- 如果希望更积极自动委派，可以写上 `use proactively`
+
+例子：
+
+```yaml
+description: Reviews recent code changes for correctness, security, and maintainability. Use proactively after any meaningful code change.
+```
+
+### 步骤 3：只给它真正需要的工具
+
+如果它只是审查代码，可能只需要：
+
+- `Read`
+- `Grep`
+- `Glob`
+- `Bash`
+
+如果它负责改文件，再明确加上编辑工具。
+
+工具越小，安全性越高，行为也越聚焦。
+
+### 步骤 4：在 prompt 里写清项目上下文
+
+一个好的子代理 prompt 至少要包含：
+
+- 它扮演什么角色
+- 应该先看什么
+- 最重要的标准是什么
+- 输出结果应该怎么汇报
+- 什么事情不要做
+
+例如：
+
+- 先读 `CLAUDE.md`
+- 先看改动文件，再决定是否扩大范围
+- 优先保持现有架构模式
+- 未经确认不要改部署相关文件
+
+### 步骤 5：同时测试“自动触发”和“显式调用”
+
+一个成熟的子代理，应该既能：
+
+- 被 Claude 自动选中
+- 也能被你显式指定
+
+显式调用例子：
+
+```text
+Use the code-reviewer subagent to inspect my recent auth changes.
+```
+
+如果一直无法自动触发，最常见原因是 description 写得太空泛。
+
+---
+
+## 子代理文件长什么样
+
+虽然推荐用 `/agents` 管理，但理解文件结构仍然很有帮助。
 
 ```markdown
 ---
-name: frontend-builder
-description: "Builds React components for this project using TypeScript, Tailwind CSS, and Zustand. Use when you need to create or modify frontend components."
-model: sonnet
-tools: Read, Write, Edit, Glob, Grep, Bash
+name: code-reviewer
+description: Reviews changed code for correctness, security, and maintainability. Use proactively after meaningful code changes.
+tools: Read, Grep, Glob, Bash
 ---
 
-# Frontend Builder Agent
+You are a senior code review specialist for this project.
 
-You are a frontend development agent for [project name].
+Always:
+1. Read `CLAUDE.md` first if present
+2. Check the changed files before broadening scope
+3. Look for correctness, security, edge cases, and missing tests
+4. Report findings in priority order with file references
 
-## Tech Stack
-- React with TypeScript
-- Tailwind CSS for styling
-- Zustand for state management
-- Vitest + React Testing Library for tests
-
-## Conventions
-- Components in src/components/ organized by feature
-- Functional components only
-- Custom hooks for business logic
-- Barrel exports from each feature folder
-
-## Your Job
-When asked to build a component or page:
-1. Read existing components to understand patterns
-2. Create the component following project conventions
-3. Write tests for the component
-4. Export it from the feature's index file
+Do not make code changes unless explicitly asked.
 ```
 
-你不必手动编写这个 —— `/agent-development` 为你生成它。但理解结构有助于你完善它。
+---
+
+## 真正重要的最佳实践
+
+- 先做一个角色，不要一口气做十个
+- 项目约定强相关的角色，优先做成项目级
+- 职责尽量窄
+- description 要具体、可执行
+- 工具权限能小就小
+- 团队共享的子代理要纳入版本控制
+- 用过几轮之后再调整 prompt，不要只靠第一次写出来的版本
 
 ---
 
-## 提示
+## 常见错误
 
-- **对约定要具体** —— 你的代理对你的项目模式知道得越多，你以后需要纠正的就越少
-- **从一个代理开始，然后添加更多** —— 不要试图一次创建 10 个代理。创建一个、使用它、看看缺少什么，然后创建下一个
-- **对于项目工作，本地代理 > 全局代理** —— 本地代理知道你的特定代码库。只在真正适用于所有项目的事情上使用全局代理（如 global doc master）
-- **并行运行代理以提高速度** —— 当构建涉及前端、后端和数据库的功能时，同时运行所有三个代理
-- **代理可以引用文档** —— 如果你有规划文档或流程文档，在代理的系统提示中提及它们，以便它在工作前阅读它们
+### 做一个“万能神代理”
+
+一个什么都想做的超大代理，通常更难触发正确，也更难信任。
+
+### description 写得太虚
+
+如果 description 太泛，Claude 根本不知道何时该委派给它。
+
+### 忘了先写好 `CLAUDE.md`
+
+项目记忆没立住，子代理效果会明显变差。
+
+### 给了太多不必要的工具
+
+一个纯审查角色，没必要默认就拥有编辑或高风险 shell 能力。
+
+---
+
+## 大多数团队最值得先做的几个子代理
+
+如果你不知道该从哪里开始，通常最先有回报的是：
+
+1. `code-reviewer`
+2. `test-runner`
+3. `frontend-builder` 或 `api-builder`
+4. `debugger`
+
+前提是：这些需求已经在真实会话里反复出现。
+
+---
+
+## 下一篇
+
+当角色已经有了，再把这些角色内部反复执行的流程沉淀成技能：
+
+- [HOW_TO_CREATE_SKILLS_CN.md](HOW_TO_CREATE_SKILLS_CN.md)
