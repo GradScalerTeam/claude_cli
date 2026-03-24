@@ -1,253 +1,280 @@
-# Claude CLI — Agents, Skills & Workflows
+# Claude CLI — 代理、技能与工作流
 
-A collection of battle-tested agents, skills, and workflows for [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) — built and maintained by [GradScaler](https://github.com/GradScalerTeam).
+**[English](README_EN.md)** | 中文
 
----
-
-## Why This Exists
-
-Claude Code CLI is powerful, but most developers barely scratch the surface. They use it for quick edits and one-off questions. That's like buying a CNC machine and using it as a paperweight.
-
-This repo exists because we've spent months figuring out how to actually ship features, entire projects, and production-grade code using Claude CLI as the primary driver. We built agents that write docs. Skills that review those docs. Skills that review code. Workflows that chain them together so you go from a vague idea to a deployed feature with minimal manual coding.
-
-We're sharing everything — the actual agent definitions, skill definitions, reference files, and the workflow that ties them all together — so you can install them and immediately level up how you use Claude CLI.
+[Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) 的实战代理、技能和工作流集合 — 由 [GradScaler](https://github.com/GradScalerTeam) 构建和维护。
 
 ---
 
-## Who Made This
+## 为什么创建这个仓库
 
-**[GradScaler](https://github.com/GradScalerTeam)** — a team that builds with Claude CLI every day and documents what works.
+Claude Code CLI 很强大，但大多数开发者只用了皮毛。他们用它做快速编辑和一次性问答。这就像买了一台数控机床却把它当镇纸用。
 
-Created and maintained by **[Devansh Raj](https://github.com/dev-arctik)**.
+这个仓库的存在是因为我们花了几个月时间，弄清楚如何真正地发布功能、完成整个项目，以及使用 Claude CLI 作为主要驱动力来编写生产级代码。我们构建了写文档的代理、审查文档的技能、审查代码的技能，以及将它们串联起来的工作流，让你从模糊的想法到部署的功能，只需最少的编码。
 
----
-
-## Getting Started
-
-New to Claude Code CLI? Start here:
-
-1. **[CLAUDE_SETUP.md](CLAUDE_SETUP.md)** — Install Claude CLI, set up authentication, get it running in VS Code, install recommended plugins, and learn the essential slash commands.
-
-Then pick the guide that matches your situation:
-
-2. **[HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)** — Building a brand new project from scratch. Covers the full workflow: planning doc → review → iterate → generate agents → build in parallel → code review → test → create local tools.
-
-3. **[HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)** — Bringing Claude CLI into a project you're already working on. Covers: documenting feature flows → reviewing code → documenting issues → creating local tools → generating development agents.
-
-Want to build your own agents and skills?
-
-4. **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** — Learn what agents are and how to create custom agents for your projects using the agent-development plugin.
-
-5. **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** — Learn what skills are, how they differ from agents, and how to create custom skills using the skill-development plugin.
-
-Want Claude to automatically know about your existing docs?
-
-6. **[Doc Scanner Hook](hooks/doc-scanner/)** — A SessionStart hook that scans your project for `.md` files and gives Claude a documentation index at the start of every conversation. No more "read the planning doc" — Claude already knows it exists.
-
-Using Pencil for UI design?
-
-7. **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** — How to use [Pencil](https://www.pencil.dev/) with Claude Code for context-aware design sessions. Includes the Design Context Hook that bridges your codebase knowledge into the Pencil design environment.
+我们分享一切 — 实际的代理定义、技能定义、参考文件，以及将它们联系在一起的工作流 — 这样你就可以安装它们，立即提升你使用 Claude CLI 的方式。
 
 ---
 
-## The Workflow
+## 谁创建了这个
 
-This isn't just a collection of random tools. Everything here follows a specific workflow we use on every project:
+**[GradScaler](https://github.com/GradScalerTeam)** — 一个每天使用 Claude CLI 构建并记录有效方法的团队。
+
+由 **[Devansh Raj](https://github.com/dev-arctik)** 创建和维护。
+
+**中文汉化** — 由 [srxly888-creator](https://github.com/srxly888-creator) 汉化
+
+---
+
+## 快速开始
+
+刚接触 Claude Code CLI？从这里开始：
+
+1. **[CLAUDE_SETUP.md](CLAUDE_SETUP.md)** — 安装 Claude CLI，设置身份验证，在 VS Code 中运行，安装推荐插件，学习基本的斜杠命令。
+
+然后选择适合你情况的指南：
+
+2. **[HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)** — 从零开始构建全新项目。涵盖完整工作流：规划文档 → 审查 → 迭代 → 生成代理 → 并行构建 → 代码审查 → 测试 → 创建本地工具。
+
+3. **[HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)** — 将 Claude CLI 引入你已经在做的项目。涵盖：记录功能流程 → 审查代码 → 记录问题 → 创建本地工具 → 生成开发代理。
+
+想构建自己的代理和技能？
+
+4. **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** — 了解什么是代理以及如何使用代理开发插件为你的项目创建自定义代理。
+
+5. **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** — 了解什么是技能，它们与代理的区别，以及如何使用技能开发插件创建自定义技能。
+
+想让 Claude 自动了解你的现有文档？
+
+6. **[Doc Scanner Hook](hooks/doc-scanner/)** — SessionStart 钩子，在每次对话开始时扫描项目的 `.md` 文件并为 Claude 提供文档索引。不再需要"读取规划文档" — Claude 已经知道它的存在。
+
+使用 Pencil 进行 UI 设计？
+
+7. **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** — 如何将 [Pencil](https://www.pencil.dev/) 与 Claude Code 结合使用进行上下文感知的设计会话。包括将代码库知识桥接到 Pencil 设计环境的设计上下文钩子。
+
+---
+
+## 工作流
+
+这不只是随机工具的集合。这里的所有内容都遵循我们在每个项目中使用的特定工作流：
 
 ```
-1. PLAN        →  global-doc-master creates a planning doc
-2. FIX         →  global-doc-fixer reviews, fixes, and repeats until READY
-3. BUILD       →  hand the doc to agents or build manually
-4. CODE REVIEW →  global-review-code audits the implementation
-5. SHIP        →  fix findings, re-review, deploy
+1. 规划        →  global-doc-master 创建规划文档
+2. 修复        →  global-doc-fixer 审查、修复并重复直到 READY
+3. 构建        →  将文档交给代理或手动构建
+4. 代码审查    →  global-review-code 审计实现
+5. 发布        →  修复发现、重新审查、部署
 ```
 
-Plan first. Review before building. Review after building. That's it. The agents and skills below are the tools that make each step fast and thorough.
+先规划。构建前审查。构建后审查。就是这样。下面的代理和技能是让每一步快速而彻底的工具。
 
 ---
 
-## What's In This Repo
+## 仓库内容
 
-### Agents
+### 代理（Agents）
 
-Agents are autonomous workers that investigate your codebase, ask you questions, and produce complete outputs. They live at `~/.claude/agents/` and are available in every project.
+代理是自主工作者，它们调查你的代码库，向你提问，并产生完整的输出。它们位于 `~/.claude/agents/` 并在每个项目中可用。
 
-| Agent | What It Does | Folder |
+| 代理 | 功能 | 文件夹 |
 |---|---|---|
-| **[Global Doc Master](agents/global-doc-master/)** | Creates and organizes all technical documentation — planning specs, feature flows, deployment guides, issue reports, resolved postmortems, and debug runbooks. Scans your codebase first, asks clarifying questions, and writes structured docs under `docs/`. | `agents/global-doc-master/` |
-| **[Global Doc Fixer](agents/global-doc-fixer/)** | Autonomously reviews and fixes documents until they're implementation-ready. Runs `global-review-doc`, fixes all findings, re-reviews, and repeats — eliminating the manual review-fix loop. Asks MCQ questions only when a business logic decision is needed. | `agents/global-doc-fixer/` |
+| **[Global Doc Master](agents/global-doc-master/)** | 创建和组织所有技术文档 — 规划规范、功能流程、部署指南、问题报告、解决的事后分析和调试手册。先扫描你的代码库，提出澄清问题，并在 `docs/` 下编写结构化文档。 | `agents/global-doc-master/` |
+| **[Global Doc Fixer](agents/global-doc-fixer/)** | 自主审查和修复文档直到它们准备好实现。运行 `global-review-doc`，修复所有发现，重新审查并重复 — 消除手动审查-修复循环。只有在需要业务逻辑决策时才提出多选题。 | `agents/global-doc-fixer/` |
 
-### Skills
+### 技能（Skills）
 
-Skills are specialized capabilities you invoke with slash commands or natural language. They run in a forked context and produce structured reports. They live at `~/.claude/skills/`.
+技能是你用斜杠命令或自然语言调用的专门能力。它们在分叉上下文中运行并产生结构化报告。它们位于 `~/.claude/skills/`。
 
-| Skill | What It Does | Folder |
+| 技能 | 功能 | 文件夹 |
 |---|---|---|
-| **[Global Review Doc](skills/global-review-doc/)** | Reviews any technical document against your actual codebase. 9-phase review covering codebase verification, completeness, security, bug prediction, edge cases, and agent readiness. Produces an 11-section report with a READY / REVISE / REWRITE verdict. | `skills/global-review-doc/` |
-| **[Global Review Code](skills/global-review-code/)** | Reviews actual code with a 12-phase audit covering architecture, security (OWASP + domain-specific), performance, error handling, dependencies, testing, and framework best practices. Also has a bug hunt mode that traces bugs from symptom to root cause. Adapts all checks to your detected tech stack. | `skills/global-review-code/` |
+| **[Global Review Doc](skills/global-review-doc/)** | 根据你的实际代码库审查任何技术文档。9阶段审查涵盖代码库验证、完整性、安全性、bug 预测、边界情况和代理准备度。生成 11 节报告，包含 READY / REVISE / REWRITE 判定。 | `skills/global-review-doc/` |
+| **[Global Review Code](skills/global-review-code/)** | 用 12 阶段审计审查实际代码，涵盖架构、安全性（OWASP + 领域特定）、性能、错误处理、依赖项、测试和框架最佳实践。还有 bug 狩猎模式，从症状追踪 bug 到根本原因。所有检查都适应你检测到的技术栈。 | `skills/global-review-code/` |
 
-### Hooks
+### 钩子（Hooks）
 
-Hooks are scripts that run automatically in response to Claude CLI events — like starting a session, using a tool, or finishing a task. They live at `~/.claude/` and are registered in `~/.claude/settings.json`.
+钩子是响应 Claude CLI 事件自动运行的脚本 — 比如启动会话、使用工具或完成任务。它们位于 `~/.claude/` 并在 `~/.claude/settings.json` 中注册。
 
-| Hook | What It Does | Folder |
+| 钩子 | 功能 | 文件夹 |
 |---|---|---|
-| **[Doc Scanner](hooks/doc-scanner/)** | SessionStart hook that scans your project for `.md` files and outputs a documentation index at the start of every conversation. Claude immediately knows what planning docs, feature specs, flow docs, and agent definitions exist — and reads the relevant ones before starting work. | `hooks/doc-scanner/` |
-| **[Design Context](hooks/design-context/)** | SessionStart hook for [Pencil](https://www.pencil.dev/) design sessions. Detects when Claude runs inside a `design/` subfolder, crawls the parent project, and generates a `design/CLAUDE.md` with project overview, routes, components, docs index, and auto-research rules — so Claude designs with full codebase awareness. | `hooks/design-context/` |
+| **[Doc Scanner](hooks/doc-scanner/)** | SessionStart 钩子，在每次对话开始时扫描项目的 `.md` 文件并输出文档索引。Claude 立即知道存在哪些规划文档、功能规范、流程文档和代理定义 — 并在开始工作前读取相关的。 | `hooks/doc-scanner/` |
+| **[Design Context](hooks/design-context/)** | [Pencil](https://www.pencil.dev/) 设计会话的 SessionStart 钩子。检测 Claude 在 `design/` 子文件夹中运行时，爬取父项目，并生成包含项目概览、路由、组件、文档索引和自动研究规则的 `design/CLAUDE.md` — 这样 Claude 就能在完全了解代码库的情况下进行设计。 | `hooks/design-context/` |
 
-### Status Line
+### 状态栏
 
-| Script | What It Does | Folder |
+| 脚本 | 功能 | 文件夹 |
 |---|---|---|
-| **[Status Line](scripts/statusline-command.sh)** | Custom Claude Code status line that shows git branch, staged/modified/untracked file counts, and ahead/behind remote — all color-coded. Copy it to `~/.claude/` and configure `settings.json` to use it. | `scripts/` |
+| **[Status Line](scripts/statusline-command.sh)** | 自定义 Claude Code 状态栏，显示 git 分支、暂存/修改/未跟踪文件计数，以及领先/落后远程 — 全部彩色编码。复制到 `~/.claude/` 并配置 `settings.json` 使用。 | `scripts/` |
 
-### Guides
+### 指南
 
-| Guide | What It Covers |
+| 指南 | 涵盖内容 |
 |---|---|
-| **[CLAUDE_SETUP.md](CLAUDE_SETUP.md)** | Installing Claude CLI, authentication, VS Code setup, plugins, slash commands, custom status line |
-| **[HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)** | Building a project from scratch — planning, review, agents, parallel build, code review, testing, local tools |
-| **[HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)** | Using Claude CLI in an existing project — feature flows, code review, issue docs, local tools, development agents |
-| **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** | What agents are, how they work, and how to create your own using the agent-development plugin |
-| **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** | What skills are, how they differ from agents, and how to create your own using the skill-development plugin |
-| **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** | Using [Pencil](https://www.pencil.dev/) with Claude Code for context-aware UI design — the context gap problem, the design context hook, and the full design workflow |
+| **[CLAUDE_SETUP.md](CLAUDE_SETUP.md)** | 安装 Claude CLI、身份验证、VS Code 设置、插件、斜杠命令、自定义状态栏 |
+| **[HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)** | 从零构建项目 — 规划、审查、代理、并行构建、代码审查、测试、本地工具 |
+| **[HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)** | 在现有项目中使用 Claude CLI — 功能流程、代码审查、问题文档、本地工具、开发代理 |
+| **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** | 什么是代理，它们如何工作，以及如何使用代理开发插件创建自己的代理 |
+| **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** | 什么是技能，它们与代理的区别，以及如何使用技能开发插件创建自己的技能 |
+| **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** | 将 [Pencil](https://www.pencil.dev/) 与 Claude Code 结合用于上下文感知的 UI 设计 — 上下文差距问题、设计上下文钩子和完整的设计工作流 |
 
 ---
 
-## Setup
+## 设置
 
-Each component has its own README with full setup instructions. Navigate to the folder, read the README, and paste the setup prompt into your Claude CLI.
+每个组件都有自己的 README，包含完整的设置说明。导航到文件夹，阅读 README，并将设置提示粘贴到你的 Claude CLI。
 
-- **[Global Doc Master](agents/global-doc-master/)** — the documentation agent. Go to [agents/global-doc-master/README.md](agents/global-doc-master/README.md) for setup.
-- **[Global Review Doc](skills/global-review-doc/)** — the document review skill. Go to [skills/global-review-doc/README.md](skills/global-review-doc/README.md) for setup.
-- **[Global Review Code](skills/global-review-code/)** — the code review & bug hunt skill. Go to [skills/global-review-code/README.md](skills/global-review-code/README.md) for setup.
-- **[Doc Scanner](hooks/doc-scanner/)** — the documentation awareness hook. Go to [hooks/doc-scanner/README.md](hooks/doc-scanner/README.md) for setup.
-- **[Design Context](hooks/design-context/)** — the Pencil design context hook. Go to [hooks/design-context/README.md](hooks/design-context/README.md) for setup. **Note:** This hook is specifically for the [Pencil](https://www.pencil.dev/) design app — it won't do anything unless you have Pencil installed and use `.pen` files for UI design. Install it separately if you use Pencil.
+- **[Global Doc Master](agents/global-doc-master/)** — 文档代理。查看 [agents/global-doc-master/README.md](agents/global-doc-master/README.md) 进行设置。
+- **[Global Review Doc](skills/global-review-doc/)** — 文档审查技能。查看 [skills/global-review-doc/README.md](skills/global-review-doc/README.md) 进行设置。
+- **[Global Review Code](skills/global-review-code/)** — 代码审查 & bug 狩猎技能。查看 [skills/global-review-code/README.md](skills/global-review-code/README.md) 进行设置。
+- **[Doc Scanner](hooks/doc-scanner/)** — 文档感知钩子。查看 [hooks/doc-scanner/README.md](hooks/doc-scanner/README.md) 进行设置。
+- **[Design Context](hooks/design-context/)** — Pencil 设计上下文钩子。查看 [hooks/design-context/README.md](hooks/design-context/README.md) 进行设置。**注意：** 此钩子专门用于 [Pencil](https://www.pencil.dev/) 设计应用 — 除非你安装了 Pencil 并使用 `.pen` 文件进行 UI 设计，否则不会做任何事情。如果你使用 Pencil，请单独安装。
 
-> **Important:** After installing agents or skills, quit your current Claude CLI session and start a new one. Claude only loads agents and skills at session startup — so newly installed tools won't appear in `/help` or respond to `/slash-commands` until you restart.
+> **重要：** 安装代理或技能后，退出当前的 Claude CLI 会话并启动新会话。Claude 只在会话启动时加载代理和技能 — 所以新安装的工具在你重启前不会出现在 `/help` 或响应 `/slash-commands`。
 
-### Install Everything
+### 一键安装所有内容
 
-To install all agents, skills, hooks, and the status line at once, paste this into your Claude CLI:
-
-```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install everything:
-
-1. Read agents/global-doc-master/global-doc-master.md — create ~/.claude/agents/global-doc-master.md with the exact same content. Create the directory if it doesn't exist.
-
-2. Read all files in skills/global-review-doc/ (SKILL.md, references/output-format.md, references/security-domains.md) — create the same structure at ~/.claude/skills/global-review-doc/ with exact content.
-
-3. Read all files in skills/global-review-code/ (SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md) — create the same structure at ~/.claude/skills/global-review-code/ with exact content.
-
-4. Read hooks/doc-scanner/doc-scanner.sh — save it to ~/.claude/doc-scanner.sh with the exact same content. Make it executable (chmod +x).
-
-5. Read scripts/statusline-command.sh — save it to ~/.claude/statusline-command.sh with the exact same content.
-
-6. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add: the statusLine config { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } } AND a SessionStart hook that runs "bash ~/.claude/doc-scanner.sh". Merge with any existing settings — don't overwrite them.
-
-Note: The Design Context Hook (for the Pencil design app) is NOT included here — it's a separate install for Pencil users only. See "Install Design Context Hook Only" below if you use Pencil.
-
-After installing everything, read the README.md in each folder and give me a summary of what was installed and how to use each one.
-```
-
-### Install Agent Only
-
-To install just the Global Doc Master agent:
+将此粘贴到你的 Claude CLI：
 
 ```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the agent:
+访问 GitHub 仓库 https://github.com/srxly888-creator/claude_cli 并安装所有内容：
 
-1. Read agents/global-doc-master/global-doc-master.md — create ~/.claude/agents/global-doc-master.md with the exact same content. Create the directory if it doesn't exist.
+1. 读取 agents/global-doc-master/global-doc-master.md — 在 ~/.claude/agents/global-doc-master.md 创建相同内容的文件。如果目录不存在则创建。
 
-After installing, read agents/global-doc-master/README.md and give me a summary of what was installed and how to use it.
+2. 读取 skills/global-review-doc/ 中的所有文件（SKILL.md, references/output-format.md, references/security-domains.md）— 在 ~/.claude/skills/global-review-doc/ 创建相同结构和内容。
+
+3. 读取 skills/global-review-code/ 中的所有文件（SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md）— 在 ~/.claude/skills/global-review-code/ 创建相同结构和内容。
+
+4. 读取 hooks/doc-scanner/doc-scanner.sh — 保存到 ~/.claude/doc-scanner.sh，内容相同。使其可执行（chmod +x）。
+
+5. 读取 scripts/statusline-command.sh — 保存到 ~/.claude/statusline-command.sh，内容相同。
+
+6. 读取我现有的 ~/.claude/settings.json（如果不存在则创建）并添加：statusLine 配置 { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } } 和一个运行 "bash ~/.claude/doc-scanner.sh" 的 SessionStart 钩子。与任何现有设置合并 — 不要覆盖它们。
+
+注意：设计上下文钩子（用于 Pencil 设计应用）不包含在此 — 它是 Pencil 用户的单独安装。如果你使用 Pencil，请参阅下面的"仅安装设计上下文钩子"。
+
+安装完所有内容后，读取每个文件夹中的 README.md 并给我一个安装了什么以及如何使用每一个的摘要。
 ```
 
-### Install Skills Only
+### 仅安装代理
 
-To install just the Global Review Doc and Global Review Code skills:
-
-```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the skills:
-
-1. Read all files in skills/global-review-doc/ (SKILL.md, references/output-format.md, references/security-domains.md) — create the same structure at ~/.claude/skills/global-review-doc/ with exact content.
-
-2. Read all files in skills/global-review-code/ (SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md) — create the same structure at ~/.claude/skills/global-review-code/ with exact content.
-
-After installing, read the README.md in each skill folder and give me a summary of what was installed and how to use each one.
-```
-
-### Install Doc Scanner Hook Only
-
-To install just the doc scanner SessionStart hook:
+仅安装 Global Doc Master 代理：
 
 ```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the doc scanner hook:
+访问 GitHub 仓库 https://github.com/srxly888-creator/claude_cli 并安装代理：
 
-1. Read hooks/doc-scanner/doc-scanner.sh — save it to ~/.claude/doc-scanner.sh with the exact same content. Make it executable (chmod +x).
+1. 读取 agents/global-doc-master/global-doc-master.md — 在 ~/.claude/agents/global-doc-master.md 创建相同内容的文件。如果目录不存在则创建。
 
-2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add a SessionStart hook that runs "bash ~/.claude/doc-scanner.sh". Merge it with any existing hooks — don't overwrite them.
-
-After installing, start a new session in a project that has .md files and confirm the doc scanner runs.
+安装后，读取 agents/global-doc-master/README.md 并给我一个安装了什么以及如何使用的摘要。
 ```
 
-### Install Design Context Hook Only
+### 仅安装技能
 
-To install just the Pencil design context SessionStart hook (for use with the [Pencil](https://www.pencil.dev/) design app):
-
-```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the design context hook:
-
-1. Read hooks/design-context/design-context-hook.sh — save it to ~/.claude/design-context-hook.sh with the exact same content. Make it executable (chmod +x).
-
-2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add a SessionStart hook that runs "bash ~/.claude/design-context-hook.sh". Merge it with any existing hooks — don't overwrite them.
-
-After installing, tell me it's done and explain what the hook does. Note: this hook only works if you have the Pencil design app (pencil.dev) installed — it bridges project context into Pencil's design sessions.
-```
-
-### Install Status Line Only
-
-To install just the custom git status line:
+仅安装 Global Review Doc 和 Global Review Code 技能：
 
 ```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the status line:
+访问 GitHub 仓库 https://github.com/srxly888-creator/claude_cli 并安装技能：
 
-1. Read scripts/statusline-command.sh — save it to ~/.claude/statusline-command.sh with the exact same content.
+1. 读取 skills/global-review-doc/ 中的所有文件（SKILL.md, references/output-format.md, references/security-domains.md）— 在 ~/.claude/skills/global-review-doc/ 创建相同结构和内容。
 
-2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add the statusLine config: { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } }. Merge it with any existing settings — don't overwrite them.
+2. 读取 skills/global-review-code/ 中的所有文件（SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md）— 在 ~/.claude/skills/global-review-code/ 创建相同结构和内容。
 
-Tell me when it's done and explain what the status line shows.
+安装后，读取每个技能文件夹中的 README.md 并给我一个安装了什么以及如何使用每一个的摘要。
 ```
 
-### Check for Updates
+### 仅安装文档扫描器钩子
 
-Already have everything installed and want to check if there's a newer version? Paste this into your Claude CLI:
+仅安装文档扫描器 SessionStart 钩子：
 
 ```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to everything I have installed:
+访问 GitHub 仓库 https://github.com/srxly888-creator/claude_cli 并安装文档扫描器钩子：
 
-1. Compare agents/global-doc-master/global-doc-master.md with my local ~/.claude/agents/global-doc-master.md
+1. 读取 hooks/doc-scanner/doc-scanner.sh — 保存到 ~/.claude/doc-scanner.sh，内容相同。使其可执行（chmod +x）。
 
-2. Compare all files in skills/global-review-doc/ (SKILL.md, references/output-format.md, references/security-domains.md) with my local versions at ~/.claude/skills/global-review-doc/
+2. 读取我现有的 ~/.claude/settings.json（如果不存在则创建）并添加一个运行 "bash ~/.claude/doc-scanner.sh" 的 SessionStart 钩子。与任何现有钩子合并 — 不要覆盖它们。
 
-3. Compare all files in skills/global-review-code/ (SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md) with my local versions at ~/.claude/skills/global-review-code/
+安装后，在有 .md 文件的项目中启动新会话并确认文档扫描器运行。
+```
 
-4. Compare hooks/doc-scanner/doc-scanner.sh with my local ~/.claude/doc-scanner.sh
+### 仅安装设计上下文钩子
 
-5. Compare scripts/statusline-command.sh with my local ~/.claude/statusline-command.sh
+仅安装 Pencil 设计上下文 SessionStart 钩子（用于 [Pencil](https://www.pencil.dev/) 设计应用）：
 
-6. If I have ~/.claude/design-context-hook.sh installed, compare hooks/design-context/design-context-hook.sh with my local version
+```
+访问 GitHub 仓库 https://github.com/srxly888-creator/claude_cli 并安装设计上下文钩子：
 
-For each component, tell me if there are any differences. If updates are found, ask me whether I want you to explain what changed first or directly pull the new updates into my local files.
+1. 读取 hooks/design-context/design-context-hook.sh — 保存到 ~/.claude/design-context-hook.sh，内容相同。使其可执行（chmod +x）。
+
+2. 读取我现有的 ~/.claude/settings.json（如果不存在则创建）并添加一个运行 "bash ~/.claude/design-context-hook.sh" 的 SessionStart 钩子。与任何现有钩子合并 — 不要覆盖它们。
+
+安装后，告诉我已完成并解释钩子的功能。注意：此钩子仅在安装了 Pencil 设计应用（pencil.dev）时有效 — 它将项目上下文桥接到 Pencil 的设计会话。
+```
+
+### 仅安装状态栏
+
+仅安装自定义 git 状态栏：
+
+```
+访问 GitHub 仓库 https://github.com/srxly888-creator/claude_cli 并安装状态栏：
+
+1. 读取 scripts/statusline-command.sh — 保存到 ~/.claude/statusline-command.sh，内容相同。
+
+2. 读取我现有的 ~/.claude/settings.json（如果不存在则创建）并添加 statusLine 配置：{ "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } }。与任何现有设置合并 — 不要覆盖它们。
+
+完成后告诉我并解释状态栏显示的内容。
+```
+
+### 检查更新
+
+已经安装了所有内容并想检查是否有更新版本？将此粘贴到你的 Claude CLI：
+
+```
+访问 GitHub 仓库 https://github.com/srxly888-creator/claude_cli 并检查我安装的所有内容的更新：
+
+1. 比较 agents/global-doc-master/global-doc-master.md 与我本地的 ~/.claude/agents/global-doc-master.md
+
+2. 比较 skills/global-review-doc/ 中的所有文件（SKILL.md, references/output-format.md, references/security-domains.md）与我本地 ~/.claude/skills/global-review-doc/ 的版本
+
+3. 比较 skills/global-review-code/ 中的所有文件（SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md）与我本地 ~/.claude/skills/global-review-code/ 的版本
+
+4. 比较 hooks/doc-scanner/doc-scanner.sh 与我本地的 ~/.claude/doc-scanner.sh
+
+5. 比较 scripts/statusline-command.sh 与我本地的 ~/.claude/statusline-command.sh
+
+6. 如果我安装了 ~/.claude/design-context-hook.sh，比较 hooks/design-context/design-context-hook.sh 与我本地的版本
+
+对于每个组件，告诉我是否有任何差异。如果发现更新，问我是想先解释变更内容还是直接将新更新拉取到我的本地文件。
 ```
 
 ---
 
-## Contributing
+## 汉化说明
 
-This repo is actively maintained. We add new agents, skills, and workflows as we build and refine them. If you have suggestions or want to contribute, open an issue or PR.
+本仓库为 [GradScalerTeam/claude_cli](https://github.com/GradScalerTeam/claude_cli) 的中文汉化版本。
+
+### 汉化内容
+
+- ✅ README.md → README_CN.md
+- 🚧 CLAUDE_SETUP.md（进行中）
+- 🚧 HOW_TO_START_NEW_PROJECT.md（进行中）
+- 🚧 HOW_TO_START_EXISTING_PROJECT.md（进行中）
+- 🚧 HOW_TO_CREATE_AGENTS.md（进行中）
+- 🚧 HOW_TO_CREATE_SKILLS.md（进行中）
+- 🚧 Agents 文档（进行中）
+- 🚧 Skills 文档（进行中）
+
+### 本地化优化
+
+- 保留所有功能完整性
+- 优化中文用户的使用体验
+- 添加中文示例和说明
 
 ---
 
-## License
+## 贡献
+
+这个仓库积极维护。我们会在构建和完善时添加新的代理、技能和工作流。如果你有建议或想贡献，请开 issue 或 PR。
+
+---
+
+## 许可证
 
 MIT
