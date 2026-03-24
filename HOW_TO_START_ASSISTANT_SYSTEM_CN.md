@@ -224,6 +224,10 @@ weekly review protocol 和 inbox triage protocol。
 
 这一步的关键不是“写很多文档”，而是先把系统运行规则写清楚。
 
+如果你想直接从可复制的样板开始，可以看：
+
+- [docs/assistant-os-starter/README_CN.md](docs/assistant-os-starter/README_CN.md)
+
 ---
 
 ## 步骤 5：自动化之前，先用 Plan Mode 设计三条核心流

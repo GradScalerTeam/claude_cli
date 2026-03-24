@@ -16,10 +16,11 @@
 2. **[新项目工作流](HOW_TO_START_NEW_PROJECT_CN.md)** — 从想法、规划、审查到实现，完整跑通一遍。
 3. **[现有项目工作流](HOW_TO_START_EXISTING_PROJECT_CN.md)** — 把 Claude Code 稳定接入已有代码库。
 4. **[个人助理 / 知识系统工作流](HOW_TO_START_ASSISTANT_SYSTEM_CN.md)** — 把 Claude Code 用在个人助理、反思系统和知识整理项目，而不只是写程序。
-5. **[创建子代理](HOW_TO_CREATE_AGENTS_CN.md)** — 用 `/agents` 创建项目专属专家。
-6. **[创建技能](HOW_TO_CREATE_SKILLS_CN.md)** — 用 `SKILL.md` 封装可复用的流程和命令。
-7. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
-8. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
+5. **[assistant-os 起步模板](docs/assistant-os-starter/README_CN.md)** — 直接复制 `reference_manifest.md` 和 3 份 protocol 模板开始跑最小系统。
+6. **[创建子代理](HOW_TO_CREATE_AGENTS_CN.md)** — 用 `/agents` 创建项目专属专家。
+7. **[创建技能](HOW_TO_CREATE_SKILLS_CN.md)** — 用 `SKILL.md` 封装可复用的流程和命令。
+8. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
+9. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
 
 ---
 
@@ -96,9 +97,10 @@
 
 1. 读 [CLAUDE_SETUP_CN.md](CLAUDE_SETUP_CN.md)
 2. 读 [HOW_TO_START_ASSISTANT_SYSTEM_CN.md](HOW_TO_START_ASSISTANT_SYSTEM_CN.md)
-3. 再读 [docs/ASSISTANT_TEAM_PATTERNS_CN.md](docs/ASSISTANT_TEAM_PATTERNS_CN.md)
-4. 先跑一个最小版本，不要一开始就做超级助理
-5. 等节奏稳定后，再补子代理和技能
+3. 直接拿 [docs/assistant-os-starter/README_CN.md](docs/assistant-os-starter/README_CN.md) 里的模板起步
+4. 再读 [docs/ASSISTANT_TEAM_PATTERNS_CN.md](docs/ASSISTANT_TEAM_PATTERNS_CN.md)
+5. 先跑一个最小版本，不要一开始就做超级助理
+6. 等节奏稳定后，再补子代理和技能
 
 ---
 
