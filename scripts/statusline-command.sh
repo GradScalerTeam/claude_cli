@@ -12,9 +12,48 @@ RED=$'\033[31m'
 DIM=$'\033[90m'
 RESET=$'\033[0m'
 
+format_rate_limit() {
+  local label="$1"
+  local raw="$2"
+  local pct=""
+  local color="$GREEN"
+
+  if [ -z "$raw" ] || [ "$raw" = "null" ]; then
+    return
+  fi
+
+  pct=$(printf "%.0f" "$raw" 2>/dev/null)
+  if [ -z "$pct" ]; then
+    return
+  fi
+
+  if [ "$pct" -ge 90 ]; then
+    color="$RED"
+  elif [ "$pct" -ge 75 ]; then
+    color="$YELLOW"
+  fi
+
+  printf "%s%s%s:%s%s%%%s" "$DIM" "$label" "$RESET" "$color" "$pct" "$RESET"
+}
+
 # Read JSON input from stdin
 input=$(cat)
 cwd=$(echo "$input" | jq -r '.workspace.current_dir')
+
+five_hour_pct=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+seven_day_pct=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+rate_info=""
+
+five_hour_display=$(format_rate_limit "5h" "$five_hour_pct")
+if [ -n "$five_hour_display" ]; then
+  rate_info="$five_hour_display"
+fi
+
+seven_day_display=$(format_rate_limit "7d" "$seven_day_pct")
+if [ -n "$seven_day_display" ]; then
+  [ -n "$rate_info" ] && rate_info="${rate_info} "
+  rate_info="${rate_info}${seven_day_display}"
+fi
 
 # Shorten path to last 2 segments
 short_path=$(echo "$cwd" | awk -F/ '{if(NF>1) print $(NF-1)"/"$NF; else print $NF}')
@@ -70,10 +109,17 @@ if git -C "$cwd" rev-parse --git-dir > /dev/null 2>&1; then
       fi
     fi
 
-    # Combine: local stats / remote stats
+    # Combine: local stats / remote stats / rate limits
     git_stats=""
     [ -n "$local_info" ] && git_stats="${local_info}"
-    [ -n "$remote_info" ] && git_stats="${git_stats} ${DIM}/${RESET} ${remote_info}"
+    if [ -n "$remote_info" ]; then
+      [ -n "$git_stats" ] && git_stats="${git_stats} ${DIM}/${RESET} "
+      git_stats="${git_stats}${remote_info}"
+    fi
+    if [ -n "$rate_info" ]; then
+      [ -n "$git_stats" ] && git_stats="${git_stats} ${DIM}/${RESET} "
+      git_stats="${git_stats}${rate_info}"
+    fi
 
     # Print — default color dir | bold cyan branch [stats]
     if [ -n "$git_stats" ]; then
@@ -82,8 +128,16 @@ if git -C "$cwd" rev-parse --git-dir > /dev/null 2>&1; then
       printf "%s ${DIM}|${RESET} ${BOLD}${CYAN}%s${RESET}\n" "$short_path" "$branch"
     fi
   else
-    printf "%s\n" "$short_path"
+    if [ -n "$rate_info" ]; then
+      printf "%s ${DIM}|${RESET} %s\n" "$short_path" "$rate_info"
+    else
+      printf "%s\n" "$short_path"
+    fi
   fi
 else
-  printf "%s\n" "$short_path"
+  if [ -n "$rate_info" ]; then
+    printf "%s ${DIM}|${RESET} %s\n" "$short_path" "$rate_info"
+  else
+    printf "%s\n" "$short_path"
+  fi
 fi

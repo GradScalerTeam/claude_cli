@@ -43,8 +43,10 @@
 
 - **对齐官方入口**：`/init`、`/agents`、`/memory`、`/permissions`、`/mcp`、`/hooks`、Plan Mode。
 - **统一心智模型**：`CLAUDE.md` 负责记忆，子代理负责专项角色，技能负责复用流程，钩子负责确定性自动化。
+- **补出高级能力入口**：把技能 frontmatter、状态栏脚本和沙箱读权限这些“官方已经支持，但新手容易漏掉”的能力提前说清楚。
 - **更安全的执行方式**：大改动先计划，权限按需放开，钩子只做“必须每次都执行”的事。
 - **更适合团队上手**：补清了用户级与项目级范围、何时创建本地工具、何时不该过度定制。
+- **跟上 2026 Q1 细节**：把 1M context、prompt caching、tool search、`rate_limits`、`sandbox.filesystem.allowRead` 这些近几个月更关键的细节补进主路径。
 
 ---
 
@@ -54,12 +56,14 @@
 |---|---|---|
 | `CLAUDE.md` | 项目共享记忆 | 你希望 Claude 持续记住命令、架构、约定、风险点 |
 | 子代理 | 放在 `.claude/agents/` 或 `~/.claude/agents/` 的专项角色 | 某类任务值得有一个专门角色和工具权限 |
-| 技能 | 放在 `.claude/skills/<name>/SKILL.md` 的可复用能力 | 你想把某个流程、检查表、命令封装起来重复使用 |
+| 技能 | 放在 `.claude/skills/<name>/SKILL.md` 的可复用能力，也支持 frontmatter 控制触发、fork 上下文和 effort | 你想把某个流程、检查表、命令封装起来重复使用 |
 | 钩子 | 写在 `settings.json` 里的事件触发自动化 | 某件事必须在工具前后稳定发生 |
 | MCP | 外部工具与数据源接入层 | Claude 需要访问 GitHub、Jira、Figma、数据库或内部服务 |
 | Plan Mode | 只读规划模式 | 你想让 Claude 先分析、先出方案，再决定是否改代码 |
 
 如果你刚开始用 Claude Code，不要先堆满钩子和代理。先把 `CLAUDE.md` 写好，再逐步加一两个真正高频的扩展。
+
+很多人第一次看技能时，会误以为它只是“存一段提示词”。现代 `SKILL.md` 还可以用 frontmatter 控制自动触发、分叉上下文和推理深度，最值得先知道的三个字段通常是 `disable-model-invocation`、`context: fork` 和 `effort`。
 
 ---
 
@@ -78,6 +82,15 @@
 9. 只有当某种行为“必须每次都执行”时才创建钩子
 
 本仓库里的代理和技能，建立在这套基线上效果最好。
+
+---
+
+## 2026 年第一季度别漏掉的几个细节
+
+- 技能不只是提示词。现代 `SKILL.md` 支持 frontmatter，可以控制是否自动触发、是否在 fork 上下文里执行，以及推理 effort。
+- 1M context 让长会话更可用，但不等于可以无限堆历史。该 `/compact` 的时候还是要 `/compact`，切换任务时该 `/clear` 就 `/clear`。
+- Claude Code 已经会自动处理一部分成本与上下文优化，例如 prompt caching、auto-compaction，以及在 MCP 工具描述太重时按需做 tool search。
+- 新版状态栏和沙箱也值得知道：statusline 脚本可以读取 `rate_limits`，而 `sandbox.filesystem.allowRead` 可以在 `denyRead` 区域里精确放开读路径。
 
 ---
 
@@ -184,7 +197,7 @@
 
 | 脚本 | 作用 | 目录 |
 |---|---|---|
-| **[Status Line](scripts/statusline-command.sh)** | 在 Claude Code 状态栏里显示分支和改动状态。 | `scripts/` |
+| **[Status Line](scripts/statusline-command.sh)** | 在 Claude Code 状态栏里显示分支、改动状态，以及新版 `rate_limits` 用量。 | `scripts/` |
 
 ---
 
