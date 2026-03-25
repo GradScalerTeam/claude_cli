@@ -2,7 +2,7 @@
 
 English | **[中文](README.md)**
 
-A practical playbook for getting real work done with Claude Code: project memory, subagents, skills, hooks, MCP, and the documentation-first workflow built around Claude CLI in this repo.
+A practical playbook for getting real work done with Claude Code: project memory, subagents, skills, hooks, MCP, and practical guides for using Claude CLI.
 
 ## Quick Start: Claude CLI Workflow Entry
 
