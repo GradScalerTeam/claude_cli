@@ -8,6 +8,10 @@ This document answers a question that becomes confusing very quickly:
 - Are they interchangeable?
 - If you use both, how should they complement each other instead of competing?
 
+If your question is more operational, especially “how does OpenClaw hand work into Claude CLI?” or “what does sharing MCP really mean?”, read this first:
+
+- [OpenClaw + Claude CLI Integration Guide](OPENCLAW_CLAUDE_INTEGRATION.md)
+
 The shortest useful answer is:
 
 - A **Claude CLI subagent** is a focused specialist inside a repo-centric coding workflow.

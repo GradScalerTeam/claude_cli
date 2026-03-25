@@ -4,6 +4,10 @@
 
 这是一个面向 Claude Code 的实战教程仓库，重点不是“多装几个工具”，而是把项目记忆、子代理、技能、Hooks、MCP 和文档优先工作流真正串起来。
 
+## Quick Start
+
+如果你只想先看 OpenClaw inbox triage + Claude CLI repo executor 的最短路径，直接从 [OpenClaw Inbox Triage 执行清单](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md) 开始。
+
 这个分支已按 **2026 年 3 月 24 日** 可访问的 Anthropic Claude Code 官方文档重新整理教程路径。
 
 ---
@@ -19,9 +23,15 @@
 5. **[assistant-os 起步模板](docs/assistant-os-starter/README_CN.md)** — 直接复制 `reference_manifest.md` 和 3 份 protocol 模板开始跑最小系统。
 6. **[创建子代理](HOW_TO_CREATE_AGENTS_CN.md)** — 用 `/agents` 创建项目专属专家。
 7. **[创建技能](HOW_TO_CREATE_SKILLS_CN.md)** — 用 `SKILL.md` 封装可复用的流程和命令。
-8. **[OpenClaw 与 Claude agent 对比](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)** — 专门解释 OpenClaw agent、OpenClaw subagent 和 Claude CLI 子代理的异同，以及如何分层互补。
-9. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
-10. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
+8. **[重构已有粗糙子代理](docs/REFACTOR_EXISTING_SUBAGENTS_CN.md)** — 讲清楚怎么把旧的万能 agent 拆成窄职责角色，并把重复流程下沉成技能。
+9. **[子代理重构起步样板](docs/subagent-refactor-starter/README_CN.md)** — 直接抄一套 `.claude/agents/` 和 `.claude/skills/` 样板，跑最小角色拆分方案。
+10. **[OpenClaw 与 Claude agent 对比](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)** — 专门解释 OpenClaw agent、OpenClaw subagent 和 Claude CLI 子代理的异同，以及如何分层互补。
+11. **[OpenClaw + Claude CLI 集成实战](docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md)** — 专门回答 OpenClaw 如何把任务送进 Claude CLI 仓库工作流，以及 MCP 到底该怎么共享。
+12. **[OpenClaw + Claude CLI 工作流场景拆分](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)** — 把外环 / 内环 / 桥接文档 / 纯仓库模式拆成具体可选方案。
+13. **[OpenClaw Inbox Triage + Claude CLI Repo Executor](docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md)** — 只保留最实用的“收件、分类、路由、进仓库执行”单独专题。
+14. **[OpenClaw Inbox Triage 执行清单](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md)** — 再压缩成能直接照着跑的最小操作手册。
+15. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
+16. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
 
 ---
 
@@ -120,6 +130,29 @@
 
 ---
 
+## 如果你想看更细的 workflow
+
+如果你看到这里，觉得“方向有了，但真正怎么跑还不够具体”，直接按下面三条看：
+
+1. **单仓库现有项目**：看 [HOW_TO_START_EXISTING_PROJECT_CN.md](HOW_TO_START_EXISTING_PROJECT_CN.md)
+   适合你已经有代码库，想把 `CLAUDE.md`、flow doc、代码审查、技能、子代理逐步接进去。
+2. **新项目从 0 到 1**：看 [HOW_TO_START_NEW_PROJECT_CN.md](HOW_TO_START_NEW_PROJECT_CN.md)
+   适合你还在规划阶段，想按“先文档、再审查、再分片实现”的顺序启动。
+3. **OpenClaw 外环 + Claude CLI 内环**：看 [docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md](docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md)
+   适合你想让长期在线助理负责收件、提醒、路由，再把具体仓库执行交给 Claude CLI。
+4. **具体场景怎么选**：看 [docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)
+   适合你想在“OpenClaw 负责什么、Claude CLI 负责什么、桥接文档怎么用”之间快速选模式。
+5. **只看收件到执行这一条链路**：看 [docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md](docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md)
+   适合你只关心最常见、最稳的那一种外环/内环分工。
+6. **只看最小执行清单**：看 [docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md)
+   适合你已经知道要做什么，只想直接照着跑。
+
+如果你只是想解决“OpenClaw agent 和 Claude CLI 子代理是不是一回事”，看：
+
+- [docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)
+
+---
+
 ## 仓库里有什么
 
 ### 代理（Agents）
@@ -187,5 +220,9 @@
 - [HOW_TO_CREATE_AGENTS_CN.md](HOW_TO_CREATE_AGENTS_CN.md)
 - [HOW_TO_CREATE_SKILLS_CN.md](HOW_TO_CREATE_SKILLS_CN.md)
 - [docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)
+- [docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md](docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md)
+- [docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)
+- [docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md](docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md)
+- [docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md)
 - [docs/ASSISTANT_TEAM_PATTERNS_CN.md](docs/ASSISTANT_TEAM_PATTERNS_CN.md)
 - [docs/OFFICIAL_REFERENCE_MAP_CN.md](docs/OFFICIAL_REFERENCE_MAP_CN.md)
