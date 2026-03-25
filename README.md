@@ -4,6 +4,10 @@
 
 这是一个面向 Claude Code 的实战教程仓库，重点不是“多装几个工具”，而是把项目记忆、子代理、技能、Hooks、MCP 和文档优先工作流真正串起来。
 
+## Quick Start
+
+如果你只想先看 OpenClaw inbox triage + Claude CLI repo executor 的最短路径，直接从 [OpenClaw Inbox Triage 执行清单](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md) 开始。
+
 这个分支已按 **2026 年 3 月 24 日** 可访问的 Anthropic Claude Code 官方文档重新整理教程路径。
 
 ---

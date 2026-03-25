@@ -4,6 +4,10 @@ English | **[中文](README.md)**
 
 A practical playbook for getting real work done with Claude Code: project memory, subagents, skills, hooks, MCP, and the documentation-first workflow in this repo.
 
+## Quick Start
+
+If you only want the shortest path for OpenClaw inbox triage + Claude CLI repo executor, start with [OpenClaw Inbox Triage Execution Checklist](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST.md).
+
 This fork refreshes the tutorial path against Anthropic's current Claude Code docs as of **March 24, 2026**.
 
 ---
