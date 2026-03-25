@@ -43,8 +43,10 @@ The original docs were useful, but parts of the onboarding path had drifted away
 
 - **Modern official entry points**: `/init`, `/agents`, `/memory`, `/permissions`, `/mcp`, `/hooks`, and Plan Mode.
 - **Stable mental models**: `CLAUDE.md` for memory, subagents for specialists, skills for reusable workflows, hooks for deterministic automation.
+- **Better visibility for advanced features**: frontmatter, status line scripts, and filesystem read controls now show up earlier instead of being buried in deeper docs.
 - **Safer execution**: plan first for risky work, keep permissions explicit, and use hooks only when you need behavior that must always run.
 - **Better team onboarding**: clearer learning paths, project-vs-user scope guidance, and stronger documentation on when to create local tools.
+- **Current through 2026 Q1 details**: the main path now calls out 1M context, prompt caching, tool search, `rate_limits`, and `sandbox.filesystem.allowRead`.
 
 ---
 
@@ -54,12 +56,14 @@ The original docs were useful, but parts of the onboarding path had drifted away
 |---|---|---|
 | `CLAUDE.md` | Shared memory for a project | You want Claude to consistently remember commands, architecture, conventions, and risks |
 | Subagents | Specialized workers in `.claude/agents/` or `~/.claude/agents/` | A task benefits from a dedicated role with a focused prompt and tool set |
-| Skills | Reusable capabilities in `.claude/skills/<name>/SKILL.md` | You want a repeatable workflow, custom command, or domain-specific playbook |
+| Skills | Reusable capabilities in `.claude/skills/<name>/SKILL.md`, with frontmatter for invocation, forked execution, and effort | You want a repeatable workflow, custom command, or domain-specific playbook |
 | Hooks | Deterministic automation in `settings.json` | Something must always happen before or after a tool event |
 | MCP | External tools and data sources | Claude needs access to GitHub, Jira, Figma, databases, internal services, or other tool servers |
 | Plan Mode | Read-only planning mode | You want Claude to analyze safely before it edits or runs commands |
 
 If you're new, do not start with custom hooks or a pile of agents. Start with `CLAUDE.md`, a clean workflow, and one or two focused extensions.
+
+Many people first read skills as "saved prompts." Modern `SKILL.md` files are more than that: frontmatter can control automatic invocation, forked execution, and reasoning depth. The three fields worth noticing early are usually `disable-model-invocation`, `context: fork`, and `effort`.
 
 ---
 
@@ -78,6 +82,15 @@ Before you install any extra tooling, set up this baseline:
 9. Add hooks only when you need deterministic enforcement, not just advice.
 
 This repository's agents and skills work best on top of that baseline.
+
+---
+
+## Easy-To-Miss 2026 Q1 Details
+
+- Skills are not just prompt snippets. Modern `SKILL.md` files support frontmatter for invocation style, forked execution, and reasoning effort.
+- 1M context makes long sessions easier to use, but it does not mean you should keep piling on stale history forever. Use `/compact` when you stay on the same task, and `/clear` when the task has changed.
+- Claude Code already handles part of the cost and context optimization story automatically through prompt caching, auto-compaction, and tool search when MCP tool descriptions get heavy.
+- Newer status line and sandbox features are worth surfacing too: status line scripts can read `rate_limits`, and `sandbox.filesystem.allowRead` can reopen specific read paths inside a broader denied region.
 
 ---
 
@@ -182,7 +195,7 @@ If your main question is simply whether OpenClaw agents and Claude CLI subagents
 
 | Script | What it does | Folder |
 |---|---|---|
-| **[Status Line](scripts/statusline-command.sh)** | Displays branch and change state in Claude Code's status line. | `scripts/` |
+| **[Status Line](scripts/statusline-command.sh)** | Displays branch, change state, and newer `rate_limits` usage in Claude Code's status line. | `scripts/` |
 
 ---
 

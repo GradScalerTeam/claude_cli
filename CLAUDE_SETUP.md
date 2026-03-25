@@ -637,6 +637,12 @@ That is when `/compact` matters.
 
 It does not make Claude smarter. It helps compress the current conversation so the next stretch of work has less context bloat.
 
+Longer context is easier to use than before on newer 1M-capable models, but bigger context is not the same thing as cleaner context.
+
+Claude Code also helps automatically with prompt caching, auto-compaction, and tool search when MCP tool descriptions get too large. Those features reduce friction and cost, but they do not solve context rot for you.
+
+Use `/compact` when you want to stay on the same task but trim transcript bloat. Use `/clear` when you are switching tasks and stale context is now more harmful than helpful.
+
 ---
 
 ## Permission Modes And Plan Mode
@@ -690,6 +696,26 @@ Anthropic's current settings hierarchy matters because many tutorials blur user,
 
 Use project settings for team-shared hooks or permissions. Use user settings for personal defaults.
 
+## One Filesystem Setting Worth Knowing
+
+If you need sandboxing that is stricter than a natural-language warning in `CLAUDE.md`, current Claude Code also supports `sandbox.filesystem.allowRead`.
+
+Use it together with `denyRead` when you want to block a broad sensitive area but still re-allow one safe path:
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "denyRead": ["~/"],
+      "allowRead": ["."]
+    }
+  }
+}
+```
+
+`allowRead` takes precedence over `denyRead`, which is useful when a review-focused agent should read the current repo but not your wider home directory.
+
 ---
 
 ## Memory Hierarchy
@@ -728,6 +754,10 @@ If you put agent files in a custom `.agents/` directory, Claude Code will not au
 - the process benefits from reference files or a checklist
 
 Store skills in `.claude/skills/<name>/SKILL.md`.
+
+Modern skills are not just prompt snippets. `SKILL.md` frontmatter can control whether a skill auto-triggers, whether it runs in forked context, and what reasoning effort it uses.
+
+In practice, `disable-model-invocation`, `context: fork`, and `effort` are three of the highest-value fields to learn early.
 
 Here, "reusable slash command" does not mean a shell alias or a built-in Claude command.
 
@@ -804,7 +834,7 @@ If you want to use the tools in this repository without overcomplicating your en
 6. Install `global-review-doc`
 7. Install `global-review-code`
 8. Add `doc-scanner` if your repo has meaningful markdown docs
-9. Add the custom status line if you want better git visibility
+9. Add the custom status line if you want better git and rate-limit visibility
 10. Add project-specific subagents and skills later
 
 ---
@@ -829,6 +859,8 @@ Then add this to `~/.claude/settings.json`:
   }
 }
 ```
+
+Newer Claude Code builds also pass `rate_limits.five_hour.*` and `rate_limits.seven_day.*` into status line scripts. The script in this repo will show those percentages when the fields are present.
 
 This is a nice quality-of-life improvement, but it is not part of the core onboarding path.
 
