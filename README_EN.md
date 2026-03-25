@@ -2,9 +2,9 @@
 
 English | **[中文](README.md)**
 
-A practical playbook for getting real work done with Claude Code: project memory, subagents, skills, hooks, MCP, and the documentation-first workflow in this repo.
+A practical playbook for getting real work done with Claude Code: project memory, subagents, skills, hooks, MCP, and the documentation-first workflow built around Claude CLI in this repo.
 
-## Quick Start
+## Quick Start: Claude CLI Workflow Entry
 
 If you only want the shortest path for OpenClaw inbox triage + Claude CLI repo executor, start with [OpenClaw Inbox Triage Execution Checklist](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST.md).
 
