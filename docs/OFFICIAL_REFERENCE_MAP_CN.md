@@ -1,6 +1,6 @@
 # 官方资料对照表
 
-**[English](OFFICIAL_REFERENCE_MAP.md)** | 中文
+中文
 
 这份文档用于说明：本仓库里重写过的 Claude Code 教程，分别参考了 Anthropic 官方的哪些文档，以及这些官方页面为什么重要。
 

@@ -28,6 +28,36 @@ die() {
   exit 1
 }
 
+cleanup_macos_metadata() {
+  find . -name '._*' -delete 2>/dev/null || true
+}
+
+remove_non_chinese_assets() {
+  local extra_paths=(
+    ".github/workflows/i18n-check.yml"
+    "scripts/check-locale-sync.js"
+    "locales/en.json"
+  )
+
+  local extra_path
+  for extra_path in "${extra_paths[@]}"; do
+    if git ls-files --error-unmatch "$extra_path" >/dev/null 2>&1; then
+      git rm -f -- "$extra_path"
+    elif [ -e "$extra_path" ]; then
+      rm -f -- "$extra_path"
+    fi
+  done
+}
+
+normalize_chinese_docs() {
+  while IFS= read -r -d '' markdown_file; do
+    perl -0pi \
+      -e 's/\*\*\[English\]\([^)]+\)\*\* \| 中文/中文/g' \
+      -e 's/> \*\*中文版\*\* \| \[English\]\([^)]+\)/> **中文版**/g' \
+      "$markdown_file"
+  done < <(find . -type f -name "*.md" ! -path "./.git/*" -print0)
+}
+
 should_keep_markdown() {
   local rel_path="$1"
   local base_name
@@ -111,6 +141,8 @@ if ! git remote get-url "$ORIGIN_REMOTE" >/dev/null 2>&1; then
   die "Remote '$ORIGIN_REMOTE' does not exist."
 fi
 
+cleanup_macos_metadata
+
 if [ -n "$(git status --porcelain)" ]; then
   die "Working tree is not clean. Commit or stash your changes first."
 fi
@@ -180,9 +212,10 @@ fi
 printf "Pruning non-Chinese Markdown files...\n"
 "$PRUNE_SCRIPT"
 
-if [ -f "README.md" ]; then
-  perl -0pi -e 's/\*\*\[English\]\(README_EN\.md\)\*\* \| 中文/中文/g' README.md
-fi
+printf "Removing non-Chinese support assets...\n"
+remove_non_chinese_assets
+normalize_chinese_docs
+cleanup_macos_metadata
 
 if [ -n "$(git status --porcelain)" ]; then
   git add -A

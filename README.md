@@ -10,6 +10,8 @@
 
 这个分支已按 **2026 年 3 月 24 日** 可访问的 Anthropic Claude Code 官方文档重新整理教程路径。
 
+本私有仓库默认只保留中文教程、中文专题文档和中文 locale 示例；上游英文原始说明会在同步时自动裁掉。
+
 ---
 
 ## 从哪里开始
@@ -157,17 +159,17 @@
 
 ### 代理（Agents）
 
-| 代理 | 作用 | 目录 |
+| 代理 | 作用 | 中文入口 |
 |---|---|---|
-| **[Global Doc Master](agents/global-doc-master/)** | 负责规划文档、功能流程、问题文档、部署说明、调试文档等结构化文档的创建与维护。 | `agents/global-doc-master/` |
-| **[Global Doc Fixer](agents/global-doc-fixer/)** | 反复调用审查与修复流程，把文档收敛到可实施状态。 | `agents/global-doc-fixer/` |
+| **Global Doc Master** | 负责规划文档、功能流程、问题文档、部署说明、调试文档等结构化文档的创建与维护。 | [新项目工作流](HOW_TO_START_NEW_PROJECT_CN.md) / [现有项目工作流](HOW_TO_START_EXISTING_PROJECT_CN.md) |
+| **Global Doc Fixer** | 反复调用审查与修复流程，把文档收敛到可实施状态。 | [新项目工作流](HOW_TO_START_NEW_PROJECT_CN.md) |
 
 ### 技能（Skills）
 
-| 技能 | 作用 | 目录 |
+| 技能 | 作用 | 中文入口 |
 |---|---|---|
-| **[Global Review Doc](skills/global-review-doc/)** | 对照真实代码库审查文档，找缺漏、歧义、风险和代理可执行性问题。 | `skills/global-review-doc/` |
-| **[Global Review Code](skills/global-review-code/)** | 从架构、安全、正确性、测试和可维护性等维度审查代码。 | `skills/global-review-code/` |
+| **Global Review Doc** | 对照真实代码库审查文档，找缺漏、歧义、风险和代理可执行性问题。 | [新项目工作流](HOW_TO_START_NEW_PROJECT_CN.md) |
+| **Global Review Code** | 从架构、安全、正确性、测试和可维护性等维度审查代码。 | [现有项目工作流](HOW_TO_START_EXISTING_PROJECT_CN.md) |
 
 ### 钩子
 
@@ -198,7 +200,7 @@
 6. 安装 **Status Line**
 7. 只有在你使用 Pencil 时才安装 **Design Context**
 
-每个组件自己的 README 里都保留了安装说明和可直接复制的提示词。
+本私有库只保留中文教程与可直接使用的脚本；上游英文原始定义会在同步时自动裁掉。
 
 ---
 

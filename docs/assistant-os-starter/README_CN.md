@@ -1,6 +1,6 @@
 # Assistant-OS 起步模板
 
-**[English](README.md)** | 中文
+中文
 
 这是一套可直接复制到个人 `assistant-os` 项目里的起步模板，用来补齐教程里提到的 4 个关键文件：
 
