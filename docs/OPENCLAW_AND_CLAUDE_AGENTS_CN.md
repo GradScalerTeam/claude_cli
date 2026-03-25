@@ -7,6 +7,10 @@
 - 两者是不是同一类东西
 - 如果同时使用，它们应该怎样分工，而不是互相替代
 
+如果你更关心的是“OpenClaw 怎么把任务送进 Claude CLI 仓库工作流”以及“MCP 到底能不能共用”，先看：
+
+- [OpenClaw 与 Claude CLI 集成实战](OPENCLAW_CLAUDE_INTEGRATION_CN.md)
+
 一句话先讲清：
 
 - **Claude CLI 子代理** 更像“当前代码仓库里的专项专家”
