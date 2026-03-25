@@ -4,6 +4,8 @@ English | **[中文](README.md)**
 
 A practical playbook for getting real work done with Claude Code: project memory, subagents, skills, hooks, MCP, and practical guides for using Claude CLI.
 
+中文：学习并掌握 Claude Code CLI - 工作流、代理、技能、钩子、插件与实战指南。
+
 ## Quick Start: Claude CLI Workflow Entry
 
 If you only want the shortest path for OpenClaw inbox triage + Claude CLI repo executor, start with [OpenClaw Inbox Triage Execution Checklist](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST.md).
