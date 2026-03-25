@@ -9,10 +9,15 @@
 相关阅读：
 
 - [OpenClaw 与 Claude CLI 集成实战](OPENCLAW_CLAUDE_INTEGRATION_CN.md)
+- [OpenClaw Inbox Triage + Claude CLI Repo Executor](OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md)
 
 ---
 
 ## 场景 1：OpenClaw 做外环，Claude CLI 做仓库执行器
+
+如果你只想看这一个模式，直接看：
+
+- [OpenClaw Inbox Triage + Claude CLI Repo Executor](OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md)
 
 适合：
 

@@ -9,10 +9,15 @@ If you already read the general integration guide, this page answers the next qu
 Related reading:
 
 - [OpenClaw + Claude CLI Integration Guide](OPENCLAW_CLAUDE_INTEGRATION.md)
+- [OpenClaw Inbox Triage + Claude CLI Repo Executor](OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR.md)
 
 ---
 
 ## Scenario 1: OpenClaw as the outer loop, Claude CLI as the repo executor
+
+If you only want this one pattern, read:
+
+- [OpenClaw Inbox Triage + Claude CLI Repo Executor](OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR.md)
 
 Use this when:
 
