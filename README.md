@@ -25,8 +25,9 @@
 11. **[OpenClaw + Claude CLI 集成实战](docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md)** — 专门回答 OpenClaw 如何把任务送进 Claude CLI 仓库工作流，以及 MCP 到底该怎么共享。
 12. **[OpenClaw + Claude CLI 工作流场景拆分](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)** — 把外环 / 内环 / 桥接文档 / 纯仓库模式拆成具体可选方案。
 13. **[OpenClaw Inbox Triage + Claude CLI Repo Executor](docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md)** — 只保留最实用的“收件、分类、路由、进仓库执行”单独专题。
-14. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
-15. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
+14. **[OpenClaw Inbox Triage 执行清单](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md)** — 再压缩成能直接照着跑的最小操作手册。
+15. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
+16. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
 
 ---
 
@@ -139,6 +140,8 @@
    适合你想在“OpenClaw 负责什么、Claude CLI 负责什么、桥接文档怎么用”之间快速选模式。
 5. **只看收件到执行这一条链路**：看 [docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md](docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md)
    适合你只关心最常见、最稳的那一种外环/内环分工。
+6. **只看最小执行清单**：看 [docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md)
+   适合你已经知道要做什么，只想直接照着跑。
 
 如果你只是想解决“OpenClaw agent 和 Claude CLI 子代理是不是一回事”，看：
 
@@ -216,5 +219,6 @@
 - [docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md](docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md)
 - [docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)
 - [docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md](docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md)
+- [docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md)
 - [docs/ASSISTANT_TEAM_PATTERNS_CN.md](docs/ASSISTANT_TEAM_PATTERNS_CN.md)
 - [docs/OFFICIAL_REFERENCE_MAP_CN.md](docs/OFFICIAL_REFERENCE_MAP_CN.md)

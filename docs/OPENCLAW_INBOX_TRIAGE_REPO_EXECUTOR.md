@@ -11,6 +11,7 @@ Related reading:
 
 - [OpenClaw + Claude CLI Integration Guide](OPENCLAW_CLAUDE_INTEGRATION.md)
 - [OpenClaw + Claude CLI Workflow Scenarios](OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md)
+- [OpenClaw Inbox Triage Execution Checklist](OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST.md)
 
 ---
 

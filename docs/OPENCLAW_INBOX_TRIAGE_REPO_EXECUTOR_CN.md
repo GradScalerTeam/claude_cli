@@ -11,6 +11,7 @@
 
 - [OpenClaw 与 Claude CLI 集成实战](OPENCLAW_CLAUDE_INTEGRATION_CN.md)
 - [OpenClaw 与 Claude CLI 工作流场景拆分](OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)
+- [OpenClaw Inbox Triage 执行清单](OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md)
 
 ---
 
