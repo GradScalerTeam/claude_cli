@@ -28,6 +28,30 @@ die() {
   exit 1
 }
 
+should_keep_markdown() {
+  local rel_path="$1"
+  local base_name
+  base_name="$(basename "$rel_path")"
+
+  if [[ "$rel_path" == "README.md" ]]; then
+    return 0
+  fi
+  if [[ "$rel_path" == "中文入口.md" ]]; then
+    return 0
+  fi
+  if [[ "$base_name" == *_CN.md ]]; then
+    return 0
+  fi
+  if [[ "$rel_path" == "Claude Code 外链笔记/"* ]]; then
+    return 0
+  fi
+  if [[ "$rel_path" == "docs/cn/"* ]]; then
+    return 0
+  fi
+
+  return 1
+}
+
 FORCE_PUSH=0
 NO_PUSH=0
 POSITIONAL=()
@@ -117,7 +141,40 @@ if git merge-base --is-ancestor "$UPSTREAM_REF" HEAD; then
   printf "Local branch already contains %s/%s.\n" "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH"
 else
   printf "Merging %s/%s into %s...\n" "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" "$TARGET_BRANCH"
-  git merge --no-edit -X ours "$UPSTREAM_REF"
+  if ! git merge --no-edit -X ours "$UPSTREAM_REF"; then
+    printf "Auto-resolving conflicts with Chinese-only policy...\n"
+
+    unresolved_files=()
+    while IFS= read -r conflict_file; do
+      if [ -n "$conflict_file" ]; then
+        unresolved_files+=("$conflict_file")
+      fi
+    done < <(git diff --name-only --diff-filter=U)
+
+    if [ "${#unresolved_files[@]}" -eq 0 ]; then
+      die "Merge failed but no conflict files were detected."
+    fi
+
+    for conflict_file in "${unresolved_files[@]}"; do
+      if [[ "$conflict_file" == *.md ]]; then
+        if should_keep_markdown "$conflict_file"; then
+          git checkout --ours -- "$conflict_file"
+          git add -- "$conflict_file"
+        else
+          git rm -f -- "$conflict_file"
+        fi
+      else
+        git checkout --ours -- "$conflict_file"
+        git add -- "$conflict_file"
+      fi
+    done
+
+    if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+      die "Unresolved merge conflicts remain after auto-resolution."
+    fi
+
+    git commit --no-edit
+  fi
 fi
 
 printf "Pruning non-Chinese Markdown files...\n"
