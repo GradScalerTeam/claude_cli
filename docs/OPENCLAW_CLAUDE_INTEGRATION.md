@@ -8,6 +8,7 @@ This page answers two practical questions:
 If you have not read the conceptual comparison yet, start here:
 
 - [OpenClaw Agents vs Claude CLI Agents](OPENCLAW_AND_CLAUDE_AGENTS.md)
+- [OpenClaw + Claude CLI Workflow Scenarios](OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md)
 
 That page explains the layers. This one explains how to wire them together.
 

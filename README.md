@@ -23,8 +23,9 @@
 9. **[子代理重构起步样板](docs/subagent-refactor-starter/README_CN.md)** — 直接抄一套 `.claude/agents/` 和 `.claude/skills/` 样板，跑最小角色拆分方案。
 10. **[OpenClaw 与 Claude agent 对比](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)** — 专门解释 OpenClaw agent、OpenClaw subagent 和 Claude CLI 子代理的异同，以及如何分层互补。
 11. **[OpenClaw + Claude CLI 集成实战](docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md)** — 专门回答 OpenClaw 如何把任务送进 Claude CLI 仓库工作流，以及 MCP 到底该怎么共享。
-12. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
-13. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
+12. **[OpenClaw + Claude CLI 工作流场景拆分](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)** — 把外环 / 内环 / 桥接文档 / 纯仓库模式拆成具体可选方案。
+13. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
+14. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
 
 ---
 
@@ -133,6 +134,8 @@
    适合你还在规划阶段，想按“先文档、再审查、再分片实现”的顺序启动。
 3. **OpenClaw 外环 + Claude CLI 内环**：看 [docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md](docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md)
    适合你想让长期在线助理负责收件、提醒、路由，再把具体仓库执行交给 Claude CLI。
+4. **具体场景怎么选**：看 [docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)
+   适合你想在“OpenClaw 负责什么、Claude CLI 负责什么、桥接文档怎么用”之间快速选模式。
 
 如果你只是想解决“OpenClaw agent 和 Claude CLI 子代理是不是一回事”，看：
 
@@ -208,5 +211,6 @@
 - [HOW_TO_CREATE_SKILLS_CN.md](HOW_TO_CREATE_SKILLS_CN.md)
 - [docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)
 - [docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md](docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md)
+- [docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)
 - [docs/ASSISTANT_TEAM_PATTERNS_CN.md](docs/ASSISTANT_TEAM_PATTERNS_CN.md)
 - [docs/OFFICIAL_REFERENCE_MAP_CN.md](docs/OFFICIAL_REFERENCE_MAP_CN.md)

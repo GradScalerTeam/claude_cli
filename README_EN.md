@@ -23,8 +23,9 @@ Pick the path that matches where you are right now:
 9. **[Subagent refactor starter](docs/subagent-refactor-starter/README.md)** — copy-ready `.claude/agents/` and `.claude/skills/` examples for a minimal role split.
 10. **[OpenClaw vs Claude agents](docs/OPENCLAW_AND_CLAUDE_AGENTS.md)** — a detailed comparison of OpenClaw agents, OpenClaw subagents, and Claude CLI subagents, plus recommended complementarity patterns.
 11. **[OpenClaw + Claude CLI integration guide](docs/OPENCLAW_CLAUDE_INTEGRATION.md)** — explains how OpenClaw hands work into Claude CLI repo workflows and what “sharing MCP” should mean in practice.
-12. **[Assistant team patterns](docs/ASSISTANT_TEAM_PATTERNS.md)** — practical patterns for splitting work, life, and reflection assistants.
-13. **[Official reference map](docs/OFFICIAL_REFERENCE_MAP.md)** — see which Anthropic docs back each guide in this repo.
+12. **[OpenClaw + Claude CLI workflow scenarios](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md)** — breaks the model into concrete choices: outer loop, inner loop, bridge artifacts, or repo-only work.
+13. **[Assistant team patterns](docs/ASSISTANT_TEAM_PATTERNS.md)** — practical patterns for splitting work, life, and reflection assistants.
+14. **[Official reference map](docs/OFFICIAL_REFERENCE_MAP.md)** — see which Anthropic docs back each guide in this repo.
 
 ---
 
@@ -133,6 +134,8 @@ If the direction is clear but the exact operating flow still feels too abstract,
    Best when you are still in planning and want to go documentation first, then review, then implement in slices.
 3. **OpenClaw outer loop + Claude CLI inner loop**: read [docs/OPENCLAW_CLAUDE_INTEGRATION.md](docs/OPENCLAW_CLAUDE_INTEGRATION.md)
    Best when you want a long-lived assistant to handle intake, reminders, and routing, while Claude CLI handles concrete repo execution.
+4. **How to choose a concrete scenario**: read [docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md)
+   Best when you want a quick decision tree for outer loop, inner loop, bridge docs, or repo-only work.
 
 If your main question is simply whether OpenClaw agents and Claude CLI subagents are the same thing, read:
 
@@ -208,5 +211,6 @@ Each component has its own README with setup instructions and copy-ready install
 - [HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)
 - [docs/OPENCLAW_AND_CLAUDE_AGENTS.md](docs/OPENCLAW_AND_CLAUDE_AGENTS.md)
 - [docs/OPENCLAW_CLAUDE_INTEGRATION.md](docs/OPENCLAW_CLAUDE_INTEGRATION.md)
+- [docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md)
 - [docs/ASSISTANT_TEAM_PATTERNS.md](docs/ASSISTANT_TEAM_PATTERNS.md)
 - [docs/OFFICIAL_REFERENCE_MAP.md](docs/OFFICIAL_REFERENCE_MAP.md)

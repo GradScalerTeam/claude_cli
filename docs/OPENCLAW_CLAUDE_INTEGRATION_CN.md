@@ -8,6 +8,7 @@
 如果你还没读过概念对比，建议先看：
 
 - [OpenClaw Agent 与 Claude CLI Agent：异同与互补](OPENCLAW_AND_CLAUDE_AGENTS_CN.md)
+- [OpenClaw 与 Claude CLI 工作流场景拆分](OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS_CN.md)
 
 这篇则更偏“怎么落地”。
 
