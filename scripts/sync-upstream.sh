@@ -52,8 +52,7 @@ remove_non_chinese_assets() {
 normalize_chinese_docs() {
   while IFS= read -r -d '' markdown_file; do
     perl -0pi \
-      -e 's{\*\*\[English\]\([^)]+\)\*\* \| 中文}{中文}g' \
-      -e 's{> \*\*中文版\*\* \| \[English\]\([^)]+\)}{> **中文版**}g' \
+      -e 's{\*\*\[English\]\([^)]+\)\*\* \| 中文}{中文}g; s{> \*\*中文版\*\* \| \[English\]\([^)]+\)}{> **中文版**}g' \
       "$markdown_file"
   done < <(find . -type f -name "*.md" ! -path "./.git/*" -print0)
 }
