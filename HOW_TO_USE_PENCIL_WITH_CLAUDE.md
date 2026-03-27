@@ -36,71 +36,27 @@ This means Claude can both **design screens** and **read your codebase** in the 
 
 ---
 
-## The Problem: The Context Gap
+## How Context Works: Pencil's Repository Selection
 
-When Claude Code runs in your **terminal** (normal CLI usage), the working directory is your project root:
+Pencil now lets you choose the **repository root** as the working directory, even if your `.pen` file lives in a subfolder like `design/`. This means Claude Code starts with full project context automatically:
 
 ```
-/MyProject/                 ← Claude starts here
+/MyProject/                 ← Claude starts here (you select this in Pencil)
 ├── CLAUDE.md                ← Auto-loaded (project context)
 ├── docs/                    ← Scanned by doc-scanner hook
 │   └── planning/*.md
 ├── frontend/src/            ← Accessible for research
 ├── backend/                 ← Accessible for research
 └── design/
-    └── screens.pen
+    └── screens.pen          ← The file you're designing
 ```
 
-Claude automatically reads `CLAUDE.md`, the doc-scanner hook indexes all `.md` files, and full project context is available from the start.
+Because Claude initializes from the project root, everything works out of the box:
+- `CLAUDE.md` is auto-loaded with project context
+- The doc-scanner hook indexes all `.md` files
+- Claude has full access to your codebase for research
 
-But when Claude Code runs inside **Pencil**, the working directory is `design/`:
-
-```
-/MyProject/design/          ← Claude starts here
-└── screens.pen              ← Only this exists
-
-CLAUDE.md?    NOT auto-loaded (it's in the parent directory)
-docs/?        NOT scanned (doc-scanner looks in pwd only)
-frontend/?    NOT indexed
-backend/?     NOT indexed
-```
-
-**Result**: Claude in Pencil has zero project awareness. It doesn't know about routes, user flows, data models, planning docs, or existing code. Every design session starts from scratch.
-
-### Why This Matters
-
-Without project context, Claude:
-- Designs forms with **guessed field names** instead of actual API fields
-- Creates screens without knowing the **user flow** or step progression
-- Uses **placeholder content** instead of real data shapes
-- Doesn't know about **Redux state**, API responses, or conditional rendering
-- Has to be told about every **convention**, branding rule, and design decision
-
----
-
-## The Solution: Design Context Hook
-
-We built a **SessionStart hook** that automatically bridges project knowledge into Pencil design sessions. It generates a `design/CLAUDE.md` file that gives Claude full project awareness at ~1,600 tokens — replacing the ~15,000+ tokens of manual research that would otherwise happen in conversation context.
-
-Full setup and technical details: **[hooks/design-context/](hooks/design-context/)**
-
-### What the Hook Does
-
-1. Detects when `pwd` ends with `/design` (safe no-op for all other sessions)
-2. Crawls the parent project — extracts overview, user flow, routes, roles from `CLAUDE.md`
-3. Indexes file paths from `docs/`, `frontend/src/Pages/`, `frontend/src/Components/`, and `backend/api/`
-4. Generates a `design/CLAUDE.md` with all context + auto-research rules
-5. Outputs a summary showing what was injected
-
-### Auto-Research Rules
-
-The generated `CLAUDE.md` includes behavioral instructions that Claude follows automatically. When you say "design the onboarding page," Claude:
-
-1. Matches "onboarding" to the screen-to-research mapping
-2. Reads `../frontend/src/Pages/Onboarding/OnboardingPage.jsx` automatically
-3. Checks `../docs/planning/` for relevant planning docs
-4. Uses actual field names, state shapes, and validation rules from the code
-5. Designs with full knowledge — no manual prompting needed
+No extra hooks or workarounds needed.
 
 ---
 
@@ -132,42 +88,11 @@ my-project/
     └── app-screens.pen
 ```
 
-### Step 2: Install the Design Context Hook
+### Step 2: Open Your .pen File in Pencil
 
-Follow the setup instructions in **[hooks/design-context/README.md](hooks/design-context/README.md)** — or paste this into your Claude CLI:
+Open the `.pen` file in Pencil and **select your project root** as the repository when prompted. This ensures Claude starts with the full project as its working directory.
 
-```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the design context hook:
-
-1. Read hooks/design-context/design-context-hook.sh — save it to ~/.claude/design-context-hook.sh with the exact same content. Make it executable (chmod +x).
-
-2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add a SessionStart hook that runs "bash ~/.claude/design-context-hook.sh". Merge it with any existing hooks — don't overwrite them.
-
-After installing, tell me it's done and explain what the hook does.
-```
-
-### Step 3: Open Your .pen File in Pencil
-
-Open the `.pen` file from your `design/` folder in the Pencil app. Claude Code will start, the SessionStart hooks will fire, and you'll see:
-
-```
-Design Context Hook
-===================
-Project: my-project
-Parent: /Users/you/projects/my-project
-
-Injected into design/CLAUDE.md:
-  - Project overview, user flow, routes, roles from CLAUDE.md
-  - 3 planning doc(s) indexed
-  - 12 frontend page(s) listed
-  - 5 frontend component(s) listed
-  - 4 backend API route file(s) listed
-
-  Auto-research rules active: Claude will read relevant
-  docs and code automatically before designing screens.
-```
-
-### Step 4: Design With Context
+### Step 3: Design With Context
 
 Now just ask Claude to design. It already knows your project:
 
@@ -177,9 +102,9 @@ Now just ask Claude to design. It already knows your project:
 ```
 
 Claude will:
-1. Check the auto-research mapping for "dashboard"
-2. Read `../frontend/src/Pages/Dashboard/DashboardPage.jsx` to understand data flow
-3. Check `../docs/planning/dashboard-feature.md` if it exists
+1. Read your `CLAUDE.md` and planning docs for project context
+2. Read `frontend/src/Pages/Dashboard/DashboardPage.jsx` to understand data flow
+3. Check `docs/planning/dashboard-feature.md` if it exists
 4. Design the screen using actual field names, real state shapes, and correct route structure
 5. Use Pencil MCP tools (`batch_design`, `batch_get`, etc.) to create the design in your `.pen` file
 
@@ -249,21 +174,13 @@ The planning doc drives both the design and the code. Claude in Pencil reads the
 
 ## Troubleshooting
 
-### Hook didn't run
-- Make sure the hook is registered in `~/.claude/settings.json` under `SessionStart`
-- Verify the script is executable: `chmod +x ~/.claude/design-context-hook.sh`
-- Check that your `.pen` file is inside a folder named `design/` (not `designs/`, `ui/`, etc.)
+### Claude doesn't have project context in Pencil
+- Make sure you selected the **project root** as the repository in Pencil, not the `design/` subfolder
+- Verify your project root has a `CLAUDE.md` file
 
-### No project context generated
-- Verify the parent directory has either a `CLAUDE.md` file or a `.git` directory
-- The hook requires the `design/` folder to be exactly one level below the project root
-
-### Missing sections in design/CLAUDE.md
-- The hook extracts sections by `##` heading name from your `CLAUDE.md`. If your headings don't match (e.g., `## Routes` instead of `## Frontend Routes`), edit the `awk` patterns in the script
-- Sections that don't exist in your `CLAUDE.md` are simply skipped — this is normal
-
-### design/CLAUDE.md keeps regenerating
-- This is intentional. The file is regenerated every session to pick up any changes in the parent project. Don't edit it manually — edit the parent `CLAUDE.md` instead
+### Doc scanner hook didn't run
+- Make sure the doc-scanner hook is registered in `~/.claude/settings.json` under `SessionStart`
+- Verify the script is executable: `chmod +x ~/.claude/doc-scanner.sh`
 
 ---
 

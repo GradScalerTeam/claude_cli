@@ -46,7 +46,6 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 - **[skills/global-review-doc/](skills/global-review-doc/)** — Skill that reviews documents against the codebase (9-phase review, 11-section report)
 - **[skills/global-review-code/](skills/global-review-code/)** — Skill that audits code and hunts bugs (12-phase audit + bug hunt mode)
 - **[hooks/doc-scanner/](hooks/doc-scanner/)** — SessionStart hook that scans for `.md` files and gives Claude a documentation index at conversation start
-- **[hooks/design-context/](hooks/design-context/)** — SessionStart hook for Pencil design sessions that bridges parent project context into `design/CLAUDE.md`
 
 ## Project Structure
 
@@ -61,11 +60,8 @@ claude_cli/
 ├── HOW_TO_CREATE_SKILLS.md            # Guide: creating custom skills
 ├── HOW_TO_USE_PENCIL_WITH_CLAUDE.md   # Guide: using Pencil for UI design with Claude
 ├── hooks/
-│   ├── doc-scanner/                   # SessionStart hook — doc awareness at conversation start
-│   │   ├── doc-scanner.sh             # The hook script
-│   │   └── README.md                  # Setup guide and explanation
-│   └── design-context/               # SessionStart hook — project context for Pencil
-│       ├── design-context-hook.sh     # The hook script
+│   └── doc-scanner/                   # SessionStart hook — doc awareness at conversation start
+│       ├── doc-scanner.sh             # The hook script
 │       └── README.md                  # Setup guide and explanation
 ├── scripts/
 │   └── statusline-command.sh          # Custom status line script for Claude Code

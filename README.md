@@ -46,7 +46,7 @@ Want Claude to automatically know about your existing docs?
 
 Using Pencil for UI design?
 
-7. **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** — How to use [Pencil](https://www.pencil.dev/) with Claude Code for context-aware design sessions. Includes the Design Context Hook that bridges your codebase knowledge into the Pencil design environment.
+7. **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** — How to use [Pencil](https://www.pencil.dev/) with Claude Code for context-aware design sessions.
 
 ---
 
@@ -93,7 +93,6 @@ Hooks are scripts that run automatically in response to Claude CLI events — li
 | Hook | What It Does | Folder |
 |---|---|---|
 | **[Doc Scanner](hooks/doc-scanner/)** | SessionStart hook that scans your project for `.md` files and outputs a documentation index at the start of every conversation. Claude immediately knows what planning docs, feature specs, flow docs, and agent definitions exist — and reads the relevant ones before starting work. | `hooks/doc-scanner/` |
-| **[Design Context](hooks/design-context/)** | SessionStart hook for [Pencil](https://www.pencil.dev/) design sessions. Detects when Claude runs inside a `design/` subfolder, crawls the parent project, and generates a `design/CLAUDE.md` with project overview, routes, components, docs index, and auto-research rules — so Claude designs with full codebase awareness. | `hooks/design-context/` |
 
 ### Status Line
 
@@ -110,7 +109,7 @@ Hooks are scripts that run automatically in response to Claude CLI events — li
 | **[HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)** | Using Claude CLI in an existing project — feature flows, code review, issue docs, local tools, development agents |
 | **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** | What agents are, how they work, and how to create your own using the agent-development plugin |
 | **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** | What skills are, how they differ from agents, and how to create your own using the skill-development plugin |
-| **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** | Using [Pencil](https://www.pencil.dev/) with Claude Code for context-aware UI design — the context gap problem, the design context hook, and the full design workflow |
+| **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** | Using [Pencil](https://www.pencil.dev/) with Claude Code for context-aware UI design — repository selection, project context, and the full design workflow |
 
 ---
 
@@ -134,8 +133,6 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install e
 3. HOOKS: Scan the hooks/ folder. For each subfolder, find the .sh file — that's the hook script. Copy it to ~/.claude/<filename> with exact content. Make it executable (chmod +x). Then read my existing ~/.claude/settings.json (create if needed) and add a SessionStart hook entry for each .sh file that runs "bash ~/.claude/<filename>". Merge with existing hooks — don't overwrite.
 
 4. SCRIPTS: Scan the scripts/ folder. Copy each .sh file to ~/.claude/<filename> with exact content. For statusline-command.sh specifically, also add the statusLine config to settings.json: { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } }. Merge with existing settings — don't overwrite.
-
-Note: The Design Context Hook (hooks/design-context/) is specifically for the Pencil design app (pencil.dev). It won't do anything unless you use Pencil — feel free to skip it or remove it after install if you don't use Pencil.
 
 After installing everything, read the README.md in each folder and give me a summary of what was installed and how to use each one.
 ```
@@ -172,8 +169,6 @@ To install just the hooks:
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the hooks:
 
 Scan the hooks/ folder. For each subfolder, find the .sh file — that's the hook script. Copy it to ~/.claude/<filename> with exact content. Make it executable (chmod +x). Then read my existing ~/.claude/settings.json (create if needed) and add a SessionStart hook entry for each .sh file that runs "bash ~/.claude/<filename>". Merge with existing hooks — don't overwrite.
-
-Note: The Design Context Hook (hooks/design-context/) is specifically for the Pencil design app — skip it if you don't use Pencil.
 
 After installing, start a new session and confirm the hooks run.
 ```
