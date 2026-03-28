@@ -74,7 +74,7 @@ Agents are autonomous workers that investigate your codebase, ask you questions,
 
 | Agent | What It Does | Folder |
 |---|---|---|
-| **[Global Doc Master](agents/global-doc-master/)** | Creates and organizes all technical documentation — planning specs, feature flows, deployment guides, issue reports, resolved postmortems, and debug runbooks. Scans your codebase first, asks clarifying questions, and writes structured docs under `docs/`. | `agents/global-doc-master/` |
+| **[Global Doc Master](agents/global-doc-master/)** | Creates and organizes all technical documentation — project overviews, tech overviews, design specs, planning docs, feature flows, deployment guides, issue reports, resolved postmortems, and debug runbooks. Uses the `doc-master-assist` skill for templates and protocols. Scans your codebase first, asks clarifying questions, and writes structured docs under `docs/`. | `agents/global-doc-master/` |
 | **[Global Doc Fixer](agents/global-doc-fixer/)** | Autonomously reviews and fixes documents until they're implementation-ready. Runs `global-review-doc`, fixes all findings, re-reviews, and repeats — eliminating the manual review-fix loop. Asks MCQ questions only when a business logic decision is needed. | `agents/global-doc-fixer/` |
 
 ### Skills
@@ -83,6 +83,7 @@ Skills are specialized capabilities you invoke with slash commands or natural la
 
 | Skill | What It Does | Folder |
 |---|---|---|
+| **[Doc Master Assist](skills/doc-master-assist/)** | Template and protocol skill used by the Doc Master agent. Contains 8 reference templates (overview, tech-overview, design, planning, feature-flow, issue, deployment, debug) with their specific protocols. Loaded on demand — only the relevant template is read per invocation. | `skills/doc-master-assist/` |
 | **[Global Review Doc](skills/global-review-doc/)** | Reviews any technical document against your actual codebase. 9-phase review covering codebase verification, completeness, security, bug prediction, edge cases, and agent readiness. Produces an 11-section report with a READY / REVISE / REWRITE verdict. | `skills/global-review-doc/` |
 | **[Global Review Code](skills/global-review-code/)** | Reviews actual code with a 12-phase audit covering architecture, security (OWASP + domain-specific), performance, error handling, dependencies, testing, and framework best practices. Also has a bug hunt mode that traces bugs from symptom to root cause. Adapts all checks to your detected tech stack. | `skills/global-review-code/` |
 
@@ -126,7 +127,7 @@ To install all agents, skills, hooks, and scripts at once, paste this into your 
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install everything:
 
-1. AGENTS: Scan the agents/ folder. For each subfolder, find the .md file that is NOT README.md — that's the agent definition. Copy it to ~/.claude/agents/<filename> with the exact same content. Create ~/.claude/agents/ if it doesn't exist.
+1. AGENTS: Scan the agents/ folder. For each subfolder, check if it contains only a single agent .md file (+ README.md) or a folder-based agent with sub-files. For single-file agents (like global-doc-fixer), copy the .md file (NOT README.md) to ~/.claude/agents/<filename>. For folder-based agents (like global-doc-master which contains only global-doc-master.md + README.md), copy the entire folder to ~/.claude/agents/<folder-name>/ excluding README.md. Create ~/.claude/agents/ if it doesn't exist.
 
 2. SKILLS: Scan the skills/ folder. For each subfolder, copy the entire folder structure (SKILL.md + references/) to ~/.claude/skills/<skill-name>/ with exact content. Exclude README.md files.
 
@@ -144,7 +145,7 @@ To install just the agents:
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the agents:
 
-Scan the agents/ folder. For each subfolder, find the .md file that is NOT README.md — that's the agent definition. Copy it to ~/.claude/agents/<filename> with the exact same content. Create ~/.claude/agents/ if it doesn't exist.
+Scan the agents/ folder. For each subfolder, check if it contains only a single agent .md file (+ README.md) or a folder-based agent. For single-file agents, copy the .md file (NOT README.md) to ~/.claude/agents/<filename>. For folder-based agents, copy the entire folder to ~/.claude/agents/<folder-name>/ excluding README.md. Create ~/.claude/agents/ if it doesn't exist.
 
 After installing, read the README.md in each agent folder and give me a summary of what was installed and how to use each one.
 ```

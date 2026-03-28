@@ -41,8 +41,9 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 
 ### Tools
 
-- **[agents/global-doc-master/](agents/global-doc-master/)** — Agent that creates all technical documentation (planning, feature flows, deployment, issues, resolved, debug)
+- **[agents/global-doc-master/](agents/global-doc-master/)** — Agent that creates all technical documentation (overview, tech-overview, design, planning, feature flows, deployment, issues, resolved, debug). Uses the `doc-master-assist` skill for templates and protocols
 - **[agents/global-doc-fixer/](agents/global-doc-fixer/)** — Agent that autonomously reviews and fixes docs — runs the review-fix loop until the document is implementation-ready
+- **[skills/doc-master-assist/](skills/doc-master-assist/)** — Template and protocol skill used by the doc-master agent. Contains 8 reference templates for all document types
 - **[skills/global-review-doc/](skills/global-review-doc/)** — Skill that reviews documents against the codebase (9-phase review, 11-section report)
 - **[skills/global-review-code/](skills/global-review-code/)** — Skill that audits code and hunts bugs (12-phase audit + bug hunt mode)
 - **[hooks/doc-scanner/](hooks/doc-scanner/)** — SessionStart hook that scans for `.md` files and gives Claude a documentation index at conversation start
@@ -69,6 +70,9 @@ claude_cli/
 │   ├── global-doc-master/             # Doc master agent definition + README
 │   └── global-doc-fixer/              # Doc fixer agent definition + README
 └── skills/
+    ├── doc-master-assist/             # Template & protocol skill for doc-master agent
+    │   ├── SKILL.md                   # Skill router + shared quality protocols
+    │   └── references/                # 8 document templates (loaded on demand)
     ├── global-review-doc/             # Doc review skill + references + README
     └── global-review-code/            # Code review skill + references + README
 ```
