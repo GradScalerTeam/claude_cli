@@ -69,6 +69,12 @@ status: 已整理
 | 中 | [[Claude Code 外链笔记/Claude Code Academy 首页]] | 想继续找中文 MCP Tools 资源 | 入口型资源 |
 | 低 | [[Claude Code 外链笔记/Claude Code 超详细完全指南（知乎）]] | 想补 API / 数据库 / 自动化集成方向 | 仅作辅助参考 |
 
+## 场景化实战
+
+| 阅读优先级 | 笔记 | 适合解决的问题 | 备注 |
+| --- | --- | --- | --- |
+| 高 | [[Claude Code 外链笔记/小红书AI内容工作流-遮瑕膏测评-新手实战版]] | 想把一套课程资料压缩成一个从零开始的业务场景 | 基于学员包 2 的遮瑕膏案例 |
+
 ## 如果只看 3 篇
 
 - 想最快上手：[[Claude Code 外链笔记/Claude Code 快速开始]]、[[Claude Code 外链笔记/Claude Code 新手教程（NxCode）]]、[[Claude Code 外链笔记/Claude Code CLI 参考]]
