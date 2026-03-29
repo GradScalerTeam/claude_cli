@@ -22,16 +22,19 @@ status: 已整理
 ## 建议起步顺序
 
 1. [[Claude Code 外链笔记/Claude Code 快速开始]]
-2. [[Claude Code 外链笔记/Claude Code 新手教程（NxCode）]]
-3. [[Claude Code 外链笔记/Claude Code CLI 参考]]
-4. [[Claude Code 外链笔记/Claude Code 2周学习教程（GitHub）]]
-5. [[Claude Code 外链笔记/Claude Code 七大核心组件指南（GACCode）]]
+2. [[Claude Code 外链笔记/小红书AI内容工作流-小白一步一步使用指南]]
+3. [[Claude Code 外链笔记/Claude Code 技能使用速查]]
+4. [[Claude Code 外链笔记/Claude Code 新手教程（NxCode）]]
+5. [[Claude Code 外链笔记/Claude Code CLI 参考]]
+6. [[Claude Code 外链笔记/Claude Code 2周学习教程（GitHub）]]
+7. [[Claude Code 外链笔记/Claude Code 七大核心组件指南（GACCode）]]
 
 ## 入门
 
 | 阅读优先级 | 笔记                                              | 适合解决的问题                   | 备注     |
 | ----- | ----------------------------------------------- | ------------------------- | ------ |
 | 高     | [[Claude Code 外链笔记/Claude Code 快速开始]]           | 第一次安装、登录、进入项目后该做什么        | 官方最短路径 |
+| 高     | [[Claude Code 外链笔记/小红书AI内容工作流-小白一步一步使用指南]] | 想按顺序一步一步把学员包 2 跑起来        | 小白执行手册 |
 | 高     | [[Claude Code 外链笔记/Claude Code 新手教程（NxCode）]]   | 想把官方 Quickstart 转成真实工作流理解 | 中文重述更顺 |
 | 高     | [[Claude Code 外链笔记/Claude Code 技能使用速查]]        | 想先学会找技能、触发技能、给技能喂输入      | 现成 Skill 的最短路径 |
 | 高     | [[Claude Code 外链笔记/小红书AI内容工作流-从零打通版]]      | 想把学员包 2 从准备到写稿的流程完整打通   | 零基础起步总览 |
@@ -75,11 +78,12 @@ status: 已整理
 
 | 阅读优先级 | 笔记 | 适合解决的问题 | 备注 |
 | --- | --- | --- | --- |
+| 高 | [[Claude Code 外链笔记/小红书AI内容工作流-小白一步一步使用指南]] | 想先按最短路径做一次完整流程 | 新手第一篇 |
 | 高 | [[Claude Code 外链笔记/小红书AI内容工作流-从零打通版]] | 想先把学员包 2 的工作流跑通，再看单品案例 | 零基础优先看 |
 | 高 | [[Claude Code 外链笔记/小红书AI内容工作流-遮瑕膏测评-新手实战版]] | 想把一套课程资料压缩成一个从零开始的业务场景 | 基于学员包 2 的遮瑕膏案例 |
 
 ## 如果只看 3 篇
 
-- 想最快上手：[[Claude Code 外链笔记/Claude Code 快速开始]]、[[Claude Code 外链笔记/Claude Code 新手教程（NxCode）]]、[[Claude Code 外链笔记/Claude Code CLI 参考]]
+- 想最快上手：[[Claude Code 外链笔记/Claude Code 快速开始]]、[[Claude Code 外链笔记/小红书AI内容工作流-小白一步一步使用指南]]、[[Claude Code 外链笔记/Claude Code 技能使用速查]]
 - 想系统进阶：[[Claude Code 外链笔记/Claude Code 2周学习教程（GitHub）]]、[[Claude Code 外链笔记/Claude Code 七大核心组件指南（GACCode）]]、[[Claude Code 外链笔记/Claude Code CLI 参考]]
 - 想做自动化和 MCP：[[Claude Code 外链笔记/Claude Code 七大核心组件指南（GACCode）]]、[[Claude Code 外链笔记/Claude Code 2周学习教程（GitHub）]]、[[Claude Code 外链笔记/Claude Code CLI 参考]]
