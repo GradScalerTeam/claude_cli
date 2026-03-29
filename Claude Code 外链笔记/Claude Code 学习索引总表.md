@@ -33,6 +33,7 @@ status: 已整理
 | ----- | ----------------------------------------------- | ------------------------- | ------ |
 | 高     | [[Claude Code 外链笔记/Claude Code 快速开始]]           | 第一次安装、登录、进入项目后该做什么        | 官方最短路径 |
 | 高     | [[Claude Code 外链笔记/Claude Code 新手教程（NxCode）]]   | 想把官方 Quickstart 转成真实工作流理解 | 中文重述更顺 |
+| 高     | [[Claude Code 外链笔记/Claude Code 技能使用速查]]        | 想先学会找技能、触发技能、给技能喂输入      | 现成 Skill 的最短路径 |
 | 高     | [[Claude Code 外链笔记/Claude Code 2周学习教程（GitHub）]] | 想按天推进学习，不想零散地看文章          | 最像课程   |
 | 中     | [[Claude Code 外链笔记/Claude Code CLI 参考]]         | 想知道常用命令和参数到底怎么写           | 适合边用边查 |
 | 中     | [[Claude Code 外链笔记/Claude Code 官方文档总览]]         | 不清楚后续该去哪一类官方文档            | 导航页    |
