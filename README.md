@@ -32,6 +32,26 @@
 14. **[OpenClaw Inbox Triage 执行清单](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md)** — 再压缩成能直接照着跑的最小操作手册。
 15. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
 16. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
+17. **[🆕 会话管理器](tools/session-manager/MAIN.md)** — 持久化、导出并公开分享 Claude Code 会话记录（支持 Markdown 导出、GitHub 同步、隐私检测）。
+
+---
+
+## 🆕 新功能：会话管理器
+
+**一键导出 Claude Code 会话到 GitHub**：
+
+```bash
+# 查看所有会话
+python3 tools/session-manager/claude_session_manager.py list
+
+# 导出为 Markdown
+python3 tools/session-manager/claude_session_manager.py export-all
+
+# 提交到 GitHub
+cd claude-exports && git init && git add . && git commit -m "Add sessions" && gh repo create claude-conversations --public --source=. --push
+```
+
+**详细文档**: [tools/session-manager/MAIN.md](tools/session-manager/MAIN.md)
 
 ---
 
