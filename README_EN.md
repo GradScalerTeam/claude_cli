@@ -14,6 +14,42 @@ This fork refreshes the tutorial path against Anthropic's current Claude Code do
 
 ---
 
+## Beginner Recommendation: GStack Structured Roles
+
+If you're new to Claude Code, you can treat **GStack** as a strong on-ramp. It gives you structured roles and stable entry points, which makes it easier to begin than staring at a blank prompt every time.
+
+### Why this layer helps beginners
+
+A lot of first-time Claude Code users get stuck on the workflow, not the commands:
+
+1. They do not know how to start because the prompt is too empty.
+2. They do not have a structure for what to ask first.
+3. They treat the model like a generic assistant instead of a role-based collaborator.
+4. The output becomes inconsistent and too generic.
+
+GStack's value is that it gives you a role-based entry point up front, so you can collaborate in a more stable way instead of rebuilding the context from scratch each time.
+
+### Quick Start
+
+```bash
+git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+cd ~/.claude/skills/gstack
+./setup
+```
+
+### 6 roles worth learning first
+
+1. **`/office-hours`** - product office hours for rethinking direction and requirements.
+2. **`/plan-ceo-review`** - CEO / founder perspective for direction and priority tradeoffs.
+3. **`/plan-eng-review`** - engineering manager perspective for architecture and implementation breakdowns.
+4. **`/review`** - senior engineer perspective for code review and risk checks.
+5. **`/qa`** - QA lead perspective for testing and edge cases.
+6. **`/ship`** - release engineer perspective for release readiness and delivery steps.
+
+If you want to understand GStack before folding it into your own Claude Code workflow, start with the upstream [GStack repository](https://github.com/garrytan/gstack).
+
+---
+
 ## Start Here
 
 Pick the path that matches where you are right now:
