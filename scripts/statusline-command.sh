@@ -88,8 +88,11 @@ if git -C "$cwd" rev-parse --git-dir > /dev/null 2>&1; then
     fi
 
     # Ahead/behind remote — blue/magenta + underlined
-    # Try configured upstream first, fall back to origin/<branch>
+    # Try configured upstream first, fall back to private/<branch> or origin/<branch>
     upstream=$(git -C "$cwd" --no-optional-locks rev-parse --abbrev-ref @{upstream} 2>/dev/null)
+    if [ -z "$upstream" ]; then
+      git -C "$cwd" --no-optional-locks rev-parse "private/${branch}" >/dev/null 2>&1 && upstream="private/${branch}"
+    fi
     if [ -z "$upstream" ]; then
       git -C "$cwd" --no-optional-locks rev-parse "origin/${branch}" >/dev/null 2>&1 && upstream="origin/${branch}"
     fi

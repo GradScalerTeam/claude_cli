@@ -13,7 +13,7 @@ Default:
 
 Environment variables:
   UPSTREAM_REMOTE (default: upstream)
-  ORIGIN_REMOTE   (default: origin)
+  PRIVATE_REMOTE  (default: private)
 
 Examples:
   ./scripts/sync-upstream.sh
@@ -120,7 +120,7 @@ fi
 UPSTREAM_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
 UPSTREAM_REMOTE="${UPSTREAM_REMOTE:-upstream}"
-ORIGIN_REMOTE="${ORIGIN_REMOTE:-origin}"
+PRIVATE_REMOTE="${PRIVATE_REMOTE:-private}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PRUNE_SCRIPT="${SCRIPT_DIR}/prune-non-chinese-md.sh"
 
@@ -136,8 +136,12 @@ if ! git remote get-url "$UPSTREAM_REMOTE" >/dev/null 2>&1; then
   die "Remote '$UPSTREAM_REMOTE' does not exist."
 fi
 
-if ! git remote get-url "$ORIGIN_REMOTE" >/dev/null 2>&1; then
-  die "Remote '$ORIGIN_REMOTE' does not exist."
+if ! git remote get-url "$PRIVATE_REMOTE" >/dev/null 2>&1; then
+  if [ "$PRIVATE_REMOTE" = "private" ] && git remote get-url origin >/dev/null 2>&1; then
+    PRIVATE_REMOTE="origin"
+  else
+    die "Remote '$PRIVATE_REMOTE' does not exist."
+  fi
 fi
 
 cleanup_macos_metadata
@@ -147,25 +151,25 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 
 printf "Fetching %s/%s and %s/%s...\n" \
-  "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" "$ORIGIN_REMOTE" "$TARGET_BRANCH"
+  "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" "$PRIVATE_REMOTE" "$TARGET_BRANCH"
 git fetch "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH"
-git fetch "$ORIGIN_REMOTE" "$TARGET_BRANCH" || true
+git fetch "$PRIVATE_REMOTE" "$TARGET_BRANCH" || true
 
 UPSTREAM_REF="refs/remotes/${UPSTREAM_REMOTE}/${UPSTREAM_BRANCH}"
-ORIGIN_REF="refs/remotes/${ORIGIN_REMOTE}/${TARGET_BRANCH}"
+PRIVATE_REF="refs/remotes/${PRIVATE_REMOTE}/${TARGET_BRANCH}"
 
 if git show-ref --verify --quiet "refs/heads/${TARGET_BRANCH}"; then
   git checkout "$TARGET_BRANCH"
 else
-  if git show-ref --verify --quiet "$ORIGIN_REF"; then
-    git checkout -b "$TARGET_BRANCH" --track "$ORIGIN_REMOTE/$TARGET_BRANCH"
+  if git show-ref --verify --quiet "$PRIVATE_REF"; then
+    git checkout -b "$TARGET_BRANCH" --track "$PRIVATE_REMOTE/$TARGET_BRANCH"
   else
     git checkout -b "$TARGET_BRANCH" "$UPSTREAM_REF"
   fi
 fi
 
-if git show-ref --verify --quiet "$ORIGIN_REF"; then
-  git merge --ff-only "$ORIGIN_REF" || true
+if git show-ref --verify --quiet "$PRIVATE_REF"; then
+  git merge --ff-only "$PRIVATE_REF" || true
 fi
 
 if git merge-base --is-ancestor "$UPSTREAM_REF" HEAD; then
@@ -228,12 +232,12 @@ if [ "$NO_PUSH" -eq 1 ]; then
   exit 0
 fi
 
-printf "Pushing %s to %s...\n" "$TARGET_BRANCH" "$ORIGIN_REMOTE"
+printf "Pushing %s to %s...\n" "$TARGET_BRANCH" "$PRIVATE_REMOTE"
 if [ "$FORCE_PUSH" -eq 1 ]; then
-  git push --force-with-lease "$ORIGIN_REMOTE" "$TARGET_BRANCH"
+  git push --force-with-lease "$PRIVATE_REMOTE" "$TARGET_BRANCH"
 else
-  git push "$ORIGIN_REMOTE" "$TARGET_BRANCH"
+  git push "$PRIVATE_REMOTE" "$TARGET_BRANCH"
 fi
 
 printf "Sync complete: %s/%s -> %s/%s (Chinese-only)\n" \
-  "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" "$ORIGIN_REMOTE" "$TARGET_BRANCH"
+  "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" "$PRIVATE_REMOTE" "$TARGET_BRANCH"

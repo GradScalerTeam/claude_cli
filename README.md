@@ -4,6 +4,8 @@
 
 这是一个面向 Claude Code 的实战教程仓库，重点不是“多装几个工具”，而是把围绕 Claude CLI 构建的项目记忆、子代理、技能、钩子、MCP 和文档优先工作流真正串起来。
 
+如果你同时维护一个私有笔记仓库和一个公开 fork 用来给上游提 PR，先看 [私有笔记 + 公共 PR 双仓库工作流](docs/PRIVATE_PUBLIC_WORKFLOW_CN.md)。
+
 ## Quick Start: Claude CLI 工作流入口
 
 如果你只想先看 OpenClaw inbox triage + Claude CLI repo executor 的最短路径，直接从 [OpenClaw Inbox Triage 执行清单](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md) 开始。
@@ -34,6 +36,7 @@
 14. **[OpenClaw Inbox Triage 执行清单](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md)** — 再压缩成能直接照着跑的最小操作手册。
 15. **[助理团架构模式](docs/ASSISTANT_TEAM_PATTERNS_CN.md)** — 了解工作、生活、每日反思如何分层设计。
 16. **[官方资料对照表](docs/OFFICIAL_REFERENCE_MAP_CN.md)** — 查看本仓库教程分别对应 Anthropic 官方哪一页文档。
+17. **[私有笔记 + 公共 PR 双仓库工作流](docs/PRIVATE_PUBLIC_WORKFLOW_CN.md)** — 说明如何同时保留私有笔记和公开贡献出口。
 
 ---
 
