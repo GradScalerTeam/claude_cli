@@ -1,0 +1,4 @@
+repo=https://github.com/affaan-m/everything-claude-code.git
+ref=main
+commit=62519f2b622b44d8289d573bb6e74c4c95fc7400
+synced_at_utc=2026-04-07T00:00:00Z

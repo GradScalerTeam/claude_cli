@@ -130,6 +130,16 @@ claude
 - [hooks/doc-scanner/README.md](hooks/doc-scanner/README.md)
 - [hooks/design-context/README.md](hooks/design-context/README.md)
 
+## 已整合 Everything Claude Code
+
+这个仓库现在额外收纳了一份 `affaan-m/everything-claude-code` 的 vendored 快照，放在 [vendor/everything-claude-code/](vendor/everything-claude-code/)。
+
+- 中文入口优先看 [vendor/everything-claude-code/README.zh-CN.md](vendor/everything-claude-code/README.zh-CN.md)
+- 原始上游入口看 [vendor/everything-claude-code/README.md](vendor/everything-claude-code/README.md)
+- 整合方式、同步约定和来源提交见 [docs/EVERYTHING_CLAUDE_CODE_INTEGRATION_CN.md](docs/EVERYTHING_CLAUDE_CODE_INTEGRATION_CN.md)
+
+这样保留了当前仓库的中文手册结构，同时把 ECC 的 agents、skills、commands、plugins、跨工具配置和安装面一并纳入仓库，后续可以独立同步更新。
+
 ## 进阶专题
 
 当你已经把基础跑顺，再看这些会更合适：
@@ -137,6 +147,7 @@ claude
 - [docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md](docs/OPENCLAW_CLAUDE_INTEGRATION_CN.md)
 - [docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md](docs/OPENCLAW_AND_CLAUDE_AGENTS_CN.md)
 - [docs/ASSISTANT_TEAM_PATTERNS_CN.md](docs/ASSISTANT_TEAM_PATTERNS_CN.md)
+- [docs/EVERYTHING_CLAUDE_CODE_INTEGRATION_CN.md](docs/EVERYTHING_CLAUDE_CODE_INTEGRATION_CN.md)
 - [docs/OFFICIAL_REFERENCE_MAP_CN.md](docs/OFFICIAL_REFERENCE_MAP_CN.md)
 
 ## 如果你今天只想做一件事
