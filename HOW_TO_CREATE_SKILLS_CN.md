@@ -99,7 +99,7 @@ When explaining code:
 
 **1. frontmatter**（`---` 之间的部分）
 
-这是技能的"配置卡"，告诉 Claude 这个技能叫什么、什么时候该用、有哪些行为限制。上面例子里的 `name` 和 `description` 就是在说：
+frontmatter 是技能的"配置卡"，放在文件开头的两个 `---` 之间。它告诉 Claude 这个技能叫什么、什么时候该用、有哪些行为限制。上面例子里的 `name` 和 `description` 就是在说：
 - `name: explain-code` → 这个技能在 Claude 里用 `/explain-code` 触发
 - `description: ...` → 告诉 Claude："当用户在学代码时，这个技能可能有用"
 
@@ -269,17 +269,17 @@ allowed-tools: Read, Grep, Glob, Bash
 
 | 字段 | 控制什么 | 你什么时候会关心它 |
 |---|---|---|
-| `name` | 技能名，也是 `/skill-name` 里的那个名字 | 每个技能都要写 |
+| `name` | 技能名，也是 `/技能名` 里的那个名字 | 每个技能都要写 |
 | `description` | 告诉 Claude 这个技能什么时候相关 | 每个技能都要写，写不好 = 自动触发失败 |
-| `argument-hint` | 用户输入 `/skill` 时显示的参数提示 | 想让用户知道该传什么参数时 |
-| `disable-model-invocation` | 设 `true` 后禁止 Claude 自动调用 | 技能有副作用时必须设 |
-| `user-invocable` | 控制是否在 slash 菜单里显示 | 某些内部技能不想让用户直接调用时 |
-| `allowed-tools` | 限制技能能用的工具 | 遵循最小权限原则时 |
-| `model` | 覆盖技能运行时使用的模型 | 某些技能想用更轻/更重的模型时 |
-| `effort` | 覆盖推理深度 | 简单任务用低 effort 省 token，复杂任务用高 effort |
-| `context` | 设为 `fork` 时在独立上下文执行 | 技能比较重、会挤占对话上下文时 |
-| `agent` | 在 fork 模式下指定 agent 类型 | 需要特定 agent 的工具或行为时 |
-| `hooks` | 给技能生命周期挂钩子 | 高级用法，暂时不需要关心 |
+| `argument-hint` | 用户输入 `/技能名` 时显示的参数提示（比如 `[path-to-routes]`） | 想让用户知道该传什么参数时 |
+| `disable-model-invocation` | 设为 `true` 后，Claude 不会自己调用这个技能，只能你手动触发 | 技能有副作用时（部署、迁移等）必须设 |
+| `user-invocable` | 控制这个技能是否出现在 `/` 菜单里 | 某些内部技能不想让用户直接看到时 |
+| `allowed-tools` | 限制技能只能用哪些工具（比如 `Read, Grep, Glob`，不给 `Write`） | 只需要读和分析的技能，没必要让它能改文件 |
+| `model` | 让这个技能跑在跟当前对话不同的模型上（override model） | 简单任务用轻量模型省成本，复杂任务用强模型要精度 |
+| `effort` | 控制这个技能花多少"力气"思考（reasoning effort） | 简单任务用低 effort 省 token，复杂分析用高 effort 要深度 |
+| `context` | 设为 `fork` 时，技能在独立上下文跑，不挤占当前对话 | 技能比较重、会读大量文件时 |
+| `agent` | 配合 `context: fork` 使用，指定跑在哪种子代理上 | 需要特定子代理的工具或行为时 |
+| `hooks` | 在技能执行的特定阶段（开始前、结束后）自动触发脚本 | 高级用法，暂时不需要关心 |
 
 ---
 
