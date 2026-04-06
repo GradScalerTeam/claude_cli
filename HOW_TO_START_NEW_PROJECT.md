@@ -1,12 +1,25 @@
-# How to Start a New Project with Claude CLI
+# How to Start a New Project with Claude Code
 
-A step-by-step guide to building an entire project from scratch using Claude CLI — from an idea in your head to working code.
+A modern workflow for going from blank folder to implementation without turning Claude into a random code generator.
 
 ---
 
-## Step 1: Create Your Project Folder and Open Claude
+## The Goal
 
-Create a folder for your project, open your terminal, navigate to it, and start Claude:
+For a new project, Claude Code works best when you do these in order:
+
+1. establish memory
+2. plan before editing
+3. review the plan
+4. build in slices
+5. review and test
+6. preserve what you learned
+
+This repository's tools are designed to strengthen each step.
+
+---
+
+## Step 1: Create The Project Folder And Start Claude
 
 ```bash
 mkdir my-project
@@ -14,297 +27,281 @@ cd my-project
 claude
 ```
 
-You're now in a Claude Code session inside an empty project directory. Everything starts here.
+Do not start by asking Claude to blindly scaffold everything. First create project memory.
 
 ---
 
-## Step 2: Write Your Planning Doc with Global Doc Master
+## Step 2: Run `/init` And Create A Useful `CLAUDE.md`
 
-Type `@global-doc-master` and describe your project idea in as much detail as you can. Don't hold back — the more you tell it, the better the planning doc will be.
+Inside the first session:
 
-**What to include in your message:**
-- What the project is and what problem it solves
-- The business logic — how things should work
-- What users will do (the user journey)
-- What tech stack you want (or let the agent suggest one)
-- How you want the folders structured
-- Any integrations (databases, APIs, third-party services)
-- Any constraints or preferences you have
-
-**Example:**
-```
-@global-doc-master I want to build a task management API with Node.js and Express.
-It should have user authentication with JWT, projects that contain tasks, and tasks
-can be assigned to users. Users can create projects, invite members, create tasks,
-assign tasks, and mark them complete. I want PostgreSQL with Prisma as the ORM.
-The folder structure should be feature-based — each feature in its own folder with
-its routes, controllers, and services. I also need rate limiting and input validation.
+```text
+/init
 ```
 
-Press enter. The agent will:
+Then improve the generated `CLAUDE.md` with:
 
-1. Scan your project (empty in this case, so it knows it's a fresh start)
-2. Ask you **2-4 rounds of structured questions** — things like "Should tasks have priorities?", "Do you need real-time notifications?", "What's the auth flow for invitations?"
-3. **Answer every question.** Be specific. These answers shape the entire planning doc.
-4. Write a complete planning doc under `docs/planning/` with requirements, technical design, implementation phases, testing strategy, and risks
+- intended stack or decision criteria
+- build/test/lint commands as they become known
+- architecture constraints
+- naming conventions
+- risky directories
+- third-party dependencies or compliance notes
 
-When it's done, you'll have a detailed blueprint for your project in `docs/planning/`.
+For a new project, `CLAUDE.md` becomes the stable center of gravity that later agents and skills can rely on.
 
 ---
 
-## Step 3: Review the Planning Doc
+## Step 3: Use Plan Mode Before You Build
 
-Now use the review skill to tear the planning doc apart before you build anything. This catches gaps, missing edge cases, security issues, and ambiguities.
+New projects invite premature coding. Resist that.
 
+Enter Plan Mode if the project is more than a toy:
+
+```text
+/plan
 ```
+
+Or start Claude in plan mode from the shell:
+
+```bash
+claude --permission-mode plan
+```
+
+Use Plan Mode to answer questions like:
+
+- what stack best fits this project?
+- what are the implementation phases?
+- where are the highest-risk decisions?
+- what should be in the first milestone?
+
+Example prompt:
+
+```text
+I want to build a task management SaaS. Create a phased implementation plan,
+propose a stack, list the core entities, and call out the biggest technical risks.
+```
+
+---
+
+## Step 4: Create A Real Planning Doc With Global Doc Master
+
+Once the direction is clear, use the documentation agent from this repo:
+
+```text
+@global-doc-master I want to build a task management SaaS. Create a planning doc
+that covers requirements, user journeys, data model, APIs, milestones, testing,
+and deployment assumptions.
+```
+
+Ask it to produce a plan under `docs/planning/`.
+
+The better your planning doc, the less re-explaining you will do later.
+
+Include:
+
+- product scope
+- user flows
+- domain model
+- core routes / screens / APIs
+- test strategy
+- non-functional requirements
+- explicit out-of-scope items
+
+---
+
+## Step 5: Review The Plan Before You Build
+
+Run the document review skill:
+
+```text
 /global-review-doc docs/planning/your-project-plan.md
 ```
 
-Claude will run a 9-phase review and produce a report with findings grouped by severity — Critical, Important, and Minor. It will also give a verdict: **READY**, **REVISE**, or **REWRITE**.
+You are looking for:
 
-Read the review carefully. It will tell you exactly what's missing, what's ambiguous, and what could cause problems during implementation.
+- vague requirements
+- missing edge cases
+- unsafe assumptions
+- missing operational details
+- implementation gaps
 
----
+If the document needs tightening, either fix it manually or use the fixer agent:
 
-## Step 4: Fix the Doc Until It's Implementation-Ready
-
-Instead of manually reviewing, fixing, and re-reviewing (which often takes 5-10+ rounds), use the **Global Doc Fixer** agent to handle the entire cycle:
-
-```
+```text
 @global-doc-fixer docs/planning/your-project-plan.md
 ```
 
-The agent will:
-1. Run `global-review-doc` on your document
-2. Fix all factual issues automatically (wrong paths, line numbers, outdated references)
-3. Ask you MCQ questions for any business logic decisions it can't make on its own
-4. Re-review after fixes, then repeat until the verdict is **READY**
-
-This typically converges in 2-4 rounds. The agent handles it all — you just answer the occasional question when it needs your input.
-
-**Prefer manual control?** You can still do it step by step — run `/global-review-doc`, read the findings, fix them yourself, and re-review. But for most cases, the doc fixer agent is faster and catches more.
+Do not treat review as optional. In new projects, the review step usually saves more time than it costs.
 
 ---
 
-## Step 5: Generate Project-Specific Agents
+## Step 6: Decide What Should Become Local Skills Or Subagents
 
-Now that the planning doc is solid, don't just jump into coding. Instead, use the **agent-development** plugin to create agents that are purpose-built for your specific project.
+Do this only after the plan is stable.
 
-```
-/agent-development
-```
+Create a **project subagent** when you need a specialist role, such as:
 
-This plugin scans your planning doc and generates local agents tailored to your project — for example, a database setup agent, an API routes agent, a test writing agent, etc. These agents live in your project's `.claude/agents/` folder and understand the exact architecture, tech stack, and patterns from your plan.
+- frontend-builder
+- api-builder
+- test-runner
+- migration-reviewer
 
-Why this matters: generic Claude is good, but agents that know your specific project plan, folder structure, and tech decisions are significantly better. They don't need to guess — they already know the blueprint.
+Create a **project skill** when you need a repeatable workflow, such as:
 
----
+- `/review-api`
+- `/deploy-preview`
+- `/write-release-notes`
 
-## Step 6: Run Agents in Parallel to Build the Project
+For modern Claude Code, the stable official paths are:
 
-Once your agents are generated, tell Claude to run them:
+- subagents -> `.claude/agents/` and `/agents`
+- skills -> `.claude/skills/<name>/SKILL.md`
 
-```
-Run all the project agents in parallel and build the project based on the planning doc
-```
+Read the dedicated guides next:
 
-Claude will spin up multiple agents simultaneously — one might be setting up the database schema while another is building API routes while another is writing middleware. This is where the speed comes from.
-
-### Choose Your Mode
-
-You have two options for how Claude writes code:
-
-**Ask Before Edit mode** — Claude shows you what it wants to write and asks for approval before making changes. Use this if you want to review every piece of code as it's written. Slower but gives you full control.
-
-**Auto-edit mode** — Claude writes all the code without stopping to ask. Use this when you trust the planning doc is solid and want the project built fast. You can always review everything after.
-
-For a well-planned project, auto-edit mode is usually fine. The planning doc already defines what should be built, and the agents follow it closely.
+- [HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)
+- [HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)
 
 ---
 
-## Step 7: Review the Code
+## Step 7: Build In Small, Reviewable Slices
 
-Now that the agents have written the code, review it before you even run it. Use the code review skill to audit what was built:
+Once the plan is READY, start building.
 
+Good prompts are slice-shaped:
+
+```text
+Implement the user model, auth schema, and registration endpoint from
+@docs/planning/your-project-plan.md. Update tests too.
 ```
-/global-review-code src/
+
+```text
+Build the dashboard shell and empty-state UI described in
+@docs/planning/your-project-plan.md. Keep styling tokens centralized.
 ```
 
-Or review the entire project:
+Prefer this over:
 
+```text
+Build the whole app.
 ```
+
+Why:
+
+- easier reviews
+- easier testing
+- easier rollback
+- less context drift
+
+Use `@file` references aggressively to anchor work to the right document or directory.
+
+---
+
+## Step 8: Use Permissions Deliberately
+
+During implementation, decide how much freedom Claude should have.
+
+Use `/permissions` when you see repeated safe prompts for the same tools.
+
+A healthy pattern is:
+
+- keep risky commands gated
+- allow common read/search commands
+- gradually allow trusted edit/test commands
+- avoid broad bypass unless you are in a truly safe environment
+
+---
+
+## Step 9: Review The Code, Then Test The Code
+
+After each meaningful slice:
+
+### Review
+
+```text
 /global-review-code
 ```
 
-Claude will run a 12-phase audit — architecture, security (OWASP + domain-specific), performance, error handling, dependencies, testing, and framework best practices. It produces a report with findings grouped by severity: Critical, Important, and Minor.
+Or target a directory:
 
-**If issues are found:**
-
-For small fixes, just tell Claude to fix them directly based on the review findings.
-
-For bigger issues — security vulnerabilities, architectural problems, missing error handling — use the doc master to document the issue properly before fixing:
-
-```
-@global-doc-master there's a security issue — the auth middleware doesn't validate
-token expiry correctly, and the refresh endpoint is missing rate limiting
+```text
+/global-review-code src/auth/
 ```
 
-The agent creates an issue doc under `docs/issues/`. Fix the code, then tell the doc master to move it to resolved:
+### Test
 
-```
-@global-doc-master the auth security issue is resolved — fixed token validation and
-added rate limiting to the refresh endpoint
+Ask Claude to run the real project commands, not imaginary ones:
+
+```text
+Run the test, lint, and build commands from CLAUDE.md. Fix failures one at a time.
 ```
 
-This builds a history of issues and fixes that's searchable later.
+The planning doc tells Claude what should exist. Tests tell you what actually works.
 
 ---
 
-## Step 8: Test the Project
+## Step 10: Parallelize Safely When The Project Grows
 
-Once the code is written, test it. How you test depends on what you built:
+Anthropic's workflow docs strongly support using Git worktrees for parallel Claude Code sessions.
 
-### Backend Projects
+Once the project is real, this becomes valuable for:
 
-Ask Claude to test the API endpoints using curl commands in the terminal:
+- frontend and backend progressing independently
+- bug fixes happening alongside feature work
+- long-running refactors that should not block other work
 
-```
-Start the server and test all the API endpoints — create a user, log in, create a
-project, add a task, assign it, and mark it complete. Use curl commands and show me
-the responses.
-```
+Example:
 
-Claude will start your server, run curl commands against every endpoint, and show you the results. If something fails, it can debug and fix it on the spot.
-
-### Frontend Projects
-
-Use Playwright to test the UI interactively:
-
-```
-Open the app in the browser using Playwright and test the full user flow — sign up,
-log in, create a project, add tasks, and check that all buttons and forms work.
+```bash
+git worktree add ../my-project-auth -b feature/auth
+git worktree add ../my-project-billing -b feature/billing
 ```
 
-Claude will launch a browser, navigate your app, click buttons, fill forms, and verify that everything works visually. It can take screenshots and catch UI bugs that curl can't find.
+Then run Claude in each worktree.
 
-### Full Stack Projects
-
-Do both — test the API with curl first, then test the frontend with Playwright.
+This is a better scaling path than stuffing every task into a single session.
 
 ---
 
-## Step 9: Fix Issues and Iterate
+## Step 11: Preserve Context As You Go
 
-If tests reveal bugs or missing functionality:
+As the project evolves, keep the docs alive.
 
-1. Describe the issue to Claude — it will fix it directly
-2. For bigger issues, create a new planning doc for the fix: `@global-doc-master there's a bug where...`
-3. Run `@global-doc-fixer` on the new doc, then rebuild — same cycle as before
+Use the doc master to create:
 
-This is the loop: **Plan → Review → Build → Test → Fix → Repeat**. Each cycle makes the project better.
+- feature flow docs
+- issue docs
+- resolved docs
+- deployment docs
+- debug docs
 
----
+Examples:
 
-## Optional: Document Your Feature Flows
-
-Once the project is built and working, it's highly recommended to ask the doc master to create **feature flow docs**. These trace how each major feature works end-to-end through your actual code — from user action to database and back.
-
-This is optional but extremely valuable. Flow docs give you (and any AI agent working on your project later) a complete map of how things work. When something breaks six months from now, you don't have to re-trace the code — you just read the flow doc.
-
-**Examples of flow docs you might create:**
-
-```
-@global-doc-master document the authentication flow — from login to token refresh
-to logout, including middleware and token storage
+```text
+@global-doc-master document the authentication flow from signup to token refresh.
 ```
 
-```
-@global-doc-master document the user registration flow — from signup form submission
-to email verification to first login
-```
-
-```
-@global-doc-master document the payment flow — from checkout initiation to Stripe
-webhook to order confirmation
+```text
+@global-doc-master there's a production issue with webhook retries. Create an issue doc.
 ```
 
-```
-@global-doc-master document the file upload flow — from the upload button to S3
-storage to serving the file back to the user
-```
-
-```
-@global-doc-master document the real-time messaging flow — from sending a message
-to WebSocket delivery to read receipts
-```
-
-The agent reads your actual code, traces every layer (frontend components, API routes, controllers, services, database queries), and produces a flow document with real `file:line` references and architecture diagrams. These docs live under `docs/feature_flow/`.
-
-The more flow docs you create, the easier it is for anyone — human or AI — to understand and work on your codebase.
-
----
-
-## Recommended: Create Local Versions of Your Tools
-
-This is the final step and it's the one that makes your project truly self-sufficient. Up until now, you've been using the **global** doc master agent and the **global** review skills — they work on any project but don't know the specifics of yours. Now that your project is built and working, create **local** versions that are tailored to your codebase.
-
-### Local Doc Master Agent
-
-Use the agent-development plugin to generate a local version of the doc master that understands your specific project:
-
-```
-/agent-development
-
-Create a local doc master agent for this project. It should work like the global
-doc-master agent but be aware of this project's tech stack, folder structure,
-database schema, API patterns, and coding conventions. It should reference the
-actual code when writing docs.
-```
-
-This creates a project-specific agent in `.claude/agents/` that knows your routes, your models, your services — so when it writes docs, it references your actual code instead of generic patterns.
-
-### Local Review Skills
-
-Use the skill-development plugin to create local versions of the review skills:
-
-```
-/skill-development
-
-Create a local review-doc skill for this project. It should work like the global
-global-review-doc skill but be adapted to this project's tech stack, architecture,
-and conventions. It should know which files to check, which patterns to verify,
-and which security domains are relevant.
-```
-
-```
-/skill-development
-
-Create a local review-code skill for this project. It should work like the global
-global-review-code skill but be tailored to this project's framework, folder structure,
-and coding patterns. It should know the project's architecture and check against
-the actual conventions used here.
-```
-
-### Why This Matters
-
-The global tools are general-purpose — they work everywhere but know nothing about your specific project. The local versions inherit the same review phases, output formats, and thoroughness, but they're pre-loaded with knowledge of your codebase. They check against your actual patterns, your actual routes, your actual models. Reviews are faster and more accurate because the tools already know the lay of the land.
-
-Think of it this way: the global tools got you from zero to a working project. The local tools keep that project healthy as it grows.
+This is what turns one good Claude session into a sustainable Claude workflow.
 
 ---
 
 ## Summary
 
-```
-1.  Create folder, open Claude           →  mkdir my-project && cd my-project && claude
-2.  Write planning doc                   →  @global-doc-master [describe your project]
-3.  Answer the agent's questions         →  Be specific, cover edge cases
-4.  Review the doc                       →  /global-review-doc docs/planning/your-plan.md
-5.  Fix until READY                      →  @global-doc-fixer handles the review-fix loop
-6.  Generate project-specific agents     →  /agent-development
-7.  Run agents in parallel               →  Tell Claude to run all agents and build
-8.  Review the code                      →  /global-review-code src/
-9.  Fix issues (doc master for big ones) →  @global-doc-master [describe the issue]
-10. Test (curl for backend, Playwright for frontend)
-11. Fix issues, repeat the cycle
+```text
+1. Start Claude                     -> claude
+2. Create project memory            -> /init
+3. Plan before editing              -> /plan
+4. Write planning docs              -> @global-doc-master
+5. Review the docs                  -> /global-review-doc
+6. Fix docs until READY             -> @global-doc-fixer
+7. Add local skills/subagents       -> .claude/skills + /agents
+8. Build in slices                  -> small prompts + @file references
+9. Review and test                  -> /global-review-code + real test commands
+10. Parallelize with worktrees      -> git worktree
+11. Preserve knowledge              -> flow docs + issue docs + resolved docs
 ```

@@ -1,0 +1,105 @@
+{
+  "cli": {
+    "name": "Claude Code CLI",
+    "version": "版本: %s",
+    "welcome": "欢迎使用 Claude Code CLI 深度汉化版"
+  },
+  "install": {
+    "success": "✅ 安装成功",
+    "error": "❌ 安装失败: %s",
+    "checking": "🔍 检查系统环境..."
+  },
+  "review": {
+    "code": {
+      "start": "🔍 启动 %d 阶段代码审查...",
+      "security": "安全审计: 检查 OWASP 漏洞",
+      "architecture": "架构评估: 圈复杂度分析",
+      "performance": "性能分析: 识别热点路径",
+      "dependencies": "依赖审查: 检查已知漏洞",
+      "testing": "测试覆盖: 评估用例完整性",
+      "complete": "✅ 审查完成 - 发现 %d 个问题",
+      "report": "📄 报告已生成: %s"
+    },
+    "doc": {
+      "start": "📝 启动文档审查...",
+      "structure": "结构检查: 验证文档完整性",
+      "codebase": "代码库对齐: 检查文档与代码一致性",
+      "security": "安全审查: 验证安全域覆盖",
+      "ready": "文档状态: READY / REVISE / REWRITE"
+    }
+  },
+  "agent": {
+    "doc_master": {
+      "start": "📚 Global Doc Master 启动",
+      "scanning": "扫描代码库结构...",
+      "creating": "创建文档: %s",
+      "questions": "需要澄清 %d 个问题"
+    },
+    "doc_fixer": {
+      "start": "🔧 Global Doc Fixer 启动",
+      "reviewing": "审查文档: %s",
+      "fixing": "修复 %d 个问题",
+      "iteration": "迭代 %d - 继续优化..."
+    }
+  },
+  "error": {
+    "network": {
+      "timeout": "网络超时: %s 毫秒",
+      "retry": "正在重试 (%d/%d)...",
+      "failed": "网络请求失败: %s"
+    },
+    "parse": {
+      "json": "JSON 解析失败: %s",
+      "invalid": "无效的输入格式"
+    },
+    "git": {
+      "not_repo": "当前目录不是 Git 仓库",
+      "no_changes": "没有检测到未提交的更改"
+    },
+    "validation": {
+      "missing_key": "缺失必需参数: %s",
+      "invalid_type": "类型错误: 期望 %s，实际 %s"
+    }
+  },
+  "git": {
+    "branch": "当前分支: %s",
+    "staged": "已暂存: %d 个文件",
+    "modified": "已修改: %d 个文件",
+    "untracked": "未跟踪: %d 个文件",
+    "ahead": "领先远程 %d 个提交",
+    "behind": "落后远程 %d 个提交"
+  },
+  "hook": {
+    "doc_scanner": {
+      "start": "📚 扫描项目文档...",
+      "found": "发现 %d 个文档文件",
+      "index": "文档索引已更新"
+    },
+    "design_context": {
+      "start": "🎨 检测设计上下文...",
+      "generating": "生成 CLAUDE.md 设计文件..."
+    }
+  },
+  "plugin": {
+    "install": "安装插件: %s",
+    "update": "更新插件: %s",
+    "remove": "移除插件: %s",
+    "list": "已安装插件列表:"
+  },
+  "config": {
+    "thinking": {
+      "enabled": "思考模式: 已启用",
+      "disabled": "思考模式: 已禁用"
+    },
+    "model": {
+      "switched": "已切换到模型: %s",
+      "current": "当前模型: %s"
+    }
+  },
+  "stats": {
+    "usage": "使用统计",
+    "streak": "活动连续天数: %d",
+    "tokens": "Token 使用: %d",
+    "sessions": "会话总数: %d"
+  }
+}

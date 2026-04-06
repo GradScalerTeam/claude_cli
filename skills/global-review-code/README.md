@@ -1,186 +1,219 @@
-# Global Review Code Skill
+# Global Review Code
 
-The **Global Review Code** is a code review and bug investigation skill for Claude Code CLI. It performs a comprehensive audit of your actual code — not docs, not specs, but the real files in your project. It checks architecture, security, performance, error handling, dependencies, testing, and framework-specific best practices. It also has a dedicated bug hunt mode that traces bugs from symptoms to root cause.
-
----
-
-## Why Use It
-
-- **Reads everything first** — before reviewing a single line, the skill reads your CLAUDE.md, README, docs, package manifests, linter configs, CI pipelines, and build configs. It knows your stack, your conventions, and what's already enforced.
-- **Doesn't duplicate linters** — if ESLint or Ruff already catches something, the skill skips it. It focuses on what automated tools miss: architecture, logic, security, and patterns.
-- **Adapts to your stack** — React gets React checks. FastAPI gets FastAPI checks. Flutter gets Flutter checks. It only applies what's relevant from its framework best practices library.
-- **Predicts bugs before they happen** — based on actual code patterns, it predicts race conditions, stale closures, type coercion bugs, memory leaks, and more.
-- **Two modes in one** — full code review for auditing, bug hunt for investigating specific issues. Same skill, different triggers.
-- **Context7 verified** — never flags a library pattern as wrong based on stale training data. Always checks against current docs first.
+A Claude Code skill for auditing real code changes, finding likely regressions, and investigating bugs with a structured review process.
 
 ---
 
-## When to Use It
+## What It Is
 
-**After your code is written and you want it reviewed before merging or deploying.** This is the code-level companion to `global-review-doc` (which reviews documents).
+`global-review-code` is the code quality and bug-hunt skill in this repository.
 
-Typical workflow:
-1. `global-doc-master` creates the planning doc
-2. `global-review-doc` reviews the planning doc until it's solid
-3. You (or agents) build the feature from the plan
-4. **`global-review-code` reviews the actual code** — catches security issues, performance problems, architecture drift, and bugs
-5. You fix the findings and re-review if needed
+Use it when you want Claude to review the actual implementation, not just the plan.
 
-**You should also use it when:**
-- You want a full audit of an existing project or module you inherited
-- You're about to merge a large PR and want a thorough review beyond what GitHub's review UI shows
-- You're onboarding onto a codebase and want to understand its health, patterns, and problem areas
-- A bug is reported and you want to trace it systematically instead of guessing — use bug hunt mode
+It is designed for two primary modes:
 
-**Bug Hunt Mode triggers when:**
-- Your input starts with `bug:` (e.g., `bug: users can't upload files larger than 5MB`)
-- Your input is a natural language bug description instead of a file/folder path
+1. **Code review mode**: audit the codebase or a target path for correctness, security, maintainability, and testing gaps
+2. **Bug hunt mode**: trace a symptom to likely root cause and propose a fix path
 
 ---
 
-## How to Use It
+## Where It Fits In The Workflow
 
-There are two ways to invoke the skill:
-
-1. **Using `/global-review-code`** — type the slash command followed by a path or bug description
-2. **Natural language** — say "review this code" or "find this bug" and provide the target
-
-**Code Review examples:**
+```text
+plan the work                -> docs + review docs
+implement                    -> Claude + project tools
+/global-review-code          -> inspect the actual implementation
+fix findings                 -> targeted edits
+re-run review                -> confirm quality improved
 ```
-/global-review-code src/auth/
-/global-review-code src/components/PaymentForm.tsx
+
+This skill is usually most valuable **after implementation** or **when a bug is already present**.
+
+---
+
+## When To Use It
+
+Use it when:
+
+- a feature was just built
+- a refactor touched important paths
+- you want a pre-merge quality pass
+- you suspect architecture drift or hidden risks
+- a bug report exists and you want structured root-cause analysis
+
+---
+
+## How To Invoke It
+
+### Review a whole repo
+
+```text
 /global-review-code
 ```
-No argument reviews the entire project.
 
-**Bug Hunt examples:**
+### Review a specific area
+
+```text
+/global-review-code src/auth/
 ```
-/global-review-code bug: users get a blank screen after login on mobile Safari
-/global-review-code bug: payment webhook fires but order status doesn't update
+
+### Bug-hunt style request
+
+```text
+Use `global-review-code` in bug-hunt mode for the intermittent token refresh failure.
+```
+
+Natural-language invocation also works well when you describe the target path or the symptom clearly.
+
+---
+
+## What It Checks In Review Mode
+
+The review mode is organized around these concerns:
+
+| Focus area | What it looks for |
+|---|---|
+| Project intelligence | stack, conventions, risk areas, architecture shape |
+| Architecture | cohesion, boundaries, structure drift |
+| Code quality | readability, duplication, hidden complexity |
+| Security | auth, validation, secrets, domain-specific risks |
+| Performance | unnecessary work, query inefficiency, rendering costs, async issues |
+| Error handling | missing guards, poor resilience, bad failure behavior |
+| Dependencies | config drift, outdated or misused packages, env hazards |
+| Testing | missing tests, weak coverage, fragile patterns |
+| Framework best practices | stack-specific correctness and style |
+| Bug prediction | likely failures based on observed patterns |
+| Current docs verification | library and framework behavior when recency matters |
+
+---
+
+## What It Does In Bug Hunt Mode
+
+Bug-hunt mode is more investigative.
+
+It should help you answer:
+
+- what is the symptom really?
+- where does the data flow diverge from expectations?
+- which files are the strongest suspects?
+- what is the likely root cause?
+- what fix is least risky?
+- what test would stop this regression from returning?
+
+This is especially helpful when the bug is intermittent or spread across multiple layers.
+
+---
+
+## Good Prompts
+
+### Whole-feature review
+
+```text
+/global-review-code apps/web/src/features/billing/
+```
+
+### Pre-merge pass
+
+```text
+Review the auth changes with `global-review-code` and focus on correctness,
+security, and missing tests.
+```
+
+### Bug hunt
+
+```text
+Use `global-review-code` in bug-hunt mode for the issue where users are sometimes
+logged out right after refreshing the page.
 ```
 
 ---
 
-## What It Does
+## What A Good Output Looks Like
 
-### Code Review Mode (12 Phases)
+A useful review should give you:
 
-#### Phase 0: Project Intelligence
+- the highest-priority findings first
+- exact file references
+- concrete explanations of why something is risky
+- specific suggested fixes
+- a sense of what can wait and what cannot
 
-Discovers everything about your project before looking at code. Reads all markdown docs, package manifests, linter configs, type configs, build configs, CI/CD files, env examples, test configs, and `.gitignore`. Builds a complete mental model of what the project does, how it's built, what rules exist, and what's already enforced by automation.
+A useful bug hunt should give you:
 
-#### Phase 1: Codebase Mapping
-
-Maps the structure of what's being reviewed — directory tree, entry points, recently changed files (most likely to have issues), uncommitted changes, file sizes, and key import relationships.
-
-#### Phase 2: Architecture & Structure
-
-Checks separation of concerns, organization patterns, naming conventions, nesting depth, module boundaries, and entry point cleanliness.
-
-#### Phase 3: Code Quality
-
-Hunts for DRY violations, single responsibility breaches, long functions, naming issues, type safety gaps (`any` overuse, missing annotations), dead code, magic values, and inconsistencies.
-
-#### Phase 4: Security Audit
-
-Runs core OWASP checks (secrets, injection, XSS, auth, authorization, CORS, rate limiting, file uploads) plus domain-specific security checklists. If your code handles payments, it checks idempotency and webhook signatures. If it handles WebSockets, it checks connection auth and event injection. Only relevant domains are checked.
-
-#### Phase 5: Performance & Efficiency
-
-Checks for N+1 queries, unnecessary re-renders, bundle size bloat, memory leaks, algorithm complexity, missing caching, lazy loading gaps, and suboptimal async patterns.
-
-#### Phase 6: Error Handling & Resilience
-
-Checks for unhandled promise rejections, missing error boundaries, swallowed errors, missing retry logic, no graceful degradation, missing timeouts, poor user feedback, and resource cleanup failures.
-
-#### Phase 7: Dependencies & Configuration
-
-Checks for outdated packages, unused dependencies, lock file integrity, peer dependency conflicts, undocumented env vars, exposed secrets, and scattered config.
-
-#### Phase 8: Testing Assessment
-
-Evaluates test existence, coverage gaps, test quality (not just snapshot tests), test patterns, missing test categories (unit/integration/E2E), flakiness risks, and test data management.
-
-#### Phase 9: Framework Best Practices
-
-Applies framework-specific checklists for the detected stack: React, Next.js, Vue, Angular, Express/Fastify, FastAPI, Django/DRF, Flask, Redux Toolkit, Tailwind CSS, Flutter/Dart, SQLAlchemy, Prisma, TypeORM, Python, and Node.js/TypeScript. Only relevant frameworks are checked.
-
-#### Phase 10: Bug Prediction
-
-Predicts production bugs based on actual code patterns — race conditions, stale closures, type coercion, encoding issues, memory leaks, cache invalidation, off-by-one errors, null propagation, timing issues, environment mismatches, concurrency conflicts, and state desync.
-
-#### Phase 11: Context7 Verification
-
-Before finalizing any finding that references a library API or framework pattern, verifies against current documentation via Context7. Doesn't flag something as wrong based on potentially outdated training data.
-
-### Bug Hunt Mode (5 Steps)
-
-1. **Understand the Bug** — parses expected vs actual behavior, trigger conditions, affected area, frequency
-2. **Identify Suspects** — searches for related code, checks recent git changes, builds a ranked suspect list, reads each file
-3. **Trace Data Flow** — follows data from trigger point through handler, state changes, side effects, to render/output. Finds where actual diverges from expected
-4. **Narrow the Cause** — checks 12 common culprits: stale closure, race condition, type coercion, encoding mismatch, timing issue, cache staleness, environment mismatch, null/undefined, off-by-one, import/module issue, async error, state mutation
-5. **Recommend Fix** — exact root cause with file:line, before/after code, related risks in the codebase, and a test case to prevent regression
+- a ranked suspect trail
+- the most likely root cause
+- the minimal safe fix direction
+- a regression test idea
 
 ---
 
-## Output Format
+## Relationship To The Other Components
 
-**Code Review Mode** produces an **11-section report**:
+### With planning docs
 
-1. **Executive Summary** — project health rating, finding count by severity, top 3 issues
-2. **Project Overview** — path, tech stack, frameworks, file count, LOC, architecture, project stage, docs found, what's already enforced
-3. **What is Done Well** — positive findings with file:line references
-4. **All Findings** — grouped by Critical / Important / Minor, each with issue, location, and recommendation
-5. **Architecture Assessment** — directory structure review with recommendations
-6. **Security Findings (Expanded)** — OWASP category, attack scenario, vulnerable code, fix
-7. **Performance Findings (Expanded)** — impact estimate, slow code, fix, how to measure improvement
-8. **Quick Wins** — easy fixes under 5 minutes each
-9. **Before/After Code Examples** — 3-5 concrete refactoring suggestions with exact code
-10. **Bug Predictions** — predicted bugs with triggers, likelihood, files at risk, prevention
-11. **Final Verdict** — health rating, summary, immediate/short-term/long-term actions
+A reviewed planning doc reduces bad implementation decisions early.
+This skill then verifies whether the built code actually matches quality expectations.
 
-**Bug Hunt Mode** produces a **6-section report**:
+### With `global-doc-master`
 
-1. **Bug Summary** — expected vs actual behavior, trigger, severity
-2. **Investigation Trail** — every file explored, what was found, verdict (suspect/cleared/root cause)
-3. **Root Cause** — exact file, line, function, culprit category, step-by-step explanation
-4. **Recommended Fix** — before/after code with explanation
-5. **Related Risks** — other places in the codebase with the same pattern
-6. **Test Case** — code to verify the fix and prevent regression
+If review finds an important incident or systemic issue, doc master can capture it as an issue or resolved doc.
+
+### With project subagents
+
+Project-specific builders create the code.
+This skill provides an independent quality pass afterward.
 
 ---
 
-## Skill Structure
+## Installation Scope
 
+| Scope | Location | When to choose it |
+|---|---|---|
+| User | `~/.claude/skills/global-review-code/` | you want it everywhere |
+| Project | `.claude/skills/global-review-code/` | you want a repo-specific shared variant |
+
+This is usually a strong **user-level global skill**.
+
+---
+
+## Install It
+
+Paste this into Claude Code:
+
+```text
+Visit the GitHub repo https://github.com/srxly888-creator/claude_cli and install the
+Global Review Code skill.
+
+1. Read every file in `skills/global-review-code/`.
+2. Recreate the same folder structure at `~/.claude/skills/global-review-code/`.
+3. Copy the contents exactly.
+4. After installing, read `skills/global-review-code/README.md` and summarize the
+   two main modes, the kinds of findings it produces, and how it fits after coding.
 ```
-skills/global-review-code/
-├── SKILL.md                                  # Main skill definition (12-phase review + 5-step bug hunt)
-├── README.md                                 # This file
-└── references/
-    ├── output-format-code-review.md          # 11-section output template for code reviews
-    ├── output-format-bug-hunt.md             # 6-section output template for bug investigations
-    ├── framework-best-practices.md           # Per-framework checklists (React, Next.js, Vue, etc.)
-    └── domain-security-checks.md             # 9-domain security checklist
+
+Restart Claude Code after installation so the skill is available in fresh sessions.
+
+---
+
+## Check For Updates
+
+Paste this into Claude Code:
+
+```text
+Visit the GitHub repo https://github.com/srxly888-creator/claude_cli and compare the
+latest files in `skills/global-review-code/` with my local
+`~/.claude/skills/global-review-code/` installation.
+
+If they differ:
+1. show me the important changes,
+2. update my local files,
+3. explain whether the review rubric, security checks, or output expectations changed.
 ```
 
 ---
 
-## Setup
+## Final Advice
 
-### Fresh Install
+Use this skill after meaningful code changes, not only when something is already on fire.
 
-To set up the Global Review Code skill in your Claude Code CLI, paste this prompt directly into your Claude CLI:
-
-```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and read all files in the skills/global-review-code/ folder — SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, and references/domain-security-checks.md. Create the same folder structure at ~/.claude/skills/global-review-code/ and copy each file's content exactly. Create any directories that don't exist. After installing, read the README.md in the same folder (skills/global-review-code/README.md) and give me a summary of what this skill does and how to use it.
-```
-
-That's it. The skill is now available in every project you work on with Claude Code CLI.
-
-### Check for Updates
-
-Already have the Global Review Code skill set up and want to check if there's a newer version? Paste this into your Claude CLI:
-
-```
-Fetch the latest versions of all files in the skills/global-review-code/ folder from the GitHub repo https://github.com/GradScalerTeam/claude_cli — compare each file (SKILL.md, references/output-format-code-review.md, references/output-format-bug-hunt.md, references/framework-best-practices.md, references/domain-security-checks.md) with my local versions at ~/.claude/skills/global-review-code/. If there are any differences, show me what changed, update my local files to match the latest versions, and give me a summary of what was updated and why it matters.
-```
+The cheapest place to find a regression is before it ships.
