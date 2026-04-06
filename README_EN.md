@@ -64,7 +64,7 @@ Pick the path that matches where you are right now:
 8. **[Refactor rough existing subagents](docs/REFACTOR_EXISTING_SUBAGENTS.md)** — shows how to split old mega-agents into narrow roles and move repeated procedures into skills.
 9. **[Subagent refactor starter](docs/subagent-refactor-starter/README.md)** — copy-ready `.claude/agents/` and `.claude/skills/` examples for a minimal role split.
 10. **[OpenClaw vs Claude agents](docs/OPENCLAW_AND_CLAUDE_AGENTS.md)** — a detailed comparison of OpenClaw agents, OpenClaw subagents, and Claude CLI subagents, plus recommended complementarity patterns.
-11. **[OpenClaw + Claude CLI integration guide](docs/OPENCLAW_CLAUDE_INTEGRATION.md)** — explains how OpenClaw hands work into Claude CLI repo workflows and what “sharing MCP” should mean in practice.
+11. **[Long-lived assistant system + Claude CLI integration guide](docs/ASSISTANT_CLAUDE_INTEGRATION.md)** — explains how any assistant outer loop, bot, reminder system, or control layer can hand work into Claude CLI repo workflows, and what “sharing MCP” should mean in practice.
 12. **[OpenClaw + Claude CLI workflow scenarios](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md)** — breaks the model into concrete choices: outer loop, inner loop, bridge artifacts, or repo-only work.
 13. **[OpenClaw Inbox Triage + Claude CLI Repo Executor](docs/OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR.md)** — keeps only the most practical “intake, classify, route, execute in repo” pattern.
 14. **[OpenClaw Inbox Triage Execution Checklist](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST.md)** — compresses the workflow into a direct runbook.
@@ -189,7 +189,7 @@ If the direction is clear but the exact operating flow still feels too abstract,
    Best when you already have a codebase and want to add `CLAUDE.md`, flow docs, review loops, skills, and subagents gradually.
 2. **New project workflow**: read [HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)
    Best when you are still in planning and want to go documentation first, then review, then implement in slices.
-3. **OpenClaw outer loop + Claude CLI inner loop**: read [docs/OPENCLAW_CLAUDE_INTEGRATION.md](docs/OPENCLAW_CLAUDE_INTEGRATION.md)
+3. **Long-lived assistant outer loop + Claude CLI inner loop**: read [docs/ASSISTANT_CLAUDE_INTEGRATION.md](docs/ASSISTANT_CLAUDE_INTEGRATION.md)
    Best when you want a long-lived assistant to handle intake, reminders, and routing, while Claude CLI handles concrete repo execution.
 4. **How to choose a concrete scenario**: read [docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md](docs/OPENCLAW_CLAUDE_WORKFLOW_SCENARIOS.md)
    Best when you want a quick decision tree for outer loop, inner loop, bridge docs, or repo-only work.
