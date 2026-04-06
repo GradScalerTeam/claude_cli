@@ -58,13 +58,15 @@ ECC_VENDOR_REF=main \
 
 ## 与中文专用同步脚本的关系
 
-`scripts/sync-upstream.sh` 和 `scripts/prune-non-chinese-md.sh` 现在会把 `vendor/everything-claude-code/` 视为保留区域。
+在 private 仓库线里，`scripts/sync-upstream.sh` 和 `scripts/prune-non-chinese-md.sh` 会把 `vendor/everything-claude-code/` 视为保留区域。
 
 这意味着：
 
 - 仓库本体仍然可以维持中文优先策略
 - vendored ECC 子树不会在同步 `GradScalerTeam/claude_cli` 时被误删
 - vendored ECC 内的英文 Markdown 不会被自动规范化或删除
+
+public 仓库线不需要这两个脚本；它只需要保留 vendored ECC 内容和 `scripts/sync-everything-claude-code.sh` 即可。
 
 ## 发布建议
 
