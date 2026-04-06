@@ -8,7 +8,7 @@
 
 相关阅读：
 
-- [OpenClaw 与 Claude CLI 集成实战](OPENCLAW_CLAUDE_INTEGRATION_CN.md)
+- [长期在线助理系统 + Claude CLI 集成指南](ASSISTANT_CLAUDE_INTEGRATION_CN.md)
 - [OpenClaw Inbox Triage + Claude CLI Repo Executor](OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR_CN.md)
 
 ---

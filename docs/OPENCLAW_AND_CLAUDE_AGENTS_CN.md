@@ -9,7 +9,7 @@
 
 如果你更关心的是“OpenClaw 怎么把任务送进 Claude CLI 仓库工作流”以及“MCP 到底能不能共用”，先看：
 
-- [OpenClaw 与 Claude CLI 集成实战](OPENCLAW_CLAUDE_INTEGRATION_CN.md)
+- [长期在线助理系统 + Claude CLI 集成指南](ASSISTANT_CLAUDE_INTEGRATION_CN.md)
 
 一句话先讲清：
 

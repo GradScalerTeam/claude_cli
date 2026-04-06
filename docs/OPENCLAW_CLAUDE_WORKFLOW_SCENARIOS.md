@@ -8,7 +8,7 @@ If you already read the general integration guide, this page answers the next qu
 
 Related reading:
 
-- [OpenClaw + Claude CLI Integration Guide](OPENCLAW_CLAUDE_INTEGRATION.md)
+- [Long-Lived Assistant Systems + Claude CLI Integration Guide](ASSISTANT_CLAUDE_INTEGRATION.md)
 - [OpenClaw Inbox Triage + Claude CLI Repo Executor](OPENCLAW_INBOX_TRIAGE_REPO_EXECUTOR.md)
 
 ---

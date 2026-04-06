@@ -10,7 +10,7 @@ This document answers a question that becomes confusing very quickly:
 
 If your question is more operational, especially “how does OpenClaw hand work into Claude CLI?” or “what does sharing MCP really mean?”, read this first:
 
-- [OpenClaw + Claude CLI Integration Guide](OPENCLAW_CLAUDE_INTEGRATION.md)
+- [Long-Lived Assistant Systems + Claude CLI Integration Guide](ASSISTANT_CLAUDE_INTEGRATION.md)
 
 The shortest useful answer is:
 
