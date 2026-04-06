@@ -124,6 +124,22 @@ description: Drafts social media posts matching the brand voice defined in the s
 
 ### 步骤 3：只给它真正需要的工具
 
+Claude Code 内置工具完整列表：
+
+| 工具 | 用途 | 典型非代码场景 |
+|------|------|----------------|
+| `Read` | 读取文件（含图片、PDF） | 读文档、读数据表 |
+| `Grep` | 按内容搜索（正则） | 在多个文件里找关键词 |
+| `Glob` | 按文件名模式搜索 | 找到所有 .md 文件 |
+| `Bash` | 执行 shell 命令 | 调用 CLI 工具（见下文） |
+| `Edit` | 精确替换文件内容 | 修改文档中的某段话 |
+| `Write` | 创建/覆盖文件 | 生成新文档 |
+| `WebSearch` | 网络搜索 | 搜索最新资讯 |
+| `WebFetch` | 抓取网页内容 | 读取网页全文 |
+| `Agent` | 启动子代理 | 委派任务给其他代理 |
+| `NotebookEdit` | 编辑 Jupyter notebook | 数据分析 |
+| `AskUserQuestion` | 向用户提问 | 确认需求细节 |
+
 非写代码场景下，大多数子代理只需要：
 
 - `Read` — 读取文件内容
@@ -131,7 +147,7 @@ description: Drafts social media posts matching the brand voice defined in the s
 - `Glob` — 按名称查找文件
 - `Bash` — 执行命令（按需）
 
-如果它需要改文件，再加上 `Edit` 和 `Write`。
+如果它需要改文件，再加上 `Edit` 和 `Write`。如果需要上网查资料，加上 `WebSearch` 和 `WebFetch`。
 
 一个只做内容审查的子代理，可能只需要 `Read`、`Grep`、`Glob`——连 `Edit` 都不需要。
 
@@ -182,6 +198,120 @@ Use the content-reviewer agent to check my blog draft for logical consistency.
 ```
 
 如果一直无法自动触发，最常见原因是 description 写得太空泛。
+
+---
+
+## 如何扩展子代理的能力（爬社交媒体、调 API 等）
+
+内置工具只覆盖文件读写和基本搜索。如果你想让子代理爬推特、搜小红书、读 YouTube 字幕——这些都不是内置的。
+
+有三种方式扩展：
+
+### 方式 1：Bash + CLI 工具（最简单）
+
+子代理只要有 `Bash` 权限，就能调用任何命令行工具。
+
+例如安装 [Agent-Reach](https://github.com/Panniantong/Agent-Reach)（一个一键装互联网能力的脚手架）：
+
+```text
+帮我安装 Agent Reach：https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
+```
+
+装好后，子代理通过 `Bash` 调用：
+
+| 平台 | 命令 | 能力 |
+|------|------|------|
+| Twitter/X | `twitter search "关键词"` | 搜索推文、读推文、浏览时间线 |
+| Reddit | `rdt search "关键词"` | 搜索帖子、读全文和评论 |
+| 小红书 | `xhs search "关键词"` | 搜索笔记、阅读详情、看评论 |
+| YouTube/B站 | `yt-dlp --dump-json URL` | 提取字幕和视频信息 |
+| 微信公众号 | 通过 Exa 搜索 | 搜索+全文阅读 |
+| 微博 | `weibo hot` | 热搜、搜索、用户动态、评论 |
+
+**不需要把这些命令写进 `tools` 字段**——`Bash` 一个就够了。
+
+子代理示例——社交媒体研究助理：
+
+```markdown
+---
+name: social-researcher
+description: 搜索和分析社交媒体内容。Use proactively when user asks about social media trends, product reviews, or public opinion.
+tools: Read, Grep, Glob, Bash, WebSearch
+---
+
+你是一位社交媒体研究专家。
+
+Always:
+1. 根据用户需求选择合适的平台工具：
+   - Twitter: twitter search/read/timeline
+   - Reddit: rdt search/read
+   - 小红书: xhs search/read/comments
+   - YouTube/B站: yt-dlp --dump-json
+   - 网页: curl https://r.jina.ai/URL
+2. 汇总分析，给出结构化结论
+3. 标注信息来源
+
+Do not:
+- 不要发帖、评论、点赞（只读研究）
+- 不要存储用户的 Cookie
+```
+
+### 方式 2：MCP 服务器（结构化 API）
+
+MCP（Model Context Protocol）是给 Claude Code 添加外部服务的标准方式。适合需要结构化 API 的场景。
+
+配置命令：
+
+```bash
+# 远程 HTTP 服务
+claude mcp add --transport http sentry https://mcp.sentry.dev/mcp
+
+# 本地 stdio 服务
+claude mcp add --transport stdio firecrawl -- npx -y @mendable/firecrawl-mcp
+```
+
+三个作用域：
+
+| 作用域 | 命令参数 | 存储位置 | 适合 |
+|--------|---------|---------|------|
+| local（默认） | `--scope local` | `~/.claude.json` | 个人临时使用 |
+| project | `--scope project` | `.mcp.json`（可提交 git） | 团队共享 |
+| user | `--scope user` | `~/.claude.json` | 个人所有项目通用 |
+
+在子代理中引用 MCP 工具：
+
+```yaml
+---
+name: browser-tester
+description: Tests features in a real browser
+mcpServers:
+  - playwright:
+      type: stdio
+      command: npx
+      args: ["-y", "@playwright/mcp@latest"]
+tools: Read, Bash
+---
+```
+
+注意：MCP 工具名（如 `mcp__playwright__navigate`）**不能**写在 `tools` 字段里，MCP 工具的访问由 `mcpServers` 字段控制。
+
+### 方式 3：Bash + curl/脚本（万能兜底）
+
+任何有 HTTP API 的服务，都可以通过 `Bash` + `curl` 调用：
+
+```text
+用 curl 调用这个 API：https://api.example.com/data?key=xxx
+```
+
+不需要额外安装，只要有 `Bash` 权限。
+
+### 三种方式怎么选
+
+| 场景 | 推荐方式 | 为什么 |
+|------|---------|--------|
+| 爬社交媒体、读网页 | Bash + CLI（如 Agent-Reach） | 零配置，装上就能用 |
+| 调用结构化 API（数据库、Figma） | MCP 服务器 | 类型安全，有 schema |
+| 一次性调 HTTP API | Bash + curl | 不需要额外依赖 |
 
 ---
 
