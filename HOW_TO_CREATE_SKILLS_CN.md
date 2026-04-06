@@ -25,6 +25,8 @@
 /review-api src/routes
 ```
 
+这里的 `/` 是斜杠（slash）。在 Claude Code 里，所有以 `/` 开头的输入都被当作特殊命令处理 — 你可能已经用过 `/help`、`/clear`、`/compact`，这些就是内置的 slash command（斜杠命令）。技能创建好以后，它会变成一个新的 slash command，名字由你定。所以"slash command"不是什么专业术语，就是"用 `/` 开头触发的命令"。
+
 看起来像缩短了输入，但你实际复用的是一整套东西：
 
 - 固定目标：审查 API
