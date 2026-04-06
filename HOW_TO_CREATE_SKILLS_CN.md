@@ -271,7 +271,7 @@ allowed-tools: Read, Grep, Glob, Bash
 |---|---|---|
 | `name` | 技能名，也是 `/技能名` 里的那个名字 | 每个技能都要写 |
 | `description` | 告诉 Claude 这个技能什么时候相关 | 每个技能都要写，写不好 = 自动触发失败 |
-| `argument-hint` | 用户输入 `/技能名` 时显示的参数提示（比如 `[path-to-routes]`） | 想让用户知道该传什么参数时 |
+| `argument-hint` | 用户输入 `/技能名` 时，后面跟的提示文字，告诉用户"这里应该填什么"。比如写成 `[path-to-routes]`，用户就知道要填一个路径，不是随便写个名字 | 技能需要用户传参数时建议写 |
 | `disable-model-invocation` | 设为 `true` 后，Claude 不会自己调用这个技能，只能你手动触发 | 技能有副作用时（部署、迁移等）必须设 |
 | `user-invocable` | 控制这个技能是否出现在 `/` 菜单里 | 某些内部技能不想让用户直接看到时 |
 | `allowed-tools` | 限制技能只能用哪些工具（比如 `Read, Grep, Glob`，不给 `Write`） | 只需要读和分析的技能，没必要让它能改文件 |
