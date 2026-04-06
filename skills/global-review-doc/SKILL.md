@@ -18,6 +18,20 @@ If `$ARGUMENTS` is empty, ask the user which document to review before proceedin
 
 ---
 
+## Delta Review Mode (Rounds 2+)
+
+When invoked with `round:N` (where N > 1) in the arguments, this is a **re-review after fixes were applied**. Run a lightweight delta review instead of the full 9-phase process:
+
+**Phases to RUN in delta mode:** Phase 1 (re-read doc), Phase 2 (codebase verification — only for sections that were edited), Phase 4 (completeness — only check previously flagged areas)
+
+**Phases to SKIP in delta mode:** Phase 0 (context already known), Phase 3 (code quality — unchanged), Phase 5 (security — unchanged), Phase 6 (bug prediction — unchanged), Phase 7 (edge cases — unchanged), Phase 8 (agent readiness — only re-check if prior round flagged it), Phase 9 (Context7 — already verified)
+
+**Output in delta mode:** Use the **Delta Output Format** from `references/output-format.md` — only sections 1 (Executive Summary), 4 (Findings), and 11 (Final Verdict). Skip all other sections.
+
+If delta mode discovers a **new Critical finding** that wasn't in the previous round (e.g., a fix introduced a regression), escalate back to full review for that specific area only — don't re-run all 9 phases.
+
+---
+
 ## Phase 0: Discover Project Context
 
 Before reviewing, understand the project:

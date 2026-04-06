@@ -44,12 +44,8 @@
 // ❌ 硬编码（破坏可维护性）
 console.log("启动代码审查...");
 
-// ❌ 合并冲突（上游更新后）
-<<<<<<< HEAD
-console.log("启动代码审查...");
-=======
+// ❌ 本地化分支和主分支写法不一致
 console.log("Starting code review...");
->>>>>>> upstream/main
 ```
 
 #### 解决方案
