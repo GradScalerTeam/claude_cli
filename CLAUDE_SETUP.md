@@ -1,205 +1,855 @@
-# Claude Code CLI — Setup Guide
+# Claude Code — Modern Setup Guide
 
-A complete guide to installing Claude Code CLI, setting it up in your terminal and VS Code, installing plugins, and learning the essential commands.
-
----
-
-## What is Claude Code CLI?
-
-Claude Code is a command-line tool by Anthropic that runs in your terminal. You talk to it in plain English, and it reads your code, writes code, runs commands, manages git, creates files, and handles entire development workflows — all from your terminal.
-
-It's not a chatbot. It's an AI developer that lives in your terminal, understands your full codebase, and can execute real actions — create files, edit code, run tests, commit to git, and more.
-
-Think of it this way: instead of switching between your editor, terminal, docs, and Stack Overflow, you just describe what you want and Claude does it.
+A practical setup guide for developers who want a clean, current Claude Code workflow instead of a pile of stale tips.
 
 ---
 
-## Installing Claude Code CLI
+## What This Guide Covers
 
-### macOS / Linux (Recommended)
+By the end of this guide you will have:
 
-Run this in your terminal:
+1. Installed Claude Code
+2. Logged in and verified the installation
+3. Created a useful `CLAUDE.md`
+4. Learned the commands that matter most for daily work
+5. Understood where settings, memories, skills, subagents, hooks, and MCP servers live
+
+---
+
+## Before You Install
+
+According to Anthropic's Claude Code docs, the current baseline is:
+
+- Node.js 18+
+- macOS 10.15+, Ubuntu 20.04+/Debian 10+, or Windows 10+
+- Bash, Zsh, or Fish recommended
+- Network access for authentication and model calls
+
+If your team uses Bedrock, Vertex, or Microsoft Foundry, Claude Code can be configured for those too, but the simplest path for most individuals is still a paid Claude.ai account or Anthropic Console.
+
+---
+
+## Installation Options
+
+Anthropic now recommends the native installer first. npm installation still works, but it is better treated as a compatibility path for people who already manage developer CLIs through Node.
+
+### Option 1: Recommended native installer
+
+Anthropic documents a native installer flow for macOS, Linux, and Windows via WSL/PowerShell.
+
+macOS / Linux / WSL:
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-This is the native installer — no Node.js required, automatic updates built in.
-
-### Windows (PowerShell)
+Windows PowerShell:
 
 ```powershell
 irm https://claude.ai/install.ps1 | iex
 ```
 
-### Verify Installation
+This is the better default if you want a cleaner install path, fewer npm permission problems, and easier updates.
 
-After installing, run:
+### Option 2: Compatibility npm install
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Use this if you already work like this:
+
+- you manage Node versions with tools like `nvm`, `fnm`, `Volta`, or `asdf`
+- you already install CLIs globally with npm or pnpm, such as `typescript`, `pnpm`, `prettier`, or `tsx`
+- you are comfortable with `PATH`, global package locations, upgrades, and uninstall flows
+- you want Claude Code to behave like one more Node-based CLI in that toolkit
+
+A simple gut check:
+
+- if global developer CLIs through Node already feel normal to you, npm install will feel normal too
+- if phrases like "global install", "PATH", or "npm permissions" already sound annoying, use the native installer instead
+
+Important:
+
+- Do **not** use `sudo npm install -g`
+- If global npm permissions are messy on your machine, expect friction later
+- Run `claude doctor` after install
+
+### Verify installation
 
 ```bash
 claude --version
-```
-
-Then run the doctor command to check everything is set up correctly:
-
-```bash
 claude doctor
 ```
 
----
-
-## Authentication
-
-When you run `claude` for the first time, it will ask you to authenticate. You have a few options:
-
-1. **Claude Pro/Max Subscription** — log in with your claude.ai account. Your subscription includes Claude Code access. This is the simplest option for individual developers.
-
-2. **Anthropic Console (API Billing)** — connects to your Anthropic Console account at console.anthropic.com. You pay per usage based on API billing.
-
-3. **Enterprise** — configure Claude Code to use Amazon Bedrock, Google Vertex AI, or Microsoft Foundry if your organization uses those.
+If `claude` is not found or `doctor` reports a broken install, check the troubleshooting section at the end of this guide.
 
 ---
 
-## Starting Claude Code
+## Log In And Start Your First Session
 
-Open your terminal, navigate to your project directory, and type:
+From a project directory:
 
 ```bash
+cd your-project
 claude
 ```
 
-That's it. You're now in a Claude Code session. Type what you want in plain English and it will start working.
+On first launch, Claude Code will ask you to authenticate.
 
-**Examples of things you can say:**
-- "Read the src/ folder and explain the architecture"
-- "Fix the bug in the login function"
-- "Create a new API endpoint for user registration"
-- "Run the tests and fix any failures"
-- "Commit these changes with a descriptive message"
+According to the current docs, Claude Code requires a `Pro`, `Max`, `Teams`, `Enterprise`, or Anthropic Console account. The free Claude.ai plan does not include Claude Code access.
 
----
+Typical account paths:
 
-## Claude Code in VS Code
+- **Paid Claude.ai account**: easiest for individual use
+- **Anthropic Console**: usage billed by API consumption
+- **AWS Bedrock / Google Vertex AI / Microsoft Foundry**: common in enterprise environments
 
-You don't have to use Claude Code only in the terminal. There's an official VS Code extension that puts it right in your editor.
-
-### Installation
-
-1. Open VS Code
-2. Go to Extensions (`Cmd+Shift+X` on Mac, `Ctrl+Shift+X` on Windows/Linux)
-3. Search for **"Claude Code"**
-4. Install the one by **Anthropic** (the verified publisher)
-
-### Using It
-
-- Click the **Spark icon** in the VS Code sidebar to open Claude Code
-- Start a new conversation with `Cmd+N` (Mac) or `Ctrl+N` (Windows)
-- It works exactly like the terminal version, but integrated into your editor — it can see your open files, selections, and editor context
-
-The extension also works with **Cursor**, **Windsurf**, and **VSCodium**.
+Once login succeeds, you are in the interactive REPL.
 
 ---
 
-## Essential Slash Commands
+## If Your Team Uses GLM Or A Shared Model Gateway
 
-Inside a Claude Code session, you can use slash commands for quick actions. Here are the ones you'll use most:
+The easiest mistake here is mixing up the Claude Code client with the model or gateway behind it.
 
-| Command | What It Does |
-|---|---|
-| `/help` | Shows all available commands, including custom ones from plugins |
-| `/stats` | Shows your usage analytics — graphs, activity streaks, model preferences |
-| `/model` | Switch between Claude models (Opus, Sonnet, Haiku) |
-| `/config` | Toggle features like thinking mode, prompt suggestions, auto-updates |
-| `/clear` | Clear the current conversation history |
-| `/compact` | Compress the conversation to save context window space |
-| `/hooks` | Open the interactive hooks interface for event-driven automation |
-| `/plugin` | Manage plugins — install, update, remove |
-| `/install-github-app` | Set up the GitHub app for automated PR reviews |
+The more stable pattern is usually not "turn Claude Code directly into a GLM client." It is:
 
-Type `/help` in any session to see the full list, including any commands added by your plugins.
+1. install and run Claude Code normally
+2. put an LLM gateway in front of your model providers
+3. let that gateway handle auth, budget controls, audit, and routing
+4. connect Claude Code to the gateway through an Anthropic-compatible endpoint
 
----
+Think of it like this:
 
-## Plugins
-
-Plugins are bundles of agents, skills, slash commands, and hooks that extend what Claude Code can do. They're how you go from "Claude can write code" to "Claude can do a 12-phase security audit of my entire codebase."
-
-### How to Install Plugins
-
-Inside a Claude Code session, type:
-
-```
-/plugin
+```text
+Claude Code -> your LLM gateway -> Claude / GLM / other models
 ```
 
-This opens the plugin manager. From there you can browse the official marketplace and install any plugin with a few clicks.
-
-### Recommended Plugins
-
-These are the plugins we use daily and recommend installing. They come from the official Claude plugins marketplace.
-
-| Plugin | What It Does |
-|---|---|
-| **plugin-dev** | The toolkit for building your own plugins. Guides you through creating hooks, agents, skills, slash commands, MCP integrations, and plugin structure. Install this if you want to create custom tooling. |
-| **feature-dev** | Full feature development workflow with specialized agents — codebase exploration, architecture design, code review, and quality checks. Good for building features end-to-end with agent support. |
-| **pr-review-toolkit** | Comprehensive PR review using multiple specialized agents. Each agent focuses on a different aspect — comments, tests, error handling, type design, code quality, and simplification. |
-| **code-review** | Automated code review for pull requests with confidence-based scoring. Uses multiple agents to review different dimensions and only surfaces high-confidence findings. |
-| **commit-commands** | Streamlines your git workflow. Adds commands for committing, pushing, creating PRs, and cleaning up gone branches — all in one step. |
-| **claude-md-management** | Tools to maintain and improve your CLAUDE.md files. Audits quality, captures session learnings, and keeps your project memory current. |
-| **claude-code-setup** | Analyzes your codebase and recommends tailored Claude Code automations — hooks, skills, MCP servers, and subagents specific to your project. Great for first-time setup. |
-| **code-simplifier** | An agent that simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Runs automatically after you write code. |
-| **frontend-design** | Specialized skill for UI/UX implementation. Creates distinctive, production-grade frontend interfaces with high design quality. |
-| **security-guidance** | A hook that warns about potential security issues when editing files — command injection, XSS, unsafe code patterns. Runs in the background and alerts you proactively. |
-| **hookify** | Easily create hooks to prevent unwanted behaviors. Analyzes your conversation patterns and generates hooks that stop Claude from doing things you don't want. |
-| **playground** | Creates interactive HTML playgrounds — self-contained single-file explorers with visual controls, live preview, and copy buttons. Useful for prototyping. |
-| **skill-creator** | Create new skills, improve existing skills, and run evals to test skill performance. Use this if you're building custom skills. |
-| **agent-sdk-dev** | Development toolkit for building with the Claude Agent SDK. Install this if you're building custom agents programmatically. |
-| **ralph-loop** | Runs Claude in a continuous self-referential loop with the same prompt until task completion. Useful for iterative development where Claude keeps refining until done. |
-| **explanatory-output-style** | Adds educational insights about implementation choices and codebase patterns to Claude's responses. Helps you learn while Claude works. |
-| **learning-output-style** | Interactive learning mode that asks you to contribute at key decision points. Claude teaches while building. |
-
-### Keep Checking for New Plugins
-
-The Anthropic team and community are constantly shipping new plugins. Run `/plugin` periodically to check the marketplace — there's frequently something new that can improve your workflow.
-
----
-
-## Custom Status Line
-
-Claude Code has a status line at the bottom of the terminal that shows contextual information while you work. By default it's pretty basic, but you can replace it with a custom script that shows useful git info at a glance.
-
-### What This Status Line Shows
-
-```
-project_name/src | main +2 *3 ~1 / ↑1 ↓2
-```
-
-Here's what each part means:
-
-| Symbol | Color | Meaning |
-|---|---|---|
-| `project/folder` | default | Shortened path — last 2 segments of your current directory |
-| `main` | **bold cyan** | Current git branch |
-| `+2` | **green underlined** | 2 files staged (ready to commit) |
-| `*3` | **yellow underlined** | 3 files modified (unstaged changes) |
-| `~1` | **red underlined** | 1 untracked file (new, not added to git) |
-| `↑1` | **blue underlined** | 1 commit ahead of remote |
-| `↓2` | **magenta underlined** | 2 commits behind remote |
-
-The local stats (staged/modified/untracked) and remote stats (ahead/behind) are separated by a `/` divider. If there are no changes, only the branch name shows. If you're not in a git repo, it just shows the shortened path.
-
-### How to Install
-
-**Step 1:** Copy the status line script to your Claude config directory:
+A minimal shape often looks like:
 
 ```bash
-# Create the file
+export ANTHROPIC_BASE_URL="https://your-llm-gateway.example.com"
+export ANTHROPIC_AUTH_TOKEN="your-token"
+claude
+```
+
+Why teams do this:
+
+- centralized auth, budget, and audit
+- the ability to route different projects to different backend models
+- less provider-specific setup on each developer machine
+
+Important caveats:
+
+- the official direct-provider paths documented for Claude Code are Anthropic, Bedrock, Vertex AI, and Microsoft Foundry; GLM is not listed as a direct provider
+- if your gateway is only OpenAI-compatible rather than Anthropic-compatible, do not assume Claude Code will work correctly
+- if your actual goal is "mostly run GLM," validate tool use, long-context behavior, and agentic workflows in a small pilot first
+
+The practical summary is that GLM is usually safer as a model behind your team's gateway than as an assumed drop-in replacement for the Claude experience.
+
+---
+
+## First 10 Minutes That Actually Matter
+
+Most tutorials jump straight into fancy automations. Don't do that yet.
+
+Do this first:
+
+1. Start Claude in a real project
+2. Run `/init`
+3. Edit the generated `CLAUDE.md`
+4. Ask Claude for a codebase overview
+5. Run one safe task
+
+Suggested first prompts:
+
+```text
+Give me an overview of this repository.
+```
+
+```text
+What are the main build, test, and lint commands here?
+```
+
+```text
+Find the riskiest directories to edit in this project.
+```
+
+`/init` is important because it creates durable memory instead of forcing Claude to rediscover the same conventions every session.
+
+---
+
+## What To Put In CLAUDE.md
+
+A good `CLAUDE.md` should reduce repeated explanation, not become a dumping ground.
+
+Add:
+
+- Build, test, lint, format, and dev commands
+- Architecture notes
+- Naming conventions
+- Paths to critical docs
+- Risky or protected directories
+- Deployment caveats
+- Test data or sandbox environment notes
+
+Good example:
+
+```md
+# Project Commands
+- Build: `pnpm build`
+- Test: `pnpm test`
+- Lint: `pnpm lint`
+
+# Architecture
+- `apps/web` contains the customer-facing Next.js app
+- `packages/api` contains shared API clients and schemas
+
+# Rules
+- Do not edit `infra/production/` without explicit confirmation
+- Prefer Zod schemas for external input validation
+```
+
+Anthropic's memory docs also support `@path/to/file` imports inside `CLAUDE.md`, which is often cleaner than duplicating long docs.
+
+### Why These Lines Matter
+
+Those lines are not just for humans reading the file. They change Claude's default behavior.
+
+| What you write | Why it matters | What Claude is more likely to do |
+|---|---|---|
+| `Build: pnpm build` | Tells Claude the real build command instead of letting it guess `npm run build` | When you say "verify the project still builds," it is more likely to run the correct command |
+| `Test: pnpm test` | Tells Claude which regression command to use after a change | After a bug fix or feature, it is more likely to run the right test baseline |
+| `Lint: pnpm lint` | Tells Claude the team's static-check entry point | It is more likely to treat lint as part of the normal validation path |
+| `` `apps/web` contains the customer-facing app `` | Tells Claude where frontend work primarily lives | When you ask for a UI change, it is more likely to start in the right place |
+| `` `packages/api` contains shared API clients and schemas `` | Tells Claude where the shared interface boundary lives | When you change an API, it is more likely to consider cross-package impact |
+| `Do not edit infra/production/ without confirmation` | Defines a risk boundary | Claude is more likely to stop and ask before touching sensitive paths |
+
+You can think of `CLAUDE.md` as the file that helps Claude guess less and follow the real project rules more often.
+
+### If You Are New, Translate These Terms Like This
+
+- `Build`: turn source code into something ready to run, deploy, or release. A simple mental model is "the official packaging step."
+- `Test`: automatically check whether your change broke existing behavior. A simple mental model is "automated acceptance checking."
+- `Lint`: inspect the code without running it to catch obvious mistakes, style problems, or risky patterns. A simple mental model is "a code health check."
+- `apps/web`: usually the directory for the user-facing frontend.
+- `packages/api`: usually the directory for shared API-related code used across parts of the app.
+- `API client`: code that calls backend endpoints, such as fetching a profile or submitting an order.
+- `schema`: a description of what data should look like, such as required fields and expected types.
+- `infra/production`: production infrastructure config. A simple mental model is "live deployment and operations settings," where mistakes can affect the real system.
+
+If that still feels abstract, think of `CLAUDE.md` as a short onboarding note for a new teammate:
+
+- which commands the project really uses
+- which directories matter for which kind of work
+- which areas are dangerous
+- how to check that a change did not break anything
+
+Claude reads that note before it starts making decisions.
+
+### Translate The Table Into Plain Language
+
+#### `Build: pnpm build`
+
+Plain language:
+
+"When this project does its real build, the command is `pnpm build`."
+
+Why that matters:
+
+- many repos have `npm`, `pnpm`, or `yarn` somewhere
+- if Claude does not know the real tool, it may guess wrong
+- once the command is wrong, validation and debugging drift off course
+
+Think of it as telling Claude: "Use this door, do not guess another route."
+
+#### `Test: pnpm test`
+
+Plain language:
+
+"After you change code, use `pnpm test` to check that old behavior still works."
+
+Why that matters:
+
+- beginners often assume "the page looks fine" means the change is done
+- real projects often break in ways that are not obvious by sight
+- if Claude knows the test command, it is more likely to do proper regression checks
+
+Think of it as telling Claude: "Do not just look at the surface. Run the automatic check."
+
+#### `Lint: pnpm lint`
+
+Plain language:
+
+"Before calling the change done, run `pnpm lint` to catch simple mistakes and team-rule violations."
+
+Why that matters:
+
+- some problems can be found before the code even runs
+- for example: unused variables, bad imports, inconsistent formatting, or forbidden patterns
+- if Claude knows the lint command, it is more likely to treat it as a baseline self-check
+
+Think of it as telling Claude: "Do a health check before saying the code is clean."
+
+#### `` `apps/web` contains the customer-facing app ``
+
+Plain language:
+
+"If I want to change pages, buttons, forms, or layout, `apps/web` is probably the first place to look."
+
+Why that matters:
+
+- large repos usually contain many directories
+- if you say "change the homepage button color" without a location hint, Claude may search everywhere
+- if you name the right directory, Claude can start in the right place immediately
+
+Think of it as telling Claude: "The frontend entrance is here. Do not get lost."
+
+#### `` `packages/api` contains shared API clients and schemas ``
+
+Plain language, split into two parts:
+
+1. `packages/api` contains code for calling backend endpoints
+2. it also contains rules for what request and response data should look like
+
+Why that matters:
+
+- changing an API often affects more than one place
+- if Claude knows this is the shared interface layer, it is more likely to check downstream impact
+
+Example:
+
+- maybe the login API used to return `{ id, name }`
+- now you want it to return `{ id, nickname }`
+- if Claude knows `packages/api` is the shared interface layer, it is more likely to ask:
+  - should the frontend display logic change too?
+  - should the type definitions change too?
+  - should the tests change too?
+
+Think of it as telling Claude: "This is the seam between frontend and backend. Changes here can ripple outward."
+
+#### `Do not edit infra/production/ without confirmation`
+
+Plain language:
+
+"This directory is dangerous. Do not touch it without checking first."
+
+Why that matters:
+
+- `infra/production` often controls live deploys, databases, networking, or environment settings
+- a mistake here can affect the running system, not just one page
+- once Claude sees that rule, it is more likely to stop and confirm before editing
+
+Think of it as drawing a high-voltage danger zone on the project map.
+
+### A More Realistic Starting Template
+
+If you are in a monorepo, this is the kind of starting detail that is usually enough for a beginner:
+
+```md
+# Project Commands
+- Install: `pnpm install`
+- Dev: `pnpm dev`
+- Build: `pnpm build`
+- Test: `pnpm test`
+- Lint: `pnpm lint`
+
+# Architecture
+- `apps/web` contains the customer-facing frontend
+- `apps/admin` contains the internal operations UI
+- `packages/api` contains shared API clients, schemas, and types
+- `packages/ui` contains reusable UI components
+
+# Rules
+- Confirm before changes involving billing, auth, or production deploys
+- Prefer Zod validation for external input
+- When changing an API, check callers and tests too
+```
+
+It does not need to be huge on day one, but it should contain things that genuinely change Claude's decisions.
+
+### A Copy-Paste Starter Template
+
+If you still do not know how to begin, copy this into the `CLAUDE.md` at the project root and replace the angle-bracket placeholders with your real project details:
+
+```md
+# Project Commands
+- Install: `<your install command, for example pnpm install>`
+- Dev: `<your dev command, for example pnpm dev>`
+- Build: `<your build command, for example pnpm build>`
+- Test: `<your test command, for example pnpm test>`
+- Lint: `<your lint command, for example pnpm lint>`
+
+# Architecture
+- `<frontend directory>` contains `<what it is responsible for>`
+- `<backend directory>` contains `<what it is responsible for>`
+- `<shared directory>` contains `<shared types, APIs, components, or utilities>`
+
+# Docs
+- Start with `README.md`
+- Feature docs live in `<your docs directory>`
+
+# Rules
+- Do not edit `<high-risk directory>` without confirmation
+- When changing an API, also check `<callers / types / tests>`
+- After changes, run at least `<your minimum validation command>`
+```
+
+If you have no idea how to fill it in yet, use this order:
+
+1. ask Claude to find the real project commands
+2. put those commands into `Project Commands`
+3. ask Claude which directories matter most
+4. fill in `Rules` with the risky paths and minimum validation steps
+
+So `CLAUDE.md` does not need to look professional on day one. It just needs to tell Claude:
+
+- which commands are real
+- which directories matter
+- which areas are dangerous
+- how to self-check a change
+
+### If Your Project Is Not Shipping Software
+
+Do not mechanically copy `Build / Test / Lint` into every `CLAUDE.md`.
+
+For a personal assistant system, reflection vault, or knowledge workflow, it is usually better to describe how the system reads, writes, and routes work.
+
+The sections that matter more in that kind of project are:
+
+- `Project Purpose`: what the system is for and what language it should default to
+- `Read Order`: which files are read first and which ones are the single source of truth
+- `Agent Routing`: which kinds of requests go to which subagents
+- `Write Destinations`: where thoughts, reflections, and plans should be stored
+- `Privacy Rules`: which topics are high-sensitivity by default
+- `Output Protocol`: what a summary, handoff, or reflection must include
+
+Example:
+
+```md
+# Project Purpose
+- This is a personal life assistant and reflection system. Default output is Chinese.
+
+# Read Order
+- Read `MEMORY.md` first
+- Then read `context/user_profile/profile.md`
+- Read `context/reference_manifest.md` when paths are needed
+
+# Agent Routing
+- thought capture -> `@thought-recorder`
+- daily review -> `@daily-reflection-mentor`
+- travel planning -> `@travel-assistant`
+
+# Write Destinations
+- quick thoughts go to `context/ideas/`
+- daily reflections go to `memory/{YYYY-MM-DD}.md`
+- stable long-term patterns go to `MEMORY.md`
+
+# Privacy Rules
+- health, relationships, and finances are high-sensitivity by default
+- do not share or send externally without confirmation
+
+# Output Protocol
+- handoffs must include `State / Alerts / Follow-up / Evidence`
+```
+
+If this feels abstract at first, a simple way to read `Output Protocol` is:
+
+"When Claude finishes a chunk of work and hands it back to you, or to a future session, it should report in a fixed structure instead of a loose paragraph."
+
+The point is not to sound formal. The point is to prevent the most common handoff failures:
+
+- nobody can quickly tell what is actually done
+- risks are buried inside long prose
+- the next step is missing or vague
+- readers cannot tell whether a claim is grounded in evidence or just inferred
+
+Without a format like this, Claude may:
+
+- write a narrative summary one time
+- say only "done" the next time
+- forget to mention risks or sources later
+
+That means the information may exist, but the handoff quality stays inconsistent.
+
+### In plain English, these four fields mean:
+
+#### `State`
+
+Plain English:
+
+"Where do things stand right now?"
+
+Use it for:
+
+- what is done
+- what is not done
+- what is currently blocked
+
+Example:
+
+- `State: The first draft is written, but the calendar sync step is not connected yet.`
+
+#### `Alerts`
+
+Plain English:
+
+"What should I be careful about?"
+
+Use it for:
+
+- risks
+- unresolved questions
+- assumptions that may be wrong
+
+Example:
+
+- `Alerts: Calendar permissions are not verified yet, so automatic sync may fail.`
+
+#### `Follow-up`
+
+Plain English:
+
+"What should happen next?"
+
+Use it for:
+
+- the next recommended action
+- who or what still needs confirmation
+- unfinished tasks that should be picked up next
+
+Example:
+
+- `Follow-up: Verify permissions tomorrow, then decide whether to enable auto-send.`
+
+#### `Evidence`
+
+Plain English:
+
+"What is this conclusion based on?"
+
+Use it for:
+
+- files reviewed
+- logs, command output, screenshots, or data checked
+- the concrete basis behind the summary
+
+Example:
+
+- `Evidence: Based on memory/2026-03-24.md, today's task list, and the latest sync log.`
+
+### Why these four sections specifically
+
+Because they cover the four things that most often get lost in a handoff:
+
+- `State` answers "where are we now?"
+- `Alerts` answers "what could go wrong or be misunderstood?"
+- `Follow-up` answers "what should the next person do?"
+- `Evidence` answers "what supports this summary?"
+
+You can think of it as a minimum viable handoff template.
+
+Not every summary needs to be long, but these four ideas should usually be present if you want the next session to stay reliable.
+
+### A copyable beginner version
+
+```md
+# Output Protocol
+- for handoffs, always include:
+  - State: current progress
+  - Alerts: risks, problems, or unknowns
+  - Follow-up: recommended next step
+  - Evidence: files, notes, logs, or results used
+```
+
+An actual handoff could look like this:
+
+```md
+State: The travel budget and hotel shortlist are done, and the draft itinerary is in `plans/japan-trip.md`.
+Alerts: Return flight prices are still moving, so the current budget may be optimistic.
+Follow-up: Confirm travel dates next, then lock flights and hotel.
+Evidence: Based on `plans/japan-trip.md`, flight comparison results, and the saved hotel list.
+```
+
+The short version is: software projects often document how to build and test; life systems are often better served by documenting what to read first, where to write, how to route work, and which information is sensitive.
+
+If you want to turn that into a durable operating system instead of a one-off setup, read next:
+
+- [HOW_TO_START_ASSISTANT_SYSTEM.md](HOW_TO_START_ASSISTANT_SYSTEM.md)
+
+---
+
+## Daily Commands You Should Actually Know
+
+These are the most useful built-in commands for everyday work:
+
+| Command | Use it for |
+|---|---|
+| `/help` | View available commands |
+| `/init` | Bootstrap a project `CLAUDE.md` |
+| `/memory` | Edit and inspect memory files |
+| `/config` | Open Claude Code settings |
+| `/status` | Check version, connectivity, and account state |
+| `/permissions` | Adjust approval rules for tools and commands |
+| `/agents` | Create and manage custom subagents |
+| `/mcp` | Add and manage MCP servers |
+| `/hooks` | Configure hook-based automation |
+| `/compact` | Shrink conversation context |
+| `/plan` | Enter Plan Mode from the prompt |
+| `/cost` | Inspect session cost and token usage |
+| `/doctor` | Diagnose installation issues |
+| `/statusline` | Configure the terminal status line |
+
+The biggest onboarding mistake is memorizing too many commands. For most developers, `/init`, `/memory`, `/permissions`, `/agents`, `/mcp`, `/hooks`, `/compact`, and `/doctor` cover most of the workflow.
+
+### Do Not Memorize Commands. Memorize 4 Workflows Instead
+
+#### Scenario 1: First time in a repository
+
+1. If the install feels suspicious, run `claude doctor`
+2. Run `/init`
+3. Ask Claude for the real commands, risky directories, and a repo overview
+4. Use `/memory` to tighten the generated `CLAUDE.md`
+
+The point is not "learn `/init`." The point is to establish durable memory early.
+
+#### Scenario 2: You are about to let Claude edit files
+
+1. Start with one small safe task
+2. Watch which permissions Claude asks for
+3. Use `/permissions` only for the high-frequency safe operations
+
+That is much safer than opening everything up on day one.
+
+#### Scenario 3: You keep repeating the same kind of request
+
+- If it is a repeated workflow, use a skill
+- If it is a repeated specialist role, use `/agents`
+- If it needs an external system, use `/mcp`
+- If it must happen every time, use `/hooks`
+
+So the real skill is not memorizing the command names. It is recognizing whether you have a workflow problem, a role problem, or a tool-integration problem.
+
+#### Scenario 4: The session is getting long and context is drifting
+
+That is when `/compact` matters.
+
+It does not make Claude smarter. It helps compress the current conversation so the next stretch of work has less context bloat.
+
+Longer context is easier to use than before on newer 1M-capable models, but bigger context is not the same thing as cleaner context.
+
+Claude Code also helps automatically with prompt caching, auto-compaction, and tool search when MCP tool descriptions get too large. Those features reduce friction and cost, but they do not solve context rot for you.
+
+Use `/compact` when you want to stay on the same task but trim transcript bloat. Use `/clear` when you are switching tasks and stale context is now more harmful than helpful.
+
+---
+
+## Permission Modes And Plan Mode
+
+Claude Code is most useful when you understand its permission model.
+
+### Default mode
+
+Claude asks for permission the first time it needs more powerful actions.
+
+### Accept edits mode
+
+Useful when you trust Claude to edit files but still want visibility on command execution.
+
+### Plan Mode
+
+Plan Mode is for read-only analysis. Use it when:
+
+- the codebase is unfamiliar
+- the change is large
+- the user story is still fuzzy
+- you want a migration plan before edits happen
+
+Ways to enter Plan Mode:
+
+```bash
+claude --permission-mode plan
+```
+
+Or inside a session:
+
+```text
+/plan
+```
+
+Or cycle permission modes in the UI.
+
+This is the safest default for exploration, refactor planning, and code review.
+
+---
+
+## Settings Hierarchy
+
+Anthropic's current settings hierarchy matters because many tutorials blur user, project, and local scope.
+
+| Scope | File | Typical use |
+|---|---|---|
+| User | `~/.claude/settings.json` | personal defaults across projects |
+| Project | `.claude/settings.json` | shared project behavior committed to git |
+| Project local | `.claude/settings.local.json` | personal experiments not committed |
+
+Use project settings for team-shared hooks or permissions. Use user settings for personal defaults.
+
+## One Filesystem Setting Worth Knowing
+
+If you need sandboxing that is stricter than a natural-language warning in `CLAUDE.md`, current Claude Code also supports `sandbox.filesystem.allowRead`.
+
+Use it together with `denyRead` when you want to block a broad sensitive area but still re-allow one safe path:
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "denyRead": ["~/"],
+      "allowRead": ["."]
+    }
+  }
+}
+```
+
+`allowRead` takes precedence over `denyRead`, which is useful when a review-focused agent should read the current repo but not your wider home directory.
+
+---
+
+## Memory Hierarchy
+
+Claude Code can load memory from several places. The ones most people need are:
+
+| Memory type | Location | Best use |
+|---|---|---|
+| Project memory | `./CLAUDE.md` | shared project instructions |
+| User memory | `~/.claude/CLAUDE.md` | your personal defaults |
+
+You can also add memories quickly by starting a prompt with `#`, and inspect/edit loaded memories with `/memory`.
+
+For teams, project memory should hold shared conventions; personal preferences should stay out of the repo when possible.
+
+---
+
+## When To Add Subagents, Skills, Hooks, And MCP
+
+### Add a subagent when...
+
+- the same specialist role keeps showing up
+- a task benefits from a focused prompt
+- you want different tool access for a specialist
+
+Use `/agents` and prefer project-level subagents for team workflows.
+
+Claude Code's native project-scoped subagents live in `.claude/agents/*.md`, while user-scoped subagents live in `~/.claude/agents/*.md`.
+
+If you put agent files in a custom `.agents/` directory, Claude Code will not auto-discover them through the standard native path.
+
+### Add a skill when...
+
+- a workflow repeats often
+- you want a reusable slash command
+- the process benefits from reference files or a checklist
+
+Store skills in `.claude/skills/<name>/SKILL.md`.
+
+Modern skills are not just prompt snippets. `SKILL.md` frontmatter can control whether a skill auto-triggers, whether it runs in forked context, and what reasoning effort it uses.
+
+In practice, `disable-model-invocation`, `context: fork`, and `effort` are three of the highest-value fields to learn early.
+
+Here, "reusable slash command" does not mean a shell alias or a built-in Claude command.
+
+It is closer to packaging a prompt you repeat often, plus its checklist and supporting files, into a command you define.
+
+For example, if you keep saying:
+
+```text
+Review src/routes for validation, auth, error handling, and missing tests, then output findings by severity.
+```
+
+That is already a strong skill candidate. After packaging it, you can just write:
+
+```text
+/review-api src/routes
+```
+
+What you are reusing is not a short nickname. You are reusing a stable workflow. For the deeper version of this idea, continue with [HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md).
+
+### Add a hook when...
+
+- something must happen every time, not just when Claude remembers
+- you want deterministic enforcement or post-processing
+
+Examples:
+
+- auto-formatting after file edits
+- blocking writes to sensitive paths
+- logging commands or approvals
+
+### Add MCP when...
+
+- Claude needs external systems like GitHub, Jira, Figma, Slack, databases, or internal tools
+
+Use `/mcp` and choose the right scope:
+
+- personal utility -> user scope
+- shared project server -> project scope
+- sensitive one-off config -> local scope
+
+---
+
+## Headless And Automation Basics
+
+You do not need to live entirely in the interactive UI.
+
+Examples from Anthropic's CLI docs:
+
+```bash
+claude -p "summarize the recent changes"
+```
+
+```bash
+claude --permission-mode plan -p "analyze the auth system and suggest improvements"
+```
+
+```bash
+cat build.log | claude -p "find the most likely root cause"
+```
+
+These patterns are especially useful for scripts, CI helpers, and local automation.
+
+---
+
+## Recommended Setup Sequence For This Repo
+
+If you want to use the tools in this repository without overcomplicating your environment:
+
+1. Install Claude Code
+2. Run `/init` in a real project
+3. Improve `CLAUDE.md`
+4. Configure only the permissions you actually need
+5. Install `global-doc-master`
+6. Install `global-review-doc`
+7. Install `global-review-code`
+8. Add `doc-scanner` if your repo has meaningful markdown docs
+9. Add the custom status line if you want better git and rate-limit visibility
+10. Add project-specific subagents and skills later
+
+---
+
+## Optional: Custom Status Line From This Repo
+
+This repository ships a status line script at [`scripts/statusline-command.sh`](scripts/statusline-command.sh).
+
+To use it:
+
+```bash
 cp scripts/statusline-command.sh ~/.claude/statusline-command.sh
 ```
 
-Or if you're installing from the GitHub repo, copy the content from [`scripts/statusline-command.sh`](scripts/statusline-command.sh) and save it to `~/.claude/statusline-command.sh`.
-
-**Step 2:** Add the status line configuration to your Claude settings. Open `~/.claude/settings.json` and add:
+Then add this to `~/.claude/settings.json`:
 
 ```json
 {
@@ -210,21 +860,49 @@ Or if you're installing from the GitHub repo, copy the content from [`scripts/st
 }
 ```
 
-If you already have other settings in `settings.json`, just add the `statusLine` key alongside them.
+Newer Claude Code builds also pass `rate_limits.five_hour.*` and `rate_limits.seven_day.*` into status line scripts. The script in this repo will show those percentages when the fields are present.
 
-**Step 3:** Restart Claude Code. The new status line will appear at the bottom of your terminal.
-
-### How It Works
-
-The script receives JSON input from Claude Code via stdin containing workspace info (like the current directory). It runs a series of fast git commands using `--no-optional-locks` (so it never interferes with other git operations) and formats the output with ANSI color codes.
-
-The script requires `jq` to parse the JSON input. Most systems have it installed — if not, install it with `brew install jq` (macOS) or `apt install jq` (Linux).
+This is a nice quality-of-life improvement, but it is not part of the core onboarding path.
 
 ---
 
-## What's Next
+## Troubleshooting Shortcuts
 
-Now that you have Claude Code installed and set up, read these guides to start using it:
+### `claude` command not found
 
-- **[Starting a New Project with Claude CLI](HOW_TO_START_NEW_PROJECT.md)** — how to set up a brand new project from scratch using Claude CLI
-- **[Using Claude CLI in an Existing Project](HOW_TO_START_EXISTING_PROJECT.md)** — how to bring Claude CLI into a project you're already working on
+- run `claude doctor`
+- check your shell `PATH`
+- if npm install is messy, consider the native installer
+
+### npm permission issues
+
+- avoid `sudo npm install -g`
+- use the native installer or migrate to a local installer path if needed
+
+### repeated permission prompts
+
+- use `/permissions` to allow safe repeated commands
+- don't broadly bypass permissions unless the environment is truly safe
+
+### login problems
+
+Try:
+
+1. `/logout`
+2. close Claude Code
+3. restart with `claude`
+4. log in again
+
+### search feels broken
+
+Anthropic recommends installing system `ripgrep` if search and custom discovery features are incomplete.
+
+---
+
+## Next Guides
+
+- [HOW_TO_START_NEW_PROJECT.md](HOW_TO_START_NEW_PROJECT.md)
+- [HOW_TO_START_EXISTING_PROJECT.md](HOW_TO_START_EXISTING_PROJECT.md)
+- [HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)
+- [HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)
+- [docs/OFFICIAL_REFERENCE_MAP.md](docs/OFFICIAL_REFERENCE_MAP.md)

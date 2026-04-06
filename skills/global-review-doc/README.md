@@ -1,178 +1,195 @@
-# Global Review Doc Skill
+# Global Review Doc
 
-The **Global Review Doc** is a document review skill for Claude Code CLI. It's the quality gate between writing a doc and handing it to an agent for implementation. You give it any technical document — planning spec, feature flow, issue report, API spec — and it tears it apart against your actual codebase, checks security, predicts bugs, and tells you exactly what to fix.
-
----
-
-## Why Use It
-
-- **Catches issues before code is written** — a bug found in a planning doc costs 0 lines of code to fix. A bug found after implementation costs hours.
-- **Verifies against real code** — the skill reads your actual codebase, not just the document. If a file path is wrong, it tells you. If an API endpoint changed, it catches it.
-- **Security by default** — every doc gets a security review adapted to its domain. Payment features get payment security checks. Auth features get auth security checks.
-- **Agent-ready output** — the agent readiness check ensures your doc is unambiguous enough for an AI agent to implement without asking questions.
-- **Actionable feedback** — every finding includes a specific recommendation and copy-paste-ready text. No vague "consider improving this".
+A Claude Code skill that reviews technical documents against the real codebase so your implementation plan is accurate, complete, and safe before code gets written.
 
 ---
 
-## When to Use It
+## What It Is
 
-**Right after Global Doc Master creates a document.** The workflow is:
+`global-review-doc` is the document quality gate in this repository.
 
-1. You tell `global-doc-master` to create a planning doc (or feature flow, issue doc, etc.)
-2. The agent writes the document under `docs/`
-3. You run `@global-doc-fixer` on the document — it uses this skill internally, fixes all findings, re-reviews, and repeats until the verdict is **READY**
-4. Only then do you hand the document to an agent for implementation
+It checks whether a doc is:
 
-The `global-doc-fixer` agent automates the review-fix loop — it calls this skill, fixes findings, re-reviews, and repeats. You can still run `/global-review-doc` manually if you want a one-off review without automatic fixes, but for the full iteration cycle, use the fixer agent.
+- factually aligned with the repo
+- complete enough for implementation
+- clear enough for humans and Claude
+- safe enough for the domain it touches
+- specific enough to avoid avoidable rework
 
-**You should also use it when:**
-- Reviewing any existing technical document before handing it to a development agent
-- Checking if a doc is still accurate after codebase changes (refactors, new features, dependency updates)
-- Validating a spec written by someone else before your team starts building from it
-- Auditing old planning docs to see if they still match reality
+It is especially useful for planning docs, flow docs, issue docs, and migration specs.
 
 ---
 
-## How to Use It
+## Where It Fits In The Workflow
 
-There are two ways to invoke the skill:
-
-1. **Using `/global-review-doc`** — type the slash command followed by the path to the document
-2. **Natural language** — say "review this doc" or "check this planning doc" and provide the path
-
-The skill runs in a forked context (doesn't affect your main conversation) and uses the Plan agent for structured analysis.
-
-**Example:**
+```text
+@global-doc-master   -> create the doc
+/global-review-doc   -> inspect the doc
+@global-doc-fixer    -> close the loop to READY
+implement            -> build from the approved doc
 ```
+
+If you want a **report only**, run this skill directly.
+If you want a **review-and-fix loop**, use `global-doc-fixer`, which depends on this skill internally.
+
+---
+
+## When To Use It
+
+Use this skill when:
+
+- a new planning doc was just written
+- a feature flow doc may be stale after refactors
+- an issue doc needs verification against the actual code
+- a migration plan might be missing edge cases
+- another person wrote a spec and you want a grounded second pass
+
+---
+
+## How To Invoke It
+
+### Slash command
+
+```text
 /global-review-doc docs/planning/payment-system.md
 ```
 
----
+### Natural language
 
-## What It Does
-
-The review runs through **9 phases**, each building on the previous:
-
-### Phase 0: Discover Project Context
-
-Before looking at the document, the skill reads your `CLAUDE.md`, detects your tech stack from package manifests (`package.json`, `pyproject.toml`, `Cargo.toml`, etc.), and understands your project's conventions. Every subsequent check adapts to your specific stack.
-
-### Phase 1: Read & Understand the Document
-
-Identifies the document type, the feature being described, the target agent, all technical claims, and the complete user journey.
-
-### Phase 2: Codebase Verification
-
-This is where it gets serious. For **every technical claim** in your document, the skill verifies against actual code:
-
-- **File paths** — does the file actually exist? Are line numbers accurate?
-- **API endpoints** — correct HTTP method, route, middleware, request/response schema?
-- **Code behavior** — does the function actually do what the doc says it does?
-- **Dependencies** — are mentioned libraries/versions in your package manifest?
-- **Feature feasibility** — do proposed changes conflict with existing code?
-
-### Phase 3: Code Quality Review
-
-Goes beyond verification — reads the actual files your document references and flags code smells, deeply nested logic, missing error handling, hardcoded values, and recent git changes that might have made the doc outdated.
-
-### Phase 4: Completeness Check
-
-Checks if the document covers everything needed for implementation:
-- Complete user journey with success AND failure paths
-- API endpoints with full specs (method, path, request/response, status codes)
-- Data models with fields, types, relationships, constraints
-- Error handling, loading states, empty states
-- Accessibility, mobile behavior, internationalization
-
-### Phase 5: Security Deep Dive
-
-Runs a full security review adapted to the feature being documented:
-- Authentication & authorization (JWT, tokens, RBAC, session management)
-- Data security (hashing, encryption, PII, input sanitization)
-- API security (rate limiting, CORS, CSRF, payload limits)
-- Frontend security (XSS, CSP, auth guards)
-
-Plus **domain-specific security checklists** — if your doc is about payments, it checks idempotency, webhook signatures, refund flows. If it's about messaging, it checks encryption, content moderation, delivery guarantees. The skill applies only the relevant domain checklists from its 11-domain security reference.
-
-### Phase 6: Bug Prediction
-
-Predicts bugs that will likely occur during implementation:
-- Race conditions, state inconsistencies, error boundary gaps
-- Type coercion bugs, encoding issues, memory leaks
-- Stale closures, cache invalidation problems
-- Timezone bugs, platform differences
-
-### Phase 7: Edge Cases
-
-Checks if the document addresses 10 critical runtime scenarios:
-1. Network failure mid-operation
-2. Concurrent requests / double submit
-3. Service outage / degraded mode
-4. Extremely large inputs
-5. Empty/null/undefined values
-6. Duplicate operations
-7. User navigates away mid-flow
-8. Expired tokens/sessions mid-operation
-9. Poor connectivity
-10. Internationalization / special characters
-
-### Phase 8: Agent Readiness
-
-Evaluates whether an agent can implement from this doc without ambiguity. Includes an **ambiguity analysis table** showing two possible interpretations for unclear sections — so you see exactly what could go wrong.
-
-### Phase 9: Context7 Library Verification
-
-Verifies that any referenced library APIs and patterns are current by checking against live documentation via Context7. No outdated examples slip through.
-
----
-
-## Output Format
-
-Every review produces an **11-section report**:
-
-1. **Executive Summary** — finding count by severity, verdict, top 3 must-fix items
-2. **Document Overview** — feature, tech stack, document type, target agent
-3. **What the Document Does Well** — acknowledges good work
-4. **All Findings** — grouped by Critical / Important / Minor, each with issue, evidence, and recommendation
-5. **Codebase Verification Results** — verified claims, failed verifications, outdated references
-6. **Code Quality Issues** — problems in referenced files that affect the feature
-7. **Agent Readiness Assessment** — pass/fail checks with ambiguity analysis table
-8. **Quick Wins** — easy fixes under 5 minutes each
-9. **Copy-Paste-Ready Additions** — exact text blocks to add to the document
-10. **Bug Prediction** — predicted bugs with trigger conditions and prevention strategies
-11. **Final Verdict** — Ready / Revise / Rewrite
-
----
-
-## Skill Structure
-
+```text
+Review `docs/planning/payment-system.md` against the codebase.
 ```
-skills/global-review-doc/
-├── SKILL.md                          # Main skill definition (the 9-phase review process)
-├── README.md                         # This file
-└── references/
-    ├── output-format.md              # 11-section output template
-    └── security-domains.md           # 11-domain security checklist
+
+This skill runs in a forked context, which keeps the review structured and reduces noise in the main session.
+
+---
+
+## What It Checks
+
+The review is organized into 9 phases:
+
+| Phase | Focus |
+|---|---|
+| 0 | project context and tech-stack discovery |
+| 1 | document understanding and scope extraction |
+| 2 | verification against the actual codebase |
+| 3 | code-quality implications of the referenced implementation |
+| 4 | completeness for implementation |
+| 5 | security and domain-specific risk |
+| 6 | bug prediction and likely failure paths |
+| 7 | edge cases and non-happy-path behavior |
+| 8 | agent-readiness and ambiguity reduction |
+| 9 | library/framework verification where current docs matter |
+
+The exact checks adapt to the project stack and the kind of document being reviewed.
+
+---
+
+## What A Good Output Looks Like
+
+A useful review output should tell you:
+
+- the verdict: `READY`, `REVISE`, or `REWRITE`
+- what is already strong
+- what is factually wrong
+- what is underspecified
+- what is risky
+- what should be corrected before implementation begins
+
+The goal is not to produce vague feedback. The goal is to identify specific blockers and reduce ambiguity.
+
+---
+
+## Typical Use Cases
+
+### Before implementation
+
+```text
+/global-review-doc docs/planning/subscription-billing.md
+```
+
+### After a refactor changed reality
+
+```text
+/global-review-doc docs/feature_flow/authentication.md
+```
+
+### Before handing a doc to another subagent
+
+```text
+/global-review-doc docs/planning/admin-dashboard.md
 ```
 
 ---
 
-## Setup
+## Relationship To The Other Components
 
-### Fresh Install
+### With `global-doc-master`
 
-To set up the Global Review Doc skill in your Claude Code CLI, paste this prompt directly into your Claude CLI:
+The doc master creates the first structured draft.
+This skill checks whether that draft actually holds up.
 
+### With `global-doc-fixer`
+
+The fixer repeatedly calls this skill until the document becomes implementation-ready.
+
+### With `doc-scanner`
+
+Once reviewed docs exist, the doc-scanner hook helps later Claude sessions discover them automatically.
+
+---
+
+## Installation Scope
+
+Skills can be installed either globally or per project:
+
+| Scope | Location | When to choose it |
+|---|---|---|
+| User | `~/.claude/skills/global-review-doc/` | you want the skill in every repo |
+| Project | `.claude/skills/global-review-doc/` | you want a project-specific shared version |
+
+This skill is usually a good **user-level global skill**.
+
+---
+
+## Install It
+
+Paste this into Claude Code:
+
+```text
+Visit the GitHub repo https://github.com/srxly888-creator/claude_cli and install the
+Global Review Doc skill.
+
+1. Read every file in `skills/global-review-doc/`.
+2. Recreate the same folder structure at `~/.claude/skills/global-review-doc/`.
+3. Copy the contents exactly.
+4. After installing, read `skills/global-review-doc/README.md` and summarize what the
+   skill checks, when to use it directly, and when to use `global-doc-fixer` instead.
 ```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and read all files in the skills/global-review-doc/ folder — SKILL.md, references/output-format.md, and references/security-domains.md. Create the same folder structure at ~/.claude/skills/global-review-doc/ and copy each file's content exactly. Create any directories that don't exist. After installing, read the README.md in the same folder (skills/global-review-doc/README.md) and give me a summary of what this skill does and how to use it.
+
+Restart Claude Code after installation so the skill is loaded in fresh sessions.
+
+---
+
+## Check For Updates
+
+Paste this into Claude Code:
+
+```text
+Visit the GitHub repo https://github.com/srxly888-creator/claude_cli and compare the
+latest files in `skills/global-review-doc/` with my local
+`~/.claude/skills/global-review-doc/` installation.
+
+If they differ:
+1. show me the important changes,
+2. update my local files,
+3. explain whether the review rubric or output expectations changed.
 ```
 
-That's it. The skill is now available in every project you work on with Claude Code CLI.
+---
 
-### Check for Updates
+## Final Advice
 
-Already have the Global Review Doc skill set up and want to check if there's a newer version? Paste this into your Claude CLI:
+If you want faster Claude implementation, do not skip document review.
 
-```
-Fetch the latest versions of all files in the skills/global-review-doc/ folder from the GitHub repo https://github.com/GradScalerTeam/claude_cli — compare each file (SKILL.md, references/output-format.md, references/security-domains.md) with my local versions at ~/.claude/skills/global-review-doc/. If there are any differences, show me what changed, update my local files to match the latest versions, and give me a summary of what was updated and why it matters.
-```
+A clean planning doc is one of the cheapest places to catch a bad idea.

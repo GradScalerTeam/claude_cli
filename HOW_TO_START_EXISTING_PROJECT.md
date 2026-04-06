@@ -1,193 +1,270 @@
-# How to Use Claude CLI in an Existing Project
+# How to Use Claude Code In An Existing Project
 
-A step-by-step guide to bringing Claude CLI into a project you're already working on — so Claude understands your codebase and can work on it effectively.
+A workflow for introducing Claude Code into a real codebase without losing control, duplicating work, or forcing Claude to rediscover the same context every day.
 
 ---
 
-## Step 1: Open Claude in Your Project
+## The Main Idea
 
-Navigate to your existing project directory and start Claude:
+Existing projects already have history, conventions, bugs, undocumented flows, and operational landmines.
+
+So the job is not "let Claude read the repo." The job is:
+
+1. capture the project's durable context
+2. map the important flows
+3. review the risky parts
+4. create local tools only where they add leverage
+5. keep the docs and memory fresh over time
+
+---
+
+## Step 1: Start Claude In The Real Project Root
 
 ```bash
 cd my-existing-project
 claude
 ```
 
-Claude is now running inside your project. It can read every file, understand your folder structure, and see your git history. But it doesn't have a structured understanding of how things work yet — that's what the next steps fix.
+If the repo is a monorepo, start from the root unless you intentionally want a package-scoped session.
 
 ---
 
-## Step 2: Create Feature Flow Docs
+## Step 2: Build Project Memory Early
 
-The first thing to do with an existing project is **document how it works**. Use the global doc master to create feature flow docs for every major feature in your codebase. These docs trace how each feature works end-to-end through your actual code — from user action to database and back.
+Run:
 
-This is the most important step. Flow docs give Claude (and any future agent) a structured map of your codebase. Without them, Claude has to re-read and re-trace the code every time you ask it to do something. With them, it already knows how everything connects.
-
-**Start with your core features:**
-
-```
-@global-doc-master document the authentication flow — from login to token refresh
-to logout, including middleware and token storage
+```text
+/init
 ```
 
-```
-@global-doc-master document the user registration flow — from signup form to email
-verification to first login
-```
+Then turn `CLAUDE.md` into a real onboarding document for both humans and Claude.
 
-```
-@global-doc-master document the database schema — all models, relationships, indexes,
-and migration history
-```
+Add:
 
-```
-@global-doc-master document the API structure — all endpoints, middleware chain,
-request validation, and response formats
-```
+- canonical build, test, lint, and format commands
+- service boundaries
+- package or app layout
+- environments and secrets caveats
+- risky directories
+- key external dependencies
+- release process notes
 
-```
-@global-doc-master document the frontend routing and state management — how pages
-are organized, how state flows, and how components communicate
-```
-
-The agent reads your actual code, traces every layer, and produces flow documents with real `file:line` references under `docs/feature_flow/`. Do this for every major feature — the more you document, the better Claude understands your project.
+If you already have strong docs, import them rather than duplicating everything in `CLAUDE.md`.
 
 ---
 
-## Step 3: Review the Code and Document Issues
+## Step 3: Ask Claude For A Read-Only Map First
 
-Now that the codebase is documented, review the actual code to find existing problems. Run the code review skill on your project:
+Before you ask Claude to change anything, ask it to explain the repo.
 
+Good starting prompts:
+
+```text
+Give me a high-level architecture overview of this repository.
 ```
+
+```text
+Which directories are the highest risk to edit?
+```
+
+```text
+What commands should be used for build, test, lint, and local development?
+```
+
+For bigger or unfamiliar repos, use Plan Mode:
+
+```text
+/plan
+```
+
+This helps Claude inspect safely before touching the code.
+
+---
+
+## Step 4: Create Feature Flow Docs For The Important Paths
+
+Now use the documentation agent from this repo to capture how the existing system works.
+
+Examples:
+
+```text
+@global-doc-master document the authentication flow from login to token refresh.
+```
+
+```text
+@global-doc-master document the checkout flow from cart to payment confirmation.
+```
+
+```text
+@global-doc-master document the background job pipeline for invoice generation.
+```
+
+Aim for the flows that matter operationally or change frequently.
+
+Good flow docs save Claude from re-tracing the entire code path every session.
+
+---
+
+## Step 5: Review The Codebase For Risks And Debt
+
+Once the major flows are documented, review the real code:
+
+```text
 /global-review-code
 ```
 
-Or review specific areas:
+Or target specific zones:
 
-```
+```text
+/global-review-code apps/web/
+/global-review-code packages/api/
 /global-review-code src/auth/
-/global-review-code src/api/
-/global-review-code src/components/
 ```
 
-Claude will run a 12-phase audit — architecture, security, performance, error handling, dependencies, testing, and framework best practices. It produces a report with findings grouped by severity.
+Use the findings to create structured issue docs when something deserves durable tracking:
 
-**For each significant finding**, use the doc master to create an issue doc:
-
-```
-@global-doc-master there's a security issue — the user input on the search endpoint
-isn't sanitized, and there's no rate limiting on the login route
+```text
+@global-doc-master there's a security issue in the auth flow. Create an issue doc.
 ```
 
-```
-@global-doc-master there's a performance issue — the dashboard page makes 12 separate
-API calls that could be batched, and the product listing has an N+1 query problem
-```
-
-This creates structured issue docs under `docs/issues/`. You now have a clear backlog of what needs fixing, with root cause analysis and recommended fixes — all documented.
-
-As you fix each issue, tell the doc master to move it to resolved:
-
-```
-@global-doc-master the search sanitization issue is resolved — added input validation
-with Zod and rate limiting with express-rate-limit
+```text
+@global-doc-master there's a performance problem in the dashboard query path. Create an issue doc.
 ```
 
-This builds a searchable history under `docs/resolved/`.
+This gives you a searchable backlog rather than a one-off chat thread.
 
 ---
 
-## Step 4: Create Local Tools for Your Project
+## Step 6: Tighten Permissions Based On Reality
 
-Now that Claude understands your codebase through the flow docs and code review, create local versions of the tools that are tailored to your specific project.
+Do not blindly switch to overly permissive modes on day one.
 
-### Local Doc Master Agent
+Instead:
 
-Use the agent-development plugin to generate a local doc master:
+1. watch which approvals repeat
+2. use `/permissions` to allow the safe ones
+3. keep production-sensitive commands gated
+4. revisit permissions as trust increases
 
-```
-/agent-development
-
-Create a local doc master agent for this project. It should work like the global
-doc-master agent but be aware of this project's tech stack, folder structure,
-database schema, API patterns, and coding conventions. Refer to the feature flow
-docs in docs/feature_flow/ and the existing code to understand the project.
-```
-
-This creates a project-specific agent in `.claude/agents/` that knows your routes, models, services, and conventions — so every doc it writes from now on references your actual code accurately.
-
-### Local Review Skills
-
-Use the skill-development plugin to create local versions of both review skills:
-
-```
-/skill-development
-
-Create a local review-doc skill for this project. It should work like the global
-global-review-doc skill but be adapted to this project's tech stack, architecture,
-and conventions. Refer to the existing code and flow docs to understand what patterns
-and security domains are relevant.
-```
-
-```
-/skill-development
-
-Create a local review-code skill for this project. It should work like the global
-global-review-code skill but be tailored to this project's framework, folder structure,
-and coding patterns. It should know the project's architecture and check against
-the actual conventions used here.
-```
-
-From this point on, use the **local** tools instead of the global ones. They produce faster, more accurate results because they already know your project.
+Claude becomes more useful when approvals are less noisy, but only after you understand the repo's risk surface.
 
 ---
 
-## Recommended: Create Development Agents
+## Step 7: Add Local Subagents Only After Patterns Stabilize
 
-Now that Claude fully understands your codebase, create purpose-built agents that help you develop new features. Use the agent-development plugin to generate agents based on your actual code structure:
+If your project repeatedly needs the same specialists, create project subagents with `/agents`.
 
-```
-/agent-development
+Good candidates:
 
-Look at this project's codebase and create development agents that will help build
-new features. Create agents based on what the project actually needs — for example
-a frontend agent, a backend agent, a database agent, a testing agent, etc. Each
-agent should understand the project's patterns and conventions.
-```
+- frontend-agent
+- backend-agent
+- db-agent
+- test-agent
+- release-agent
 
-The plugin scans your code and generates agents tailored to your project. For example:
+These should live in `.claude/agents/` so the whole team can share them.
 
-- **Frontend Agent** — knows your component structure, state management, styling patterns, and routing
-- **Backend Agent** — knows your API patterns, middleware chain, service layer, and database queries
-- **Database Agent** — knows your schema, migrations, ORM patterns, and query optimization
-- **Testing Agent** — knows your test framework, fixtures, mocking patterns, and coverage gaps
-
-These agents live in `.claude/agents/` and are ready to use whenever you need to build something new. When you start a new feature, instead of explaining your project's conventions from scratch, you just tell the relevant agent what to build and it already knows how.
+Do not create ten agents up front. Start with one or two roles that clearly pay for themselves.
 
 ---
 
-## The Ongoing Workflow
+## Step 8: Add Local Skills For Repeatable Workflows
 
-Once your existing project is set up with Claude CLI, the day-to-day workflow is the same as a new project:
+If the same workflow keeps repeating, capture it as a skill.
 
-1. **New feature?** → Use the local doc master to create a planning doc, run `@global-doc-fixer` to review and fix it until READY, then build
-2. **Bug found?** → Use the local doc master to create an issue doc, fix it, move to resolved
-3. **Code changes?** → Use the local review-code skill to audit before merging
-4. **Feature shipped?** → Use the local doc master to create or update the flow doc
+Good examples:
 
-The difference is that everything is faster because your local tools already know the project.
+- `/review-api`
+- `/release-checklist`
+- `/migrate-config`
+- `/triage-bug`
+
+Put project skills in `.claude/skills/` and keep them close to the codebase conventions they depend on.
+
+Unlike a one-off prompt, a skill gives your team a reusable, reviewable workflow definition.
+
+---
+
+## Step 9: Use `@file` References And Memory To Keep Context Tight
+
+In existing projects, context bloat is the silent killer.
+
+Prefer prompts like:
+
+```text
+Update the validation logic in @src/auth/login.ts and make sure it still matches
+@docs/feature_flow/authentication.md.
+```
+
+Over prompts like:
+
+```text
+Fix auth stuff.
+```
+
+Using `@file` references, `CLAUDE.md`, and flow docs together keeps Claude grounded in the right context.
+
+---
+
+## Step 10: Use Git Worktrees For Parallel High-Risk Work
+
+Anthropic's workflow docs recommend Git worktrees for parallel Claude Code sessions.
+
+This matters even more in existing repositories because you often need to:
+
+- fix a production bug while a feature is in flight
+- compare two solution paths
+- isolate a risky migration
+
+Example:
+
+```bash
+git worktree add ../project-hotfix -b hotfix/auth-timeout
+git worktree add ../project-refactor -b refactor/session-model
+```
+
+Open Claude in each worktree instead of mixing everything into one branch and one session.
+
+---
+
+## Step 11: Keep Documentation And Memory Alive
+
+Existing projects drift unless you update the docs when the code changes.
+
+Use the doc master to maintain:
+
+- feature flow docs
+- issue docs
+- resolved docs
+- deployment docs
+- debug docs
+
+Examples:
+
+```text
+@global-doc-master update the payments flow doc to reflect the new retry logic.
+```
+
+```text
+@global-doc-master the webhook duplication issue is fixed. Move it to resolved.
+```
+
+This is how Claude gets better over months instead of only being good in the current session.
 
 ---
 
 ## Summary
 
-```
-1. Open Claude in your project          →  cd my-project && claude
-2. Create feature flow docs             →  @global-doc-master document [each feature]
-3. Review the code                      →  /global-review-code
-4. Document issues found                →  @global-doc-master [describe each issue]
-5. Create local doc master agent        →  /agent-development
-6. Create local review skills           →  /skill-development (review-doc + review-code)
-7. Create development agents            →  /agent-development (frontend, backend, etc.)
-8. Use local tools for all future work
+```text
+1. Start Claude in the repo           -> claude
+2. Create durable project memory      -> /init + CLAUDE.md
+3. Map the codebase safely            -> overview prompts + /plan
+4. Document the important flows       -> @global-doc-master
+5. Review risky areas                 -> /global-review-code
+6. Track durable issues               -> issue docs
+7. Add subagents for specialist roles -> /agents
+8. Add skills for repeated workflows  -> .claude/skills
+9. Keep prompts anchored              -> @file + docs + memory
+10. Parallelize safely                -> git worktree
+11. Update docs continuously          -> flow docs + resolved docs
 ```

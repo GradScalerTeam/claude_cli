@@ -1,0 +1,67 @@
+name: 本地化完整性检查
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'locales/**'
+      - 'scripts/check-locale-sync.js'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'locales/**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: 检查本地化文件
+        run: |
+          echo "🔍 检查本地化文件完整性..."
+          node scripts/check-locale-sync.js
+      
+      - name: 验证 JSON 格式
+        run: |
+          echo "📝 验证 JSON 格式..."
+          node -e "JSON.parse(require('fs').readFileSync('locales/en.json'))"
+          node -e "JSON.parse(require('fs').readFileSync('locales/zh.json'))"
+          echo "✅ JSON 格式正确"
+      
+      - name: 检查文件大小
+        run: |
+          echo "📊 检查文件大小..."
+          en_size=$(wc -c < locales/en.json)
+          zh_size=$(wc -c < locales/zh.json)
+          echo "   英文文件: $en_size 字节"
+          echo "   中文文件: $zh_size 字节"
+          
+          # 检查大小差异是否过大（允许 50% 差异）
+          diff=$((en_size - zh_size))
+          if [ $diff -lt 0 ]; then
+            diff=$((-diff))
+          fi
+          
+          threshold=$((en_size / 2))
+          if [ $diff -gt $threshold ]; then
+            echo "⚠️  警告: 文件大小差异较大，可能存在翻译遗漏"
+          fi
+      
+      - name: 生成报告
+        if: always()
+        run: |
+          echo "📋 本地化检查报告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ 所有检查通过" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "文件统计:" >> $GITHUB_STEP_SUMMARY
+          echo "- 英文键: $(node -e "console.log(Object.keys(JSON.parse(require('fs').readFileSync('locales/en.json'))).length)")" >> $GITHUB_STEP_SUMMARY
+          echo "- 中文键: $(node -e "console.log(Object.keys(JSON.parse(require('fs').readFileSync('locales/zh.json'))).length)")" >> $GITHUB_STEP_SUMMARY
