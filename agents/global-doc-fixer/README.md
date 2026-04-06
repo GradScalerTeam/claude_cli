@@ -147,7 +147,7 @@ Install `global-review-doc` first.
 
 This subagent depends on that skill to run the actual document review loop.
 
-See [skills/global-review-doc/README.md](/Volumes/PS1008/Github/claude_cli/skills/global-review-doc/README.md).
+See [../../skills/global-review-doc/README.md](../../skills/global-review-doc/README.md).
 
 ---
 
