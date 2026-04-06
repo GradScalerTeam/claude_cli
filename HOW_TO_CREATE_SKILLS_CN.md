@@ -1,90 +1,80 @@
 # 如何在 Claude Code 中创建技能
 
-这篇指南基于当前 Claude Code 的技能模型：在 `.claude/skills/<skill-name>/` 或 `~/.claude/skills/<skill-name>/` 里放一个 `SKILL.md`，并按需要添加辅助文件。
+这篇指南会带你从"为什么需要技能"开始，一步一步理解它的设计逻辑，最后自己手写一个。
+
+读完这篇，你应该能回答：
+- 技能和 shell alias、子代理、Hook 有什么区别？
+- 一个最小技能由哪些部分组成？
+- frontmatter 里每个字段控制的是什么行为？
 
 ---
 
-## 什么是技能
+## 先想一个问题：你在 Claude 里有没有说过重复的话？
 
-技能是 Claude 可以自动调用、也可以让你手动通过 `/skill-name` 触发的可复用能力。
-
-技能最适合这些场景：
-
-- 某个流程会重复出现
-- 你想做一个可复用的 slash command
-- 某类任务需要结构化说明
-- 你希望这个能力附带模板、示例、检查表等辅助文件
-
-Anthropic 当前的技能文档也明确说明：旧的自定义 commands 能力，已经基本并入技能体系。`.claude/commands/` 还兼容，但技能是更现代、能力更完整的方式。
-
----
-
-## “可复用的 slash command” 到底是什么意思
-
-它的意思不是“给 shell 起一个别名”，而是把一段你会反复说的提示词流程，封装成 Claude 里可重复调用的命令。
-
-比如你每次都要输入：
+比如你每次审查代码时都会说：
 
 ```text
 审查 src/routes 下的 API，检查参数校验、鉴权、错误处理和缺失测试，并按严重级别输出。
 ```
 
-如果这句话你一周要说很多次，它就已经是技能候选了。做成技能以后，你可以直接写：
+这句话你一周要说很多次。每次都要重新打一遍，或者从别的地方复制过来。
+
+**技能就是为了解决这个问题的。** 你把这段话封装好以后，只需要输入：
 
 ```text
 /review-api src/routes
 ```
 
-这时你复用的不是 1 行短命令，而是下面这整套东西：
+看起来像缩短了输入，但你实际复用的是一整套东西：
 
 - 固定目标：审查 API
 - 固定检查项：校验、鉴权、错误处理、测试
 - 固定输出格式：按严重级别列问题
-- 可变输入：这次审查哪个目录或文件
+- 可变输入：这次审查哪个目录
 
-最容易混淆的是这 4 种东西：
-
-| 你想解决的问题 | 更适合的形态 |
-|---|---|
-| 我总在重复一段长 prompt | 技能 |
-| 我想要一个有独立人格和权限范围的专家角色 | 子代理 |
-| 我想让某件事每次都自动发生 | Hook |
-| 我只是想把一个 shell 命令缩短 | shell alias / 脚本 |
-
-所以“可复用的 slash command”更像是“Claude 里的流程命令”，不是操作系统里的命令别名。
+这就是技能的本质：**把会重复的脑力劳动固化下来。**
 
 ---
 
-## 技能、子代理、Hook 怎么选
+## 但是……它和这些东西有什么区别？
 
-| 用这个 | 当你需要 |
-|---|---|
-| 技能 | 一个可重复执行的流程、命令或结构化提示词 |
-| 子代理 | 一个有专属 prompt 和可选工具限制的专家角色 |
-| Hook | 一个必须每次都执行的确定性自动化 |
+新手最容易混淆的是这四种东西：
 
-经验法则：
+| 你想解决的问题 | 该用什么 | 为什么不用技能 |
+|---|---|---|
+| 我总在重复一段长 prompt | **技能** | — |
+| 我想要一个有独立人格和工具权限的专家角色 | **子代理** | 技能没有"角色感"，它只是流程 |
+| 我想让某件事每次都自动发生，不可跳过 | **Hook** | 技能是可选的，Claude 可能不调用 |
+| 我只是想把一个 shell 命令缩短 | **shell alias** | 技能不是给终端用的 |
 
-- **流程** -> 技能
-- **角色** -> 子代理
-- **保证执行** -> Hook
+记住这个区分方式：
+
+- **流程** -> 技能（你反复做的一套步骤）
+- **角色** -> 子代理（你想要一个专属专家）
+- **保证执行** -> Hook（这件事必须每次都发生，不能漏）
+
+还有一个常见误解：技能不是 shell alias。`/review-api` 不是 `alias review-api="..."` 的缩写。它运行在 Claude 的对话上下文里，能用 Claude 的所有工具（读文件、搜索、写文件等），而且可以带 frontmatter 控制行为。shell alias 做不到这些。
 
 ---
 
 ## 技能放在哪里
 
-| 作用域 | 位置 | 适合什么 |
-|---|---|---|
-| 项目级 | `.claude/skills/<name>/SKILL.md` | 某个仓库团队共享的技能 |
-| 个人级 | `~/.claude/skills/<name>/SKILL.md` | 你跨项目复用的个人技能 |
+技能文件的位置决定了谁能用它：
 
-Claude Code 还会自动发现嵌套目录里的 `.claude/skills/`，所以在 monorepo 里也很好用。
+| 位置 | 谁能用 | 什么时候放这里 |
+|---|---|---|
+| `.claude/skills/<name>/SKILL.md`（项目根目录下） | 这个仓库的所有人 | 团队共享的流程，比如 `review-api`、`release-checklist` |
+| `~/.claude/skills/<name>/SKILL.md`（家目录下） | 只有你自己 | 你个人的跨项目习惯，比如你自己的笔记格式 |
+
+如果一个同名技能同时存在于两个位置，**项目级的优先**。这和 `CLAUDE.md` 的规则一样：近的覆盖远的。
+
+Claude Code 会自动发现嵌套目录里的 `.claude/skills/`，monorepo 里也能正常工作。
 
 ---
 
 ## 一个最小技能长什么样
 
-示例：
+先看一个能跑的例子，然后再拆解它的结构：
 
 ```markdown
 ---
@@ -99,78 +89,119 @@ When explaining code:
 4. Call out one common gotcha
 ```
 
-这已经会生成一个 `/explain-code` 技能。
+把它存成 `.claude/skills/explain-code/SKILL.md`，你就有了一个 `/explain-code` 技能。
 
-### 一个更贴近真实工作的例子
+### 它的结构是什么
 
-你可以把“手写 prompt”这样升级成“可复用 slash command”：
+每个技能由两部分组成：
 
-手写 prompt：
+**1. frontmatter**（`---` 之间的部分）
+
+这是技能的"配置卡"，告诉 Claude 这个技能叫什么、什么时候该用、有哪些行为限制。上面例子里的 `name` 和 `description` 就是在说：
+- `name: explain-code` → 这个技能在 Claude 里用 `/explain-code` 触发
+- `description: ...` → 告诉 Claude："当用户在学代码时，这个技能可能有用"
+
+**2. 正文**（`---` 之后的部分）
+
+这是技能真正要做的事。当技能被触发时，这段文字会作为指令注入给 Claude。你可以把它理解成"你每次都要说的那段话，但只写一次"。
+
+### 从手写 prompt 到技能的演变
+
+假设你经常要审查 API 路由。你每次都手动输入：
 
 ```text
 检查 src/api 下的路由，确认输入校验、鉴权、错误处理和测试是否完整。
 ```
 
-做成技能以后：
+把它变成技能以后，你只需要：
 
 ```text
 /review-api src/api
 ```
 
-对应的 `SKILL.md` 大概会负责两件事：
+对应的 `SKILL.md` 做了两件事：
 
-1. 把“每次都不变的检查标准”固定下来
-2. 只把“这次要审查哪里”留给参数
-
-这就是技能最大的价值：把会重复的脑力劳动固化下来。
+1. 把"每次都不变的检查标准"固定下来（校验、鉴权、错误处理、测试）
+2. 只把"这次要审查哪里"留给参数（`$ARGUMENTS` 会接住你输入的 `src/api`）
 
 ---
 
 ## 一步一步创建靠谱的技能
 
+下面的 6 个步骤不是"你必须全做"，而是"你在创建技能时应该想清楚的 6 个问题"。简单的技能可能只需要前 3 步。
+
 ### 步骤 1：先决定它是自动触发还是手动触发
 
-如果它是轻量知识或通用模式，自动触发可能有帮助。
+技能被 Claude 使用有两种方式：
 
-如果它是部署、迁移、发布这类需要明确人为触发的流程，建议设为手动：
+**自动触发（model invocation）：** Claude 读到你的 description 以后，觉得"这个技能跟当前对话相关"，就自己调用它。你不需要输入 `/skill-name`。这和 Claude 自动决定使用 Read 工具或 Grep 工具的机制一样 — 它根据上下文判断该不该用。
+
+**手动触发：** 只有你明确输入 `/skill-name` 时，技能才会执行。Claude 不会主动调用它。
+
+那么问题来了：什么时候该让 Claude 自动调用？
+
+**简单的判断方式：这个技能有副作用吗？**
+
+- **没有副作用**（只是读、分析、给建议）→ 可以自动触发。比如代码风格建议、注释规范这类轻量指导。
+- **有副作用**（会改文件、改线上状态、发请求）→ 禁掉自动触发。比如部署、数据库迁移、发布。你不希望 Claude 猜到"你可能要部署"就自动跑起来。
+
+禁掉自动触发的方式：
 
 ```yaml
 disable-model-invocation: true
 ```
 
+这里的关键词是 **invocation**，意思是"调用"。`disable-model-invocation` 的字面意思就是"禁止模型自动调用这个技能"。设了 `true` 以后，这个技能只能通过你手动输入 `/skill-name` 来触发。
+
 ### 步骤 2：决定它应该在当前上下文运行，还是 fork 出去跑
 
-轻量指导类技能可以直接 inline。
+**先理解一个问题：** Claude 的每个对话都有一个上下文窗口。技能在执行时会占用这个窗口。轻量技能（几句话的指导）不会占多少，但重型技能（要读几十个文件、做复杂分析）可能会挤掉你当前对话里已有的内容。
 
-较重的流程建议使用 forked context：
+**`context: fork`** 就是用来解决这个问题的。它的意思是：给这个技能开一个独立的分叉上下文去跑，跑完只把结果带回来。你当前对话的上下文不受影响。
 
 ```yaml
 context: fork
 ```
 
-必要时还可以指定它运行在哪种 agent 类型里。
+**什么时候用 fork：**
+- 技能需要读大量文件
+- 技能会跑长时间分析
+- 你不想让它占用当前对话的上下文
+
+**什么时候不用 fork：**
+- 轻量指导类技能
+- 几句话就能完成的事
+
+如果你用了 `context: fork`，还可以用 `agent` 字段指定它在 fork 模式下跑在哪种 agent 类型里（比如 `Explore` 只读型、`Plan` 规划型等）。
 
 ### 步骤 3：写好 description
 
-description 决定 Claude 什么时候会觉得“这个技能相关”。
+description 是整个 frontmatter 里最重要的字段。它决定了 Claude 会不会在合适的时机自动触发你的技能，也决定了用户在 slash 菜单里能不能一眼看出这个技能是干什么的。
 
-好的 description 要能说明：
+好的 description 要回答三个问题：
 
-- 这个技能做什么
-- 在什么场景下该用
-- 大概会输出什么样的结果
+1. **这个技能做什么**（动作）
+2. **在什么场景下该用**（触发条件）
+3. **大概会输出什么**（预期结果）
+
+对比一下：
+
+```yaml
+# 太虚 — Claude 不知道什么时候该用它
+description: Review code.
+
+# 好一些 — 但没说什么时候该用
+description: Reviews code for bugs and style issues.
+
+# 好 — 动作、场景、预期结果都说了
+description: Reviews API routes for input validation, auth, error handling, and missing tests. Use when auditing REST endpoints. Outputs findings grouped by severity.
+```
+
+**如果你的技能设了自动触发（没有 `disable-model-invocation: true`），但 Claude 从来不自动调用它，问题几乎一定出在 description 上。**
 
 ### 步骤 4：复杂技能要拆辅助文件
 
-技能可以附带：
-
-- 模板
-- 示例
-- 检查表
-- 脚本
-- 参考文档
-
-结构示例：
+小技能只需要一个 `SKILL.md` 就够了。但当技能变复杂时，你可以把模板、示例、检查表、脚本拆成辅助文件，放在同一个目录下：
 
 ```text
 my-skill/
@@ -182,58 +213,82 @@ my-skill/
     └── validate.sh
 ```
 
-这也是为什么技能比旧式 custom command 更值得优先采用。
+在 `SKILL.md` 的正文里，你可以用相对路径引用这些文件，Claude 能读到它们。
+
+**为什么这比把所有内容塞进一个文件好？** 因为 `SKILL.md` 应该是技能的"入口和流程说明"，不是所有细节的堆砌。模板归模板，示例归示例，各司其职。这也是技能比旧式 `.claude/commands/` 更值得优先采用的原因之一。
 
 ### 步骤 5：按需限制工具权限
 
-如果技能只需要读和分析，就把工具范围收窄：
+默认情况下，技能被触发后可以使用 Claude 的所有工具。但很多时候你的技能只需要读和分析，不需要改文件。
+
+这时候可以用 `allowed-tools` 把工具范围收窄：
 
 ```yaml
 allowed-tools: Read, Grep, Glob
 ```
 
-如果需要 shell，再明确写出来。
+这就像给技能设了一个"最小权限"原则。如果它只需要读，就没必要让它能写。这样做的好处是：即使技能的 prompt 被误解或触发条件判断错了，它也不会意外修改你的代码。
 
-### 步骤 6：同时测试自动触发和手动调用
+如果技能确实需要执行 shell 命令（比如跑测试），再加上 `Bash`：
 
-先用自然语言试一遍自动触发。
-
-再直接手动调用：
-
-```text
-/my-skill-name args
+```yaml
+allowed-tools: Read, Grep, Glob, Bash
 ```
 
-如果它一直不自动触发，通常是 description 写得太虚。
+### 步骤 6：测试它能不能被触发
+
+技能创建好以后，应该测两个场景：
+
+**场景 1：手动触发**
+
+直接输入：
+
+```text
+/my-skill-name 参数
+```
+
+看它能不能正常执行，输出是否符合预期。
+
+**场景 2：自动触发**（如果你没有设 `disable-model-invocation: true`）
+
+用自然语言描述一个应该触发这个技能的场景，比如：
+
+```text
+帮我看看 src/api 下的路由有没有问题。
+```
+
+如果 Claude 自动调用了你的技能，说明 description 写得够好。如果没有，回去改 description。
 
 ---
 
-## 最值得先知道的 frontmatter 字段
+## frontmatter 字段速查
 
-下面这些是 Anthropic 当前技能文档里最实用的字段：
+下面这些是 Claude Code 技能 frontmatter 里目前支持的字段。你不需要全记住，知道有哪些、需要时回来查就行。
 
-| 字段 | 作用 |
-|---|---|
-| `name` | 技能名，也是 slash command 名 |
-| `description` | 告诉 Claude 什么时候应该用它 |
-| `argument-hint` | 自动补全时显示参数提示 |
-| `disable-model-invocation` | 禁止自动触发 |
-| `user-invocable` | 控制是否在 slash 菜单里显示 |
-| `allowed-tools` | 收窄工具权限 |
-| `model` | 技能运行时覆盖模型 |
-| `effort` | 覆盖推理深度 |
-| `context` | 设为 `fork` 时在分叉上下文执行 |
-| `agent` | 在 fork 模式下指定 agent 类型 |
-| `hooks` | 给技能生命周期挂钩子 |
+| 字段 | 控制什么 | 你什么时候会关心它 |
+|---|---|---|
+| `name` | 技能名，也是 `/skill-name` 里的那个名字 | 每个技能都要写 |
+| `description` | 告诉 Claude 这个技能什么时候相关 | 每个技能都要写，写不好 = 自动触发失败 |
+| `argument-hint` | 用户输入 `/skill` 时显示的参数提示 | 想让用户知道该传什么参数时 |
+| `disable-model-invocation` | 设 `true` 后禁止 Claude 自动调用 | 技能有副作用时必须设 |
+| `user-invocable` | 控制是否在 slash 菜单里显示 | 某些内部技能不想让用户直接调用时 |
+| `allowed-tools` | 限制技能能用的工具 | 遵循最小权限原则时 |
+| `model` | 覆盖技能运行时使用的模型 | 某些技能想用更轻/更重的模型时 |
+| `effort` | 覆盖推理深度 | 简单任务用低 effort 省 token，复杂任务用高 effort |
+| `context` | 设为 `fork` 时在独立上下文执行 | 技能比较重、会挤占对话上下文时 |
+| `agent` | 在 fork 模式下指定 agent 类型 | 需要特定 agent 的工具或行为时 |
+| `hooks` | 给技能生命周期挂钩子 | 高级用法，暂时不需要关心 |
 
 ---
 
-## 例子：一个手动 API 审查技能
+## 完整例子：一个 API 审查技能
+
+把前面说的所有概念串起来，看一个真实可用的技能：
 
 ```markdown
 ---
 name: review-api
-description: Reviews API routes for consistency, validation, and security.
+description: Reviews API routes for input validation, auth, error handling, and missing tests. Use when auditing REST endpoints. Outputs findings grouped by severity.
 argument-hint: [path-to-routes]
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob
@@ -250,59 +305,50 @@ Review `$ARGUMENTS` for:
 Output findings by severity with file references.
 ```
 
-这类项目技能的优点是：可复用、可审查、显式清晰。
+逐行读一下这个 frontmatter，每个字段你都应该能解释了：
 
-如果你回头看前面的例子，就会发现它其实就是把一句常说的话：
+- `name: review-api` → 用 `/review-api` 触发
+- `description: ...` → 三句话分别说了：做什么、什么时候用、输出什么
+- `argument-hint: [path-to-routes]` → 用户输入时看到这个提示，知道要传路径
+- `disable-model-invocation: true` → 有副作用，禁掉自动触发
+- `allowed-tools: Read, Grep, Glob` → 只需要读和搜索，不需要写
+- `context: fork` → 会读很多文件，用独立上下文跑
 
-```text
-帮我审查这批 API 路由。
-```
-
-变成了一个团队可共享、可演进、可带参数的 `/review-api` 命令。
-
----
-
-## 真正重要的最佳实践
-
-- 从一个已经反复让你痛苦的流程开始
-- 优先用技能替代“超长一次性 prompt”
-- 用辅助文件，不要把 `SKILL.md` 塞到爆
-- 明确它是自动触发还是手动触发
-- 较重流程优先 `context: fork`
-- 项目技能提交到仓库
-- 个人习惯放 `~/.claude/skills/`
+正文里的 `$ARGUMENTS` 会接住用户输入的参数。比如你输入 `/review-api src/api`，那 `$ARGUMENTS` 就是 `src/api`。
 
 ---
 
-## 常见错误
+## 最常见的错误
 
 ### 什么都想做成技能
 
-如果某件事很少发生，就先保留成普通 prompt，等它真的重复了再封装。
+如果某件事很少发生，先保留成普通 prompt。等它真的重复了再封装。判断标准：**一周内你会不会用到第二次？** 不会的话先别做。
 
-### description 写得太空
+### description 写得太虚
 
-这样 Claude 就不知道什么时候该触发它。
+这是自动触发失败的第一大原因。"Review code" 不如 "Reviews API routes for input validation, auth, error handling, and missing tests"。越具体，Claude 越容易判断该不该用它。
 
-### 把所有内容都塞进一个 `SKILL.md`
+### 把所有内容都塞进一个 SKILL.md
 
-复杂技能本来就应该拆辅助文件。
+复杂技能应该拆辅助文件。SKILL.md 是入口，不是百科全书。
 
 ### 把技能和 Hook 搞混
 
-技能是可选、由提示词驱动的；Hook 是确定性、由事件驱动的。
+问自己一个问题："这件事可以不执行吗？" 如果可以，用技能。如果不可以（比如"每次写文件后必须跑 prettier"），用 Hook。技能是可选的、由提示词驱动的；Hook 是强制的、由事件驱动的。
 
 ---
 
-## 大多数团队最值得先做的技能
+## 大多数团队最值得先做的 5 个技能
 
-1. `review-api`
-2. `release-checklist`
-3. `triage-bug`
-4. `write-changelog`
-5. `deploy-preview`
+如果你不知道从哪个技能开始，从团队里最常重复的流程选：
 
-从团队里最常重复的那个流程开始做，收益最大。
+1. `review-api` — 审查 API 路由
+2. `release-checklist` — 发布前检查清单
+3. `triage-bug` — Bug 分类和优先级判断
+4. `write-changelog` — 生成变更日志
+5. `deploy-preview` — 预览环境部署
+
+**判断方法：看你上周在 Claude 里重复输入最多的是什么，那就是你的第一个技能。**
 
 ---
 
