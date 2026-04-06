@@ -290,31 +290,31 @@ allowed-tools: Read, Grep, Glob, Bash
 ```markdown
 ---
 name: review-api
-description: Reviews API routes for input validation, auth, error handling, and missing tests. Use when auditing REST endpoints. Outputs findings grouped by severity.
-argument-hint: [path-to-routes]
+description: 审查 API 路由的输入校验、鉴权、错误处理和缺失测试。适合审查 REST 接口时使用。按严重级别分组输出问题。
+argument-hint: [要审查的路由目录]
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob
 context: fork
 ---
 
-Review `$ARGUMENTS` for:
-1. input validation
-2. auth and authorization
-3. error handling consistency
-4. response shape consistency
-5. missing tests
+审查 `$ARGUMENTS` 下的代码，检查：
+1. 输入是否做了校验（参数类型、必填项、边界值）
+2. 是否有鉴权和权限控制
+3. 错误处理是否统一（状态码、错误格式、异常捕获）
+4. 返回的数据结构是否一致
+5. 有没有对应的测试
 
-Output findings by severity with file references.
+按严重级别（高/中/低）分组输出，每个问题标注文件名和行号。
 ```
 
 逐行读一下这个 frontmatter，每个字段你都应该能解释了：
 
 - `name: review-api` → 用 `/review-api` 触发
 - `description: ...` → 三句话分别说了：做什么、什么时候用、输出什么
-- `argument-hint: [path-to-routes]` → 用户输入时看到这个提示，知道要传路径
-- `disable-model-invocation: true` → 有副作用，禁掉自动触发
-- `allowed-tools: Read, Grep, Glob` → 只需要读和搜索，不需要写
-- `context: fork` → 会读很多文件，用独立上下文跑
+- `argument-hint: [要审查的路由目录]` → 用户输入时看到这个提示，知道要传一个目录路径
+- `disable-model-invocation: true` → 审查代码有判断成分，不让 Claude 自动触发，只在你手动调用时才跑
+- `allowed-tools: Read, Grep, Glob` → 只需要读和搜索，不需要写文件
+- `context: fork` → 会读很多文件，用独立上下文跑，不挤占当前对话
 
 正文里的 `$ARGUMENTS` 会接住用户输入的参数。比如你输入 `/review-api src/api`，那 `$ARGUMENTS` 就是 `src/api`。
 
