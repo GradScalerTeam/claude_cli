@@ -130,15 +130,23 @@ claude
 - [hooks/doc-scanner/README.md](hooks/doc-scanner/README.md)
 - [hooks/design-context/README.md](hooks/design-context/README.md)
 
-## 已整合 Everything Claude Code
+## 已整合的开源项目
 
-这个仓库现在额外收纳了一份 `affaan-m/everything-claude-code` 的 vendored 快照，放在 [vendor/everything-claude-code/](vendor/everything-claude-code/)。
+本仓库整合了多个开源项目的内容，形成一套中文优先的 Claude Code 实战教程体系。
 
-- 中文入口优先看 [vendor/everything-claude-code/README.zh-CN.md](vendor/everything-claude-code/README.zh-CN.md)
-- 原始上游入口看 [vendor/everything-claude-code/README.md](vendor/everything-claude-code/README.md)
-- 整合方式、同步约定和来源提交见 [docs/EVERYTHING_CLAUDE_CODE_INTEGRATION_CN.md](docs/EVERYTHING_CLAUDE_CODE_INTEGRATION_CN.md)
+| 来源项目 | 整合内容 | 位置 |
+| --- | --- | --- |
+| [GradScalerTeam/claude_cli](https://github.com/GradScalerTeam/claude_cli) | 基础框架：agents（doc-master, doc-fixer）、skills（review-doc, review-code）、hooks（doc-scanner, design-context）、英文指南 | `agents/`, `skills/`, `hooks/` |
+| [garrytan/gstack](https://github.com/garrytan/gstack) | GStack 31 个专家角色、6 个核心技能、初学者结构化入门 | `docs/GSTACK_INTEGRATION.md` |
+| [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code) | Vendored 快照：agents、skills、commands、plugins、跨工具配置 | `vendor/everything-claude-code/` |
+| [Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach) | 社交媒体爬取工具集成指南（Twitter、小红书、Reddit、YouTube 等） | `HOW_TO_CREATE_AGENTS_NON_CODE_CN.md` |
+| OpenClaw | OpenClaw + Claude 集成指南、inbox triage 工作流、场景文档 | `docs/OPENCLAW_*.md` |
 
-这样保留了当前仓库的中文手册结构，同时把 ECC 的 agents、skills、commands、plugins、跨工具配置和安装面一并纳入仓库，后续可以独立同步更新。
+整合方式说明：
+- GradScalerTeam 为上游（upstream），定期同步更新
+- everything-claude-code 以 vendor 快照形式纳入，可独立同步更新，详见 [docs/EVERYTHING_CLAUDE_CODE_INTEGRATION_CN.md](docs/EVERYTHING_CLAUDE_CODE_INTEGRATION_CN.md)
+- GStack 和 Agent-Reach 以指南/教程形式整合，指向原始安装方式
+- OpenClaw 内容为独立中文文档，与上游 GradScaler 仓库无直接依赖
 
 ## 进阶专题
 
