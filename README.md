@@ -97,9 +97,20 @@ Hooks are scripts that run automatically in response to Claude CLI events — li
 
 ### Status Line
 
-| Script | What It Does | Folder |
-|---|---|---|
-| **[Status Line](scripts/statusline-command.sh)** | Custom Claude Code status line that shows git branch, staged/modified/untracked file counts, and ahead/behind remote — all color-coded. Copy it to `~/.claude/` and configure `settings.json` to use it. | `scripts/` |
+A two-line custom status line that keeps git and session context always visible at the bottom of Claude Code.
+
+```
+github_project_code/claude_cli | main   +2 *1 ~3  /  ↑1
+[Sonnet · high]  ███░░ 23%  |  5h 41%  ·  7d 18%
+```
+
+**Line 1** — workspace & git: path, branch, staged (`+`), modified (`*`), untracked (`~`), ahead (`↑`), behind (`↓`)
+
+**Line 2** — session context: model + effort level (color-coded by intensity) · 5-char context window bar · 5h/7d rate limit usage (Pro/Max only)
+
+| Script | Folder |
+|---|---|
+| **[Status Line](scripts/statusline-command.sh)** — see [scripts/README.md](scripts/README.md) for full setup and color coding reference | `scripts/` |
 
 ### Guides
 
