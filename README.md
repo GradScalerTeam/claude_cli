@@ -48,6 +48,10 @@ Using Pencil for UI design?
 
 7. **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** — How to use [Pencil](https://www.pencil.dev/) with Claude Code for context-aware design sessions.
 
+Want a persistent memory that follows you across projects?
+
+8. **[Local Brain Guide](local-brain-guide/)** — Build a personal knowledge base with Claude Code + Obsidian. Your preferences, design opinions, and learnings persist across every project. Inspired by [Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
+
 ---
 
 ## The Workflow
@@ -56,13 +60,12 @@ This isn't just a collection of random tools. Everything here follows a specific
 
 ```
 1. PLAN        →  global-doc-master creates a planning doc
-2. FIX         →  global-doc-fixer reviews, fixes, and repeats until READY
-3. BUILD       →  hand the doc to agents or build manually
-4. CODE REVIEW →  global-review-code audits the implementation
-5. SHIP        →  fix findings, re-review, deploy
+2. BUILD       →  hand the doc to agents or build manually
+3. REVIEW      →  Claude reviews code inline during self-analysis
+4. SHIP        →  fix findings, deploy
 ```
 
-Plan first. Review before building. Review after building. That's it. The agents and skills below are the tools that make each step fast and thorough.
+Plan first. Build with agents. Claude reviews as it goes. Ship.
 
 ---
 
@@ -75,7 +78,9 @@ Agents are autonomous workers that investigate your codebase, ask you questions,
 | Agent | What It Does | Folder |
 |---|---|---|
 | **[Global Doc Master](agents/global-doc-master/)** | Creates and organizes all technical documentation — project overviews, tech overviews, design specs, planning docs, feature flows, deployment guides, issue reports, resolved postmortems, and debug runbooks. Uses the `doc-master-assist` skill for templates and protocols. Scans your codebase first, asks clarifying questions, and writes structured docs under `docs/`. | `agents/global-doc-master/` |
-| **[Global Doc Fixer](agents/global-doc-fixer/)** | Autonomously reviews and fixes documents until they're implementation-ready. Runs `global-review-doc`, fixes all findings, re-reviews, and repeats — eliminating the manual review-fix loop. Asks MCQ questions only when a business logic decision is needed. | `agents/global-doc-fixer/` |
+| **[Local Brain](agents/local-brain/)** | Manages a personal Obsidian knowledge base that persists across all projects. Four modes: `fetch` (read-only lookup via index + canvas graph), `research` (explore new topics + add to wiki), `learn` (extract generalized preferences from work sessions), `maintain` (audit for orphans, staleness, outdated knowledge). Uses the `obsidian-canvas` skill for knowledge graph canvases. Inspired by [Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). | `agents/local-brain/` |
+
+> **Removed: Global Doc Fixer** — Previously this repo included a `global-doc-fixer` agent that autonomously reviewed and fixed documents in a loop (review → fix → re-review → repeat). We removed it because it consumed excessive tokens per run — the iterative review-fix loop often burned through significant context on minor formatting issues. If you already have it installed and want to remove it: `rm ~/.claude/agents/global-doc-fixer.md`
 
 ### Skills
 
@@ -84,8 +89,11 @@ Skills are specialized capabilities you invoke with slash commands or natural la
 | Skill | What It Does | Folder |
 |---|---|---|
 | **[Doc Master Assist](skills/doc-master-assist/)** | Template and protocol skill used by the Doc Master agent. Contains 8 reference templates (overview, tech-overview, design, planning, feature-flow, issue, deployment, debug) with their specific protocols. Loaded on demand — only the relevant template is read per invocation. | `skills/doc-master-assist/` |
-| **[Global Review Doc](skills/global-review-doc/)** | Reviews any technical document against your actual codebase. 9-phase review covering codebase verification, completeness, security, bug prediction, edge cases, and agent readiness. Produces an 11-section report with a READY / REVISE / REWRITE verdict. | `skills/global-review-doc/` |
-| **[Global Review Code](skills/global-review-code/)** | Reviews actual code with a 12-phase audit covering architecture, security (OWASP + domain-specific), performance, error handling, dependencies, testing, and framework best practices. Also has a bug hunt mode that traces bugs from symptom to root cause. Adapts all checks to your detected tech stack. | `skills/global-review-code/` |
+| **[Obsidian Canvas](skills/obsidian-canvas/)** | Reference skill for creating and editing Obsidian Canvas (`.canvas`) JSON files. Covers the full JSON Canvas 1.0 spec, node positioning rules to prevent overlapping, color conventions, edge label standards, and layout algorithms. Used by the Local Brain agent for knowledge graph canvases. | `skills/obsidian-canvas/` |
+| **[Code to Design](skills/code-to-design/)** | Converts frontend code into pixel-accurate Pencil (`.pen`) design files. Works with any frontend framework (React, Vue, Svelte, HTML/CSS) and any CSS system (Tailwind, CSS modules, styled-components). | `skills/code-to-design/` |
+| **[GitHub](skills/github/)** | GitHub CLI operations — creating repos, pushing, PRs, issues, branch management. Wraps `gh` commands with proper conventions. | `skills/github/` |
+
+> **Removed: Global Review Doc & Global Review Code** — Previously this repo included dedicated review skills (9-phase doc review, 12-phase code audit). We removed them because they consumed excessive tokens per invocation — the multi-phase review pipelines added significant overhead without proportional value. Claude's built-in self-analysis during coding already catches issues effectively. If you already have them installed and want to remove them: `rm -rf ~/.claude/skills/global-review-doc ~/.claude/skills/global-review-code`
 
 ### Hooks
 
@@ -122,6 +130,7 @@ github_project_code/claude_cli | main   +2 *1 ~3  /  ↑1
 | **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** | What agents are, how they work, and how to create your own using the agent-development plugin |
 | **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** | What skills are, how they differ from agents, and how to create your own using the skill-development plugin |
 | **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** | Using [Pencil](https://www.pencil.dev/) with Claude Code for context-aware UI design — repository selection, project context, and the full design workflow |
+| **[Local Brain Guide](local-brain-guide/)** | Build a personal knowledge base with Claude Code + Obsidian. Covers the concept (Karpathy's LLM Wiki), Obsidian setup, vault schema, canvas knowledge graphs, agent modes, and daily workflow. 6-part guide. |
 
 ---
 
@@ -147,6 +156,8 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install e
 4. SCRIPTS: Scan the scripts/ folder. Copy each .sh file to ~/.claude/<filename> with exact content. For statusline-command.sh specifically, also add the statusLine config to settings.json: { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } }. Merge with existing settings — don't overwrite.
 
 After installing everything, read the README.md in each folder and give me a summary of what was installed and how to use each one.
+
+IMPORTANT for local-brain agent: After copying, open ~/.claude/agents/local-brain/local-brain.md and replace <VAULT_PATH> with my actual Obsidian vault path. Also read the local-brain-guide/ folder for setup steps — I need an Obsidian vault with the right folder structure and a CLAUDE.md schema before the agent works. Walk me through the full setup if I don't have a vault yet.
 ```
 
 ### Install Agents Only

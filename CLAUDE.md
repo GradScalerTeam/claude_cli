@@ -38,14 +38,16 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 - **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** — What agents are and how to create your own
 - **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** — What skills are and how to create your own
 - **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** — Using Pencil for context-aware UI design with Claude Code
+- **[local-brain-guide/](local-brain-guide/)** — 6-part guide to building a personal knowledge base with Claude Code + Obsidian (concept, setup, schema, canvas graphs, agent modes, daily workflow)
 
 ### Tools
 
 - **[agents/global-doc-master/](agents/global-doc-master/)** — Agent that creates all technical documentation (overview, tech-overview, design, planning, feature flows, deployment, issues, resolved, debug). Uses the `doc-master-assist` skill for templates and protocols
-- **[agents/global-doc-fixer/](agents/global-doc-fixer/)** — Agent that autonomously reviews and fixes docs — runs the review-fix loop until the document is implementation-ready
+- **[agents/local-brain/](agents/local-brain/)** — Agent that manages a personal Obsidian knowledge base. Four modes: fetch (read-only lookup), research (explore + add), learn (extract from sessions), maintain (cleanup + freshness). Uses the `obsidian-canvas` skill for knowledge graph canvases
 - **[skills/doc-master-assist/](skills/doc-master-assist/)** — Template and protocol skill used by the doc-master agent. Contains 8 reference templates for all document types
-- **[skills/global-review-doc/](skills/global-review-doc/)** — Skill that reviews documents against the codebase (9-phase review, 11-section report)
-- **[skills/global-review-code/](skills/global-review-code/)** — Skill that audits code and hunts bugs (12-phase audit + bug hunt mode)
+- **[skills/obsidian-canvas/](skills/obsidian-canvas/)** — Reference skill for creating and editing Obsidian Canvas (.canvas) JSON files. Covers the JSON Canvas 1.0 spec, node positioning rules, color conventions, and edge label standards
+- **[skills/code-to-design/](skills/code-to-design/)** — Converts frontend code into pixel-accurate Pencil (.pen) design files
+- **[skills/github/](skills/github/)** — GitHub CLI operations — repos, PRs, issues, branch management
 - **[hooks/doc-scanner/](hooks/doc-scanner/)** — SessionStart hook that scans for `.md` files and gives Claude a documentation index at conversation start
 
 ## Project Structure
@@ -60,6 +62,14 @@ claude_cli/
 ├── HOW_TO_CREATE_AGENTS.md            # Guide: creating custom agents
 ├── HOW_TO_CREATE_SKILLS.md            # Guide: creating custom skills
 ├── HOW_TO_USE_PENCIL_WITH_CLAUDE.md   # Guide: using Pencil for UI design with Claude
+├── local-brain-guide/                 # 6-part guide: Obsidian + Claude Code knowledge base
+│   ├── README.md                      # Overview and quick start
+│   ├── 01-CONCEPT.md                  # Why this exists, compilation vs retrieval
+│   ├── 02-SETUP-OBSIDIAN.md           # Install Obsidian, create vault, structure
+│   ├── 03-VAULT-SCHEMA.md             # CLAUDE.md schema, frontmatter, conventions
+│   ├── 04-CANVAS-GRAPHS.md            # Knowledge graph canvases, edge types, layout
+│   ├── 05-AGENT-MODES.md              # fetch, research, learn, maintain
+│   └── 06-DAILY-WORKFLOW.md           # How to use this day-to-day
 ├── hooks/
 │   └── doc-scanner/                   # SessionStart hook — doc awareness at conversation start
 │       ├── doc-scanner.sh             # The hook script
@@ -68,13 +78,14 @@ claude_cli/
 │   └── statusline-command.sh          # Custom status line script for Claude Code
 ├── agents/
 │   ├── global-doc-master/             # Doc master agent definition + README
-│   └── global-doc-fixer/              # Doc fixer agent definition + README
+│   └── local-brain/                   # Local brain agent — personal knowledge base manager
 └── skills/
     ├── doc-master-assist/             # Template & protocol skill for doc-master agent
     │   ├── SKILL.md                   # Skill router + shared quality protocols
     │   └── references/                # 8 document templates (loaded on demand)
-    ├── global-review-doc/             # Doc review skill + references + README
-    └── global-review-code/            # Code review skill + references + README
+    ├── obsidian-canvas/               # JSON Canvas spec + positioning rules for .canvas files
+    ├── code-to-design/                # Frontend code → Pencil design files
+    └── github/                        # GitHub CLI operations skill
 ```
 
 ## Development Instructions
@@ -82,8 +93,7 @@ claude_cli/
 ### Content Creation Workflow
 
 1. **All docs go through `global-doc-master`** — Never write docs directly. The agent investigates the codebase, follows templates, and produces consistent output.
-2. **All docs get reviewed** — Use `global-review-doc` skill before finalizing any document.
-3. **Examples must be real** — Every example in this repo should be something that actually works. No theoretical snippets.
+2. **Examples must be real** — Every example in this repo should be something that actually works. No theoretical snippets.
 4. **Keep it practical** — Explain the "how" and "why", not just the "what". Developers reading this should be able to copy patterns and apply them immediately.
 
 ### Writing Style

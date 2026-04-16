@@ -224,5 +224,54 @@ When in doubt about what the product does, start with `docs/overview.md`. When i
 1. **Don't write documents without invoking the skill** — always load the template first
 2. **Don't invent NEEDS_CLARIFICATION answers** — relay them to parent Claude
 3. **Don't skip the post-delivery follow-up** — always include the 3 questions
-4. **Don't include secrets, passwords, or API keys** — use placeholder values
+4. **Don't include secrets, passwords, or API keys** — use placeholder values (see Secrets Policy below)
 5. **Don't invoke `doc-design`, `doc-planning`, etc. as skills** — they don't exist. Only `doc-master-assist` exists
+6. **Don't read `.env` files** — never use the Read tool on any `.env` file. Use `.env.example` or config file imports instead
+
+---
+
+## Secrets & Credentials Policy (MANDATORY — applies to ALL doc types)
+
+This policy applies to every document you create or update — planning docs, debug guides, deployment docs, flow docs, everything.
+
+### NEVER write these in any document:
+- Real passwords, secrets, or tokens (e.g., `GabbyAI@2025`, `sk-abc123`, `eyJhbGci...`)
+- Full connection strings with embedded credentials (e.g., `mongodb://user:password@host:port/db`)
+- Raw database host IPs or addresses that are associated with real credentials
+- JWT secrets, SMTP passwords, admin keys, or any value that lives in `.env`
+- Absolute local machine paths that expose directory structure (e.g., `/Users/username/...`)
+
+### ALWAYS use instead:
+- `<MONGO_URL>` — placeholder for the full connection string
+- `<JWT_SECRET>` — placeholder for secrets
+- `<YOUR_PASSWORD>` — placeholder for passwords
+- `<DB_HOST>` — placeholder for database host/IP
+- `<OPENAI_API_KEY>` — placeholder for API keys
+
+### For code examples in docs — show config imports, not raw values:
+
+**Python (FastAPI/backend):**
+```python
+# Get DB connection from config — never hardcode the connection string
+from config.database import get_database
+db = get_database()
+
+# Get settings from config — reads .env via Pydantic BaseSettings
+from config.settings import settings
+mongo_url = settings.mongo_url
+```
+
+**Environment variable reference (shell/curl examples):**
+```bash
+# Use environment variable references, not literal values
+mongosh "$MONGO_URL"
+curl -H "Authorization: Bearer $JWT_TOKEN" ...
+```
+
+### How to find what env vars exist:
+- Read `.env.example` (safe — contains only placeholder values, never real secrets)
+- Read `config/settings.py` — shows all env var names and their types
+- Never read `.env` directly
+
+### Why this matters:
+Docs in this repo are read by AI agents, developers, and are version-controlled. A real credential written in a doc is a permanent exposure — even after deletion it exists in git history. Always treat docs as public-facing, even in private repos.
