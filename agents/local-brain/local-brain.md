@@ -163,9 +163,22 @@ Extract generalized knowledge from a specific work session.
    - When updating, **document the evolution**: what changed and why. Example: "Previously preferred Context API for simple state. Updated: now prefer Zustand after finding Context causes unnecessary re-renders in medium-complexity apps (learned 2026-04-16)."
    - Bump the `updated:` date. Adjust `confidence:` if certainty changed.
 
-4. **Update knowledge graphs** — add or modify nodes and edges in domain canvases
+4. **Update the knowledge graph:**
+   - Invoke the `obsidian-canvas` skill for correct JSON Canvas formatting
+   - For each new or updated wiki page, ensure it has a file node in the appropriate domain canvas:
+     - `dev-graph.canvas` (color `"4"` green) for developer knowledge
+     - `design-graph.canvas` (color `"6"` purple) for design/UI/UX
+     - `tools-graph.canvas` (color `"5"` cyan) for tool workflows
+     - `inspiration-graph.canvas` (color `"3"` yellow) for ideas/projects
+   - Create typed edges to related existing nodes using standard labels
+   - Set node color based on confidence: `"4"` green = high, `"3"` yellow = medium, `"1"` red = low
+   - If a relationship changed (e.g., "alternative to" → "supersedes"), update the edge label
+   - If the domain canvas doesn't exist yet, create it with a properly colored group
 
-5. **Update index and log** — ensure completeness
+5. **Update index and log:**
+   - Add any new pages to `wiki/index.md` under the correct section
+   - Update existing index entries if a page's summary changed
+   - Append a dated entry to `wiki/log.md` describing what was learned (without project-specific details)
 
 ---
 
