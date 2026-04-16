@@ -1,6 +1,6 @@
 ---
 name: obsidian-canvas
-description: "Reference skill for creating and editing Obsidian Canvas (.canvas) JSON files. Use this skill whenever you need to create a canvas, edit a canvas, add nodes or edges to a canvas, build a knowledge graph canvas, or generate any .canvas file for an Obsidian vault. Also use when the local-brain agent needs to create or update domain graph canvases (dev-graph.canvas, design-graph.canvas, etc.). Trigger on: 'create a canvas', 'update the canvas', 'add to the graph', 'build a knowledge graph', 'make a mind map', any mention of .canvas files, or when working with the cortex wiki's graph layer."
+description: "Reference skill for creating and editing Obsidian Canvas (.canvas) JSON files. Use this skill whenever you need to create a canvas, edit a canvas, add nodes or edges to a canvas, build a knowledge graph canvas, or generate any .canvas file for an Obsidian vault. Also use when the local-brain agent needs to update the unified knowledge graph at wiki/index.canvas. Trigger on: 'create a canvas', 'update the canvas', 'add to the graph', 'build a knowledge graph', 'make a mind map', any mention of .canvas files, or when working with the cortex wiki's graph layer."
 ---
 
 # Obsidian Canvas — JSON Canvas 1.0 Reference
@@ -20,8 +20,8 @@ This skill covers the spec, positioning rules, and conventions. Read the section
 5. [Color System](#color-system) — What colors mean
 6. [Edge Label Standards](#edge-label-standards) — Typed relationships
 7. [ID Generation](#id-generation)
-8. [Validation Checklist](#validation-checklist) — Run before writing
-9. [Cortex Wiki Conventions](#cortex-wiki-conventions) — Domain canvases
+8. [Post-Write Verification Protocol](#post-write-verification-protocol) — MANDATORY after every canvas write
+9. [Knowledge Base Conventions](#knowledge-base-conventions) — Unified knowledge graph (`wiki/index.canvas`)
 10. [Examples](#examples) — Complete working canvases
 
 ---
@@ -96,7 +96,7 @@ Embeds an existing file from the vault. Obsidian renders a live preview.
 
 **Standard size:** 400×300 for wiki pages, 400×400 for long documents.
 
-The `file` path must point to an actual file in the vault — the [Validation Checklist](#validation-checklist) catches dead references.
+The `file` path must point to an actual file in the vault — the [Post-Write Verification Protocol](#post-write-verification-protocol) catches dead references.
 
 ### Link Node
 
@@ -278,19 +278,46 @@ Round to nearest 20px grid point.
 
 ### Adding Nodes to an Existing Canvas
 
-When modifying an existing canvas:
+Adding nodes is NOT "find empty space and dump." New content may require reorganizing the entire layout. Treat every canvas write as a full layout pass.
 
-1. Read the file and parse all node positions
-2. Calculate the bounding box of all existing nodes:
-   ```
-   minX = min(node.x for all nodes)
-   maxX = max(node.x + node.width for all nodes)
-   minY = min(node.y for all nodes)
-   maxY = max(node.y + node.height for all nodes)
-   ```
-3. Place new nodes outside this bounding box + 80px gap
-4. Preferred placement: below existing content (y = maxY + 80) or to the right (x = maxX + 80)
-5. If adding a node that logically belongs near an existing node, place it adjacent with 40px gap and verify no overlap with other nodes
+**Step 1 — Read and understand the current layout:**
+1. Read the file and parse all node positions, sizes, group memberships, and edges
+2. Map which nodes are inside which groups (by bounding box containment)
+3. Note which edges have labels and their current routing (fromSide/toSide)
+
+**Step 2 — Plan the new layout holistically:**
+1. Determine where new nodes logically belong (which group, near which existing nodes)
+2. Check if existing nodes need to move to accommodate the new ones cleanly
+3. Check if groups need to be resized — groups should fit their children tightly (80px padding on sides, 100px on top for label), not leave large empty areas
+4. Check if any nodes should move OUT of a group (e.g., a shared/contextual page that multiple groups reference should float outside groups, not be trapped inside one)
+5. Consider edge label space — if adding new edges with labels, ensure there's room for the labels to render without clipping (see Edge Label Space Rules below)
+
+**Step 3 — Write the full canvas:**
+When changes affect layout significantly (adding 3+ nodes, adding a new group, or restructuring), rewrite the entire canvas rather than surgically inserting. This prevents accumulated layout drift.
+
+**Step 4 — Post-write verification (MANDATORY):**
+After writing the canvas, run the full [Post-Write Verification Protocol](#post-write-verification-protocol). If any check fails, fix and rewrite.
+
+### Edge Label Space Rules
+
+Edge labels are the most common source of visual clutter. Follow these rules:
+
+**Horizontal edges (left→right):**
+- Minimum gap between connected nodes: `max(160px, labelLength * 9px)`
+- A 10-character label like "depends on" needs ~90px, so 160px minimum gap works
+- A 20-character label needs ~180px gap — increase spacing accordingly
+
+**Vertical edges (top→bottom):**
+- Labels sit beside the vertical line, so they need less gap: 100px minimum
+- But if multiple vertical edges emerge from the same node's bottom side, spread the target nodes horizontally so labels don't stack on top of each other
+
+**Multiple edges from one side:**
+- If 3+ edges leave from the same node side (e.g., hub node with "bottom" edges to 3 children), the children MUST be spread out enough that the edge lines diverge visibly
+- Fan-out rule: children connected from the same parent side should span at least `(childCount - 1) * 480px` horizontally
+
+**Label truncation prevention:**
+- Obsidian truncates labels when edges are too short or nodes are too close
+- Always verify: would a human reading this canvas see the full label text?
 
 ---
 
@@ -307,7 +334,7 @@ When modifying an existing canvas:
 | `"5"` | Cyan | #53dfdd |
 | `"6"` | Purple | #a882ff |
 
-### Cortex Knowledge Base Color Conventions
+### Knowledge Base Color Conventions
 
 **Node colors (confidence level):**
 | Color | Meaning |
@@ -367,46 +394,77 @@ When adding to an existing canvas, collect all existing IDs first and ensure no 
 
 ---
 
-## Validation Checklist
+## Post-Write Verification Protocol
 
-Run through this before writing any `.canvas` file:
+This is MANDATORY after every canvas write. Re-read the canvas you just wrote and verify every check. If any check fails, fix the canvas and rewrite — do not leave a broken layout.
 
-- [ ] **No overlapping nodes** — For every pair of nodes, verify bounding boxes don't intersect:
+### Structural Checks
+
+- [ ] **Valid JSON** — Parse the output to verify structure
+- [ ] **No duplicate IDs** — All `id` values across nodes and edges are unique
+- [ ] **All edge references valid** — Every `fromNode` and `toNode` matches an existing node `id`
+- [ ] **File nodes point to real files** — Every `file` path resolves to an actual file in the vault
+- [ ] **Groups appear before children** in the `nodes` array (z-index ordering)
+- [ ] **Grid-aligned** — All positions and sizes are multiples of 20
+
+### Spatial Checks
+
+- [ ] **No overlapping nodes** — For every pair of non-group nodes, verify bounding boxes don't intersect:
   ```
   Overlap if: nodeA.x < nodeB.x + nodeB.width
            && nodeA.x + nodeA.width > nodeB.x
            && nodeA.y < nodeB.y + nodeB.height
            && nodeA.y + nodeA.height > nodeB.y
   ```
-- [ ] **All edge references valid** — Every `fromNode` and `toNode` matches an existing node `id`
-- [ ] **File nodes point to real files** — Every `file` path resolves to an actual file in the vault
-- [ ] **Groups contain their children** — Child nodes' bounding boxes fall within the group's bounds
-- [ ] **Groups appear before children** in the `nodes` array (z-index ordering)
-- [ ] **No duplicate IDs** — All `id` values across nodes and edges are unique
-- [ ] **Grid-aligned** — All positions and sizes are multiples of 20
-- [ ] **Valid JSON** — Parse the output before writing to verify structure
+- [ ] **Groups contain their children** — Every child node's bounding box falls within the parent group's bounds
+- [ ] **Groups are tight** — No group has more than 120px of empty padding beyond its outermost child on any side. Oversized groups waste space and look broken.
+- [ ] **Minimum gaps respected** — Adjacent nodes have at least 40px gap (unlabeled edges) or 160px gap (labeled horizontal edges) or 100px gap (labeled vertical edges)
+
+### Edge Label Checks
+
+- [ ] **Labels have room** — For every labeled edge, verify:
+  - Horizontal edges: gap between connected nodes >= `max(160px, labelLength * 9px)`
+  - Vertical edges: gap between connected nodes >= 100px
+- [ ] **No label stacking** — If multiple labeled edges leave from the same node side, the target nodes are spread enough that labels don't overlap (fan-out rule: `(edgeCount - 1) * 480px` horizontal spread)
+- [ ] **Edge sides match spatial position** — Nodes to the right connect via `fromSide: "right"` → `toSide: "left"`. Nodes below connect via `fromSide: "bottom"` → `toSide: "top"`. Wrong sides cause edges to loop around nodes awkwardly.
+
+### Semantic Checks
+
+- [ ] **Shared pages float outside groups** — If a page is referenced by nodes in multiple groups (via edges), it should NOT be trapped inside one group. Place it between or outside the groups it connects.
+- [ ] **Hub nodes are prominent** — The core concept page for a topic cluster should be positioned at the top or center of its group, not buried among detail pages.
 
 ---
 
 ## Knowledge Base Conventions
 
-Your Obsidian vault uses domain-specific canvases (see the [Local Brain Guide](https://github.com/GradScalerTeam/claude_cli/tree/main/local-brain-guide) for full setup):
+Your Obsidian vault uses a **single unified knowledge graph canvas**:
 
-| Canvas File | Domain | Group Color | Contains |
-|-------------|--------|-------------|----------|
-| `dev-graph.canvas` | Developer knowledge | `"4"` green | wiki/dev/ pages |
-| `design-graph.canvas` | UI/UX design | `"6"` purple | wiki/design/ pages |
-| `tools-graph.canvas` | Tools & workflows | `"5"` cyan | wiki/tools/ pages |
-| `inspiration-graph.canvas` | Ideas & projects | `"3"` yellow | wiki/inspiration/ pages |
+**File:** `wiki/index.canvas`
 
-Each canvas lives at the vault root (alongside `wiki/`, `raw/`, etc.).
+This canvas is a graph index for the entire wiki. It parallels `wiki/index.md` — same purpose (routing to the right page), but as a traversable graph instead of a flat list. The canvas stores relationships as structure (nodes + edges), making it cheaper to traverse than reading full wiki pages to discover connections.
 
-When adding a wiki page to a domain canvas:
-1. Create a file node pointing to the wiki page
-2. Set node color based on the page's `confidence` frontmatter
-3. Create edges to related pages (check the page's `related:` frontmatter)
-4. Use appropriate edge labels and direction
-5. Place the node near its most-related existing node, or in a new area if it's a new cluster
+**Why one canvas, not many:** Cross-domain connections (design concept → dev pattern) work naturally when everything is in one graph. Splitting into domain canvases would break traversal across domains and add file management overhead for no benefit.
+
+### Domain Groups
+
+Domains are represented as group nodes inside the single canvas:
+
+| Group Label | Group Color | Contains |
+|-------------|-------------|----------|
+| Dev | `"4"` green | wiki/dev/ pages |
+| Design | `"6"` purple | wiki/design/ pages |
+| Tools | `"5"` cyan | wiki/tools/ pages |
+| Inspiration | `"3"` yellow | wiki/inspiration/ pages |
+
+### When adding a wiki page to the canvas:
+1. Read the existing `wiki/index.canvas` to understand current layout
+2. Create a file node pointing to the wiki page
+3. Place it inside the appropriate domain group (create the group if it doesn't exist yet)
+4. Set node color based on the page's `confidence` frontmatter
+5. Create edges to related pages (check the page's `related:` frontmatter)
+6. Use appropriate edge labels and direction from the [Edge Label Standards](#edge-label-standards)
+7. Place the node near its most-related existing node within the group
+8. Cross-domain edges are encouraged — connect nodes across groups when concepts relate
 
 ---
 
@@ -502,9 +560,9 @@ A dev domain group containing three related concepts:
 }
 ```
 
-### Example 3: Multi-Domain Canvas with Cross-References
+### Example 3: Unified Knowledge Graph with Cross-Domain Edges
 
-Nodes from different domains connected across groups:
+A single canvas with domain groups and cross-domain connections (the `wiki/index.canvas` pattern):
 
 ```json
 {
