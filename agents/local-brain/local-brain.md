@@ -148,6 +148,8 @@ Explore a new topic, discover knowledge, and add it to the wiki. This covers bot
    - Add new pages to `wiki/index.md` under the correct section
    - Append a dated entry to `wiki/log.md`
 
+6. **Commit changes** — run the [Closing Protocol](#closing-protocol--commit-changes) at the bottom of this file. Auto-commit, no push.
+
 ---
 
 ## Mode: learn
@@ -191,6 +193,8 @@ Extract generalized knowledge from a specific work session.
    - Add any new pages to `wiki/index.md` under the correct section
    - Update existing index entries if a page's summary changed
    - Append a dated entry to `wiki/log.md` describing what was learned (without project-specific details)
+
+6. **Commit changes** — run the [Closing Protocol](#closing-protocol--commit-changes) at the bottom of this file. Auto-commit, no push.
 
 ---
 
@@ -242,6 +246,43 @@ Audit the wiki for structural issues AND check if existing knowledge is outdated
 6. **Ask before fixing** — present the report and wait for approval. Never auto-fix silently.
 
 7. **Apply approved fixes** — modify pages, bump dates, adjust confidence, fix canvas issues, update `wiki/log.md`.
+
+8. **Commit changes** — if any fixes were applied, run the [Closing Protocol](#closing-protocol--commit-changes) at the bottom of this file. Skip if it was an audit-only run with no edits. Auto-commit, no push.
+
+---
+
+## Closing Protocol — Commit Changes
+
+After any write mode (`research`, `learn`, `maintain`) finishes, automatically commit the changes to git so wiki history is preserved. Push is always manual — never push automatically.
+
+**Why auto-commit:** The wiki is a living knowledge base. Every write should be a commit so the history shows the evolution of beliefs over time. Manual commits get forgotten, which leads to giant unfocused commits later that lose the per-session context.
+
+**Process:**
+
+1. **Verify `.gitignore` exists in the vault root.** If it doesn't, create one with these defaults BEFORE staging anything:
+   ```
+   # Obsidian internals — UI state, plugins, themes, settings
+   .obsidian/
+
+   # Obsidian trash
+   .trash/
+
+   # OS files
+   .DS_Store
+   ```
+   The `.gitignore` keeps machine-specific Obsidian config and OS junk out of the wiki — only knowledge content gets committed.
+
+2. **Stage everything** with `git add -A` from the vault root. Safe because `.gitignore` filters out non-knowledge files.
+
+3. **Verify what's staged** with `git status`. Confirm only wiki content (`.md`, `.canvas`, `wiki/log.md`, `wiki/index.md`, `raw/` source files) is being committed. If you see anything unexpected (binary files, large dumps, accidental secrets, files outside `wiki/` or `raw/`), STOP and flag it to the user before committing.
+
+4. **Derive the commit message from the latest `wiki/log.md` entry** you just appended. That entry already describes what changed — lift it as a single-line commit message in the existing vault style. Examples: `Bento UI design research`, `Add Flutter Android setup + RN/Flutter/KMP cross-platform research`, `Add UI kit methodology learnings from neumorphic design session`.
+
+5. **Commit** with `git commit -m "<message>"`. No `Co-Authored-By` line. No trailers. No body — single-line message only, matching the existing vault style.
+
+6. **Do not push.** Push is always manual — the user controls when wiki updates go to the remote.
+
+7. **Report the commit** — show the commit SHA and message in your final response so the user can verify and push manually when ready.
 
 ---
 
