@@ -2,9 +2,22 @@
 
 **[English](README_EN.md)** | 中文
 
-适合初学者的 Claude Code 上手、项目接入与进阶路线。
+这是一个面向 Claude Code 的实战教程仓库，重点不是"多装几个工具"，而是把项目记忆、子代理、技能、Hooks、MCP 和文档优先工作流真正串起来。
 
-这个仓库不是一份零散命令清单，而是一套中文优先的实践教程，帮助你从第一次启动 Claude Code，走到在真实项目里稳定使用 `CLAUDE.md`、技能、子代理、Hook 和 MCP。
+## Quick Start
+
+如果你只想先看 OpenClaw inbox triage + Claude CLI repo executor 的最短路径，直接从 [OpenClaw Inbox Triage 执行清单](docs/OPENCLAW_INBOX_TRIAGE_EXECUTION_CHECKLIST_CN.md) 开始。
+
+这个分支已按 **2026 年 3 月 24 日** 可访问的 Anthropic Claude Code 官方文档重新整理教程路径。
+
+## 从哪里开始
+
+按你现在的阶段来选：
+
+1. **[10 分钟上手](CLAUDE_SETUP_CN.md)** — 安装 Claude Code、登录、创建第一份 CLAUDE.md，掌握最重要的几个命令。
+2. **[新项目工作流](HOW_TO_START_NEW_PROJECT_CN.md)** — 从想法、规划、审查到实现，完整跑通一遍。
+3. **[现有项目工作流](HOW_TO_START_EXISTING_PROJECT_CN.md)** — 把 Claude Code 稳定接入已有代码库。
+4. **[个人助理 / 知识系统工作流](HOW_TO_START_ASSISTANT_SYSTEM_CN.md)** — 把 Claude Code 用在个人助理、反思系统和知识整理项目，而不只是写程序。
 
 ## 这个仓库适合谁
 
@@ -12,52 +25,6 @@
 - 已经有一个项目，想把 Claude Code 稳定接进去
 - 想弄清 `CLAUDE.md`、技能、子代理、Hook、MCP 分别是什么
 - 想先把基础打稳，再逐步扩展到个人助理或长期工作流
-
-## 5 分钟开始
-
-### 1. 先安装 Claude Code
-
-如果你只想先跑起来，可以先用：
-
-```bash
-npm install -g @anthropic-ai/claude-code
-claude doctor
-```
-
-如果你想看更完整的安装、登录、排障说明，先读 [CLAUDE_SETUP_CN.md](CLAUDE_SETUP_CN.md)。安装方式可能会更新，官方入口以 [Anthropic Claude Code setup docs](https://docs.anthropic.com/en/docs/claude-code/setup) 为准。
-
-### 2. 进入一个真实项目后启动 Claude
-
-```bash
-cd your-project
-claude
-```
-
-### 3. 第一次会话先执行 `/init`
-
-```text
-/init
-```
-
-这一步会生成 `CLAUDE.md`。它是项目共享记忆，不是可有可无的装饰文件。
-
-### 4. 先别急着改代码，先问这 3 句
-
-```text
-给我概览一下这个仓库。
-这里真实可用的 build、test、lint 命令分别是什么？
-先不要改代码，告诉我风险最高的目录和原因。
-```
-
-如果仓库比较大、你对代码还不熟，先用：
-
-```text
-/plan
-```
-
-### 5. 先做一个小而安全的任务
-
-比如修一个小 bug、补一条文档、跑一次测试、梳理一个模块结构。不要一上来就让 Claude“把整个项目做完”。
 
 ## 你现在应该先读哪篇
 
@@ -89,7 +56,7 @@ claude
 | `CLAUDE.md` | 项目的共享记忆，记录命令、架构、规则和风险点 | 第一天就该用 |
 | Plan Mode | 先分析、先规划，不直接改文件 | 面对陌生仓库或大改动时 |
 | 技能 | 可复用的流程、检查表或固定能力 | 当某件事开始重复出现时 |
-| 子代理 | 专门处理某类任务的角色 | 当某种“专家角色”反复需要时 |
+| 子代理 | 专门处理某类任务的角色 | 当某种"专家角色"反复需要时 |
 | Hook | 在固定事件前后自动执行的动作 | 当某件事必须每次都发生时 |
 | MCP | Claude 访问外部工具和数据源的接口层 | 当你真的需要接 GitHub、数据库、服务端接口时 |
 
