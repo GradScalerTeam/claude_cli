@@ -199,7 +199,7 @@ project_name/src | main +2 *3 ~1 / ↑1 ↓2
 cp scripts/statusline-command.sh ~/.claude/statusline-command.sh
 ```
 
-或者如果你从 GitHub 仓库安装，从 [`scripts/statusline-command.sh`](scripts/statusline-command.sh) 复制内容并保存到 `~/.claude/statusline-command.sh`。
+或者如果你从 GitHub 仓库安装，从 [`scripts/statusline-command.sh`](../../scripts/statusline-command.sh) 复制内容并保存到 `~/.claude/statusline-command.sh`。
 
 **步骤 2：** 将状态栏配置添加到你的 Claude 设置。打开 `~/.claude/settings.json` 并添加：
 
@@ -228,5 +228,5 @@ cp scripts/statusline-command.sh ~/.claude/statusline-command.sh
 
 现在你已经安装并设置了 Claude Code，阅读这些指南开始使用：
 
-- **[用 Claude CLI 开始新项目](HOW_TO_START_NEW_PROJECT.md)** — 如何使用 Claude CLI 从零开始设置全新项目
-- **[在现有项目中使用 Claude CLI](HOW_TO_START_EXISTING_PROJECT.md)** — 如何将 Claude CLI 引入你已经在做的项目
+- **[用 Claude CLI 开始新项目](../../HOW_TO_START_NEW_PROJECT.md)** — 如何使用 Claude CLI 从零开始设置全新项目
+- **[在现有项目中使用 Claude CLI](../../HOW_TO_START_EXISTING_PROJECT.md)** — 如何将 Claude CLI 引入你已经在做的项目

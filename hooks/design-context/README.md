@@ -180,7 +180,7 @@ These two hooks do different jobs:
 
 If you use both, Claude is much less likely to design screens that ignore existing implementation reality.
 
-See [hooks/doc-scanner/README.md](/Volumes/PS1008/Github/claude_cli/hooks/doc-scanner/README.md).
+See [../doc-scanner/README.md](../doc-scanner/README.md).
 
 ---
 

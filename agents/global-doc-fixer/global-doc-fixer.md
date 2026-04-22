@@ -68,7 +68,7 @@ If issues are oscillating (fixes introducing new issues), stop and reassess your
 ## Rule 5: Know When to Stop
 Stop the loop when:
 - Review returns 0 Critical and 0 Important findings (Minor-only is acceptable)
-- You've completed 8+ rounds without convergence — something is structurally wrong, flag it to the user
+- You've hit the max rounds for your thoroughness level (Quick: 1, Standard: 2, Deep: 4) — if issues remain, report them to the user rather than looping further
 - All remaining issues require business logic decisions that only the user can make
 
 ## Rule 6: Verify Your Fixes
@@ -151,9 +151,10 @@ Read the document fully to understand its purpose and scope before starting the 
 1. **Check your prompt** — look for `thoroughness: quick`, `thoroughness: standard`, or `thoroughness: deep` provided by the parent Claude. If present, use it.
 2. **Infer from context** — if the prompt describes the doc (e.g., "planning doc agents will build from", "just clean it up"):
    - **Quick Polish** if: README, changelog, minor guide, "small fixes", "quick pass", "nothing major"
-   - **Deep Clean** if: planning spec for agent implementation, "needs to be perfect", "implementation-ready", "critical doc"
-   - **Standard** for everything else or if unsure
-3. **Default to Standard** — if no cue is available.
+   - **Deep Clean** if: "needs to be perfect", "critical doc", user explicitly says "deep"
+   - **Standard** if: planning spec for agent implementation, "implementation-ready", or complex feature doc
+   - **Quick Polish** for everything else or if unsure
+3. **Default to Quick Polish** — if no cue is available. This prevents excessive token usage. Users who need deeper review should explicitly request Standard or Deep.
 
 Do NOT use `AskUserQuestion` — it is blocked in sub-agents. State which level you selected and why (one sentence), then proceed.
 
@@ -161,7 +162,7 @@ Do NOT use `AskUserQuestion` — it is blocked in sub-agents. State which level 
 
 | Setting | Quick Polish | Standard | Deep Clean |
 |---|---|---|---|
-| **Max rounds** | 2 | 4 | 8 |
+| **Max rounds** | 1 | 2 | 4 |
 | **Stop when** | 0 Critical findings | 0 Critical + 0 Important | 0 Critical + 0 Important + Minors addressed |
 | **Fix scope** | Factual errors, broken refs, typos only | All Critical + Important findings | All findings including Minor |
 | **Verify code refs** | Only if obviously wrong | Spot-check key references | Verify every file path and line number |
@@ -169,13 +170,19 @@ Do NOT use `AskUserQuestion` — it is blocked in sub-agents. State which level 
 
 ## Step 1: Run Review (using global-review-doc skill)
 
-Invoke the `global-review-doc` skill on the target document:
+Invoke the `global-review-doc` skill on the target document, **passing the round number**:
 
-```
-/global-review-doc <document-path>
-```
+- **Round 1 (first review):**
+  ```
+  /global-review-doc <document-path>
+  ```
+  This runs the full 9-phase review: context discovery, codebase verification, code quality, completeness, security, bug prediction, edge cases, agent readiness, and context7 verification.
 
-This runs the full 9-phase review: context discovery, codebase verification, code quality, completeness, security, bug prediction, edge cases, agent readiness, and context7 verification.
+- **Rounds 2+ (re-review after fixes):**
+  ```
+  /global-review-doc <document-path> round:N
+  ```
+  This triggers **Delta Review Mode** — only re-checks codebase verification for edited sections and completeness for previously flagged areas. Outputs only the Delta Summary, Remaining Findings, and Verdict. This is dramatically cheaper than a full review.
 
 **IMPORTANT:** The skill runs in a forked context — it will return findings but will NOT modify the document (Rule 9 of the skill: "Never modify the document"). That's YOUR job.
 
@@ -209,15 +216,14 @@ For each business logic question found in the review:
 3. STOP — do not continue fixing until you receive the answers from parent Claude
 4. When re-spawned with the answers in the prompt, apply the decisions to the document and continue
 
-## Step 5: Re-Review
+## Step 5: Re-Review (Delta Mode)
 
-After all fixes are applied, go back to Step 1 and run the review again.
+After all fixes are applied, go back to Step 1 and run the review again **with the round number** (e.g., `round:2`, `round:3`). This triggers delta review mode — a lightweight re-check that only verifies your fixes and catches regressions, instead of re-running all 9 phases.
 
 **Expected pattern:**
-- Round 1: 10-20 findings → fix most
-- Round 2: 3-8 findings (some new from shifted content, some missed) → fix
-- Round 3: 0-3 findings → fix
-- Round 4: 0 Critical/Important → done
+- Round 1: Full review → findings → fix all auto-fixable
+- Round 2 (delta): Verify fixes, catch regressions → done for most docs
+- Round 3-4 (delta, Deep only): Remaining stragglers → done
 
 ## Step 6: Report Completion
 

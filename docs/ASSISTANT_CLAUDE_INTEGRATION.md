@@ -18,6 +18,14 @@ It can be:
 
 If it owns intake, reminders, routing, follow-up, or result delivery, it belongs to the outer loop described here.
 
+In this tutorial set, you should keep two repositories distinct:
+
+- **this `claude_cli` repo** documents the Claude CLI side, meaning `CLAUDE.md`, repo workflows, skills, subagents, and repo execution patterns
+- the default reference implementation for the long-lived assistant side is the separate [`autonomous-agent-stack`](https://github.com/srxly888-creator/autonomous-agent-stack) repository
+
+So "long-lived assistant system" is not meant as an empty abstraction here.
+In the context of this documentation set, if you want a concrete, engineering-oriented outer loop, the default reference point is `autonomous-agent-stack`.
+
 Related reading:
 
 - [Personal assistant / knowledge system workflow](../HOW_TO_START_ASSISTANT_SYSTEM.md)
@@ -88,6 +96,36 @@ flowchart TD
 ```
 
 If you only have one computer, the same flow still holds. The boxes are just logical layers running on one machine.
+
+---
+
+## How to interpret `autonomous-agent-stack` in this tutorial set
+
+If you want a real outer-loop implementation instead of just a conceptual diagram, treat [`autonomous-agent-stack`](https://github.com/srxly888-creator/autonomous-agent-stack) as a combination of:
+
+- a long-lived control plane
+- a unified intake, session, memory, and routing layer
+- an auditable task dispatch and execution-status layer
+- a bridge that can hand work into Claude CLI or other executors
+
+The important part is that it does not require multi-machine deployment on day one.
+
+It can start as:
+
+- single-machine intake
+- single-machine session and memory
+- single-machine task brief generation
+- single-machine `claude -p` execution
+- single-machine result recording and approval
+
+Then expand later into:
+
+- webhook, Telegram, or panel entry points
+- queues, workers, and leases
+- approval flows
+- remote execution nodes
+
+So while this guide uses the generic term "long-lived assistant system," the most recommended concrete landing point in this tutorial ecosystem is `autonomous-agent-stack`.
 
 ---
 
@@ -228,6 +266,170 @@ That keeps two things healthy:
 
 - repo specialists stay defined inside the repo
 - the outer assistant does not become a god scheduler for every internal repo role
+
+---
+
+## What this operating model adds beyond the agent comparison doc
+
+[OpenClaw Agents vs Claude CLI Agents](OPENCLAW_AND_CLAUDE_AGENTS.md) mainly answers:
+
+- do not confuse the terms
+- do not flatten the layers
+- know which thing is the long-lived brain, which thing is the repo specialist, and which thing is the temporary background worker
+
+That document answers **"what are these things?"**
+
+This guide answers **"once the system is live, why is this outer-loop / inner-loop split operationally better?"**
+
+The main advantages are sixfold:
+
+### 1. Clearer safety boundaries
+
+You do not need the long-lived assistant to directly own repo-internal role definitions plus broad write access.
+
+The safer split is:
+
+- the outer loop owns intake, routing, approval, and result delivery
+- repo writes and verification stay inside Claude CLI
+
+That makes high-risk actions easier to see, gate, and audit.
+
+### 2. Better auditability and reruns
+
+Once you introduce task briefs, issue docs, triage notes, or specs, the system stops depending entirely on one-off chat context.
+
+That means you can:
+
+- inspect why a task was routed a certain way
+- rerun the same work from the same brief
+- hand the same brief to a different executor later
+- review the workflow as an engineering artifact, not just a conversation
+
+### 3. A much more natural single-computer starting point
+
+Pure concept comparisons often make people think this only matters once they have multiple machines, worker pools, or a big orchestration layer.
+
+Not true.
+
+One of the biggest practical advantages of this model is:
+
+- one machine is enough
+- you do not need remote workers first
+- you do not need distributed scheduling first
+- you can get the boundary right before you scale deployment
+
+### 4. Repo-internal roles can evolve independently
+
+If the outer loop is tightly coupled to every repo specialist, any refactor in `.claude/agents/` or `.claude/skills/` leaks into orchestration logic.
+
+With this split:
+
+- the outer loop targets the Claude CLI main session
+- repo-internal role design stays a repo concern
+
+That lowers coupling substantially.
+
+### 5. Better failure isolation
+
+When something goes wrong, you can reason about the layer that failed:
+
+- intake or triage failed
+- the bridge artifact was weak
+- Claude CLI failed inside the repo
+- verification was skipped or broken
+- approval blocked the run
+
+That is much easier to debug than piling everything into one long-lived assistant brain.
+
+### 6. A clean upgrade path from personal assistant to control plane
+
+If you grow the system later, this boundary supports gradual expansion:
+
+1. single-machine assistant plus Claude CLI
+2. assistant plus approvals plus panel
+3. assistant plus queue and workers
+4. assistant plus multiple execution nodes
+
+You do not need to throw away the operating model to scale it.
+
+That is the key value beyond a document that only compares terminology and layers.
+
+---
+
+## Best practices for building this layer with `autonomous-agent-stack`
+
+The stable order is not "connect Telegram, workers, cron, approvals, and remote nodes all at once."
+The stable order is:
+
+### Phase 1: prove the smallest single-machine loop first
+
+First prove these five things:
+
+1. intake works
+2. session and memory persistence work
+3. routing can decide whether a task belongs in a repo
+4. task brief generation works
+5. one `claude -p` run can execute in a repo and return a result
+
+If that loop is not stable, multi-machine deployment will only amplify confusion.
+
+### Phase 2: make bridge artifacts a rule, not an exception
+
+Do not let the outer loop and Claude CLI depend forever on one-line prompt handoffs.
+
+Pick at least one durable bridge format:
+
+- `docs/inbox/*.md`
+- `docs/issues/*.md`
+- `docs/triage/*.md`
+
+And standardize the expected result fields, such as:
+
+- files changed
+- verification
+- manual follow-up
+- evidence
+
+### Phase 3: gate sensitive actions early
+
+These should default to explicit human confirmation:
+
+- external sending
+- deletes or broad writes
+- production operations
+- expensive jobs
+
+One of the outer loop's biggest jobs is not reckless automation. It is collecting risk into one controllable layer.
+
+### Phase 4: layer memory instead of dumping everything into the main session
+
+At minimum, separate:
+
+- raw intake
+- task brief and routing notes
+- long-term memory and stable decisions
+
+That makes auditing, reruns, and context compression much easier.
+
+### Phase 5: add scheduling and workers last
+
+Only after the single-machine loop is stable should you add:
+
+- cron or heartbeat
+- queues or leases
+- standby workers
+- remote execution nodes
+
+Do not reverse that order.
+
+### One-line best practice
+
+For an outer loop like `autonomous-agent-stack`, the best starting sequence is:
+
+- **get the responsibility boundary right first**
+- **make bridge artifacts real second**
+- **gate approvals and memory third**
+- **expand the execution plane last**
 
 ---
 
