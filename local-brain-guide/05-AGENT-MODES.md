@@ -9,17 +9,25 @@ The `local-brain` agent has 4 modes. Each serves a different moment in your work
 cp -r agents/local-brain ~/.claude/agents/local-brain
 ```
 
-**Important:** After copying, open `~/.claude/agents/local-brain/local-brain.md` and update the vault path to match your setup:
+**Important:** After copying, open `~/.claude/agents/local-brain/local-brain.md` and replace **both occurrences** of `<VAULT_PATH>` with your actual vault path:
 
 ```markdown
-# find this line:
+# find these lines:
+**Your first action in every invocation:** Read the vault's schema at `<VAULT_PATH>/CLAUDE.md` ...
 **Vault location:** `<VAULT_PATH>`
 
 # change to your vault path:
-**Vault location:** `~/Projects/obsidian_notes/your-vault-name/`
+**Your first action in every invocation:** Read the vault's schema at `~/Projects/obsidian_notes/my-brain/CLAUDE.md` ...
+**Vault location:** `~/Projects/obsidian_notes/my-brain/`
 ```
 
-Also update the CLAUDE.md schema path in the same file.
+That's it — no other skills required for the brain itself. The agent uses `wiki/pageindex.json` for search and Obsidian's built-in graph view for visualization.
+
+> **Optional bonus:** the [`obsidian-canvas` skill](../skills/obsidian-canvas/) is **not** part of the brain, but it's handy if you want Claude to build canvases for *other* things — architecture sketches, planning boards, mind maps, decision trees. Install it only if you'll use canvases outside the brain workflow:
+>
+> ```bash
+> cp -r skills/obsidian-canvas ~/.claude/skills/obsidian-canvas
+> ```
 
 ---
 
@@ -38,17 +46,23 @@ Also update the CLAUDE.md schema path in the same file.
 You: "what do I know about state management?"
 
 Claude:
-1. Reads wiki/index.md → finds redux-toolkit, zustand, context-api
-2. Reads dev-graph.canvas → finds edges:
-   redux-toolkit ◀──▶ alternative to ◀──▶ zustand
-   redux-toolkit ──▶ extends ──▶ redux
-3. Reads those wiki pages
+1. Reads wiki/pageindex.json (~8KB) — scores every page entry against the query:
+   • Tag match  → "state-management" tag matches → strongest signal
+   • Title match → "Redux Toolkit", "Zustand"
+   • Summary keyword match → tiebreaker
+   Top 3: redux-toolkit, zustand, context-api
+2. Reads only those 3 .md files for full content
+3. (Optional) Pulls in 1 hop via related[]: redux-toolkit.related = ["redux"]
 4. Synthesizes: "You prefer Redux Toolkit for complex apps (high confidence)
    and Zustand for simpler cases (medium confidence). You moved away from
    Context API after finding re-render issues."
 ```
 
-**Key rule:** Never writes anything. If it finds a gap, it mentions it: "You don't have a page on Jotai yet — want me to research it?"
+Total cost: 1 index read + 2-3 page reads, instead of grepping the whole wiki.
+
+**Key rule:** Never writes anything. **Answers, doesn't audit.** No "here's what's in your brain" tables, no graph-structure reports, no suggestions to run other modes — just the answer with `[[wikilink]]` citations.
+
+If a page is genuinely missing for what you asked about, fetch closes with one line: "You don't have a page on Jotai yet — want me to research it?"
 
 ---
 
@@ -69,13 +83,17 @@ You: "research CSS anchor positioning — I saw it's shipping in browsers now"
 
 Claude:
 1. Web searches for CSS anchor positioning
-2. Saves key sources to raw/articles/2026-04-16-css-anchor-positioning.md
+2. Saves key sources to raw/articles/2026-04-25-css-anchor-positioning.md
 3. Discusses findings: "Here's what's new — anchor() function, position-area,
    inset-area. This changes how you do popovers and tooltips."
 4. You: "cool, add it — medium confidence, I haven't used it yet"
 5. Creates wiki/dev/css-anchor-positioning.md with proper frontmatter
-6. Adds node to dev-graph.canvas, creates edge to wiki/dev/css-positioning.md
-7. Updates index.md and log.md
+   (including non-empty tags: ["css", "positioning", "popovers"]
+    and related: [[css-positioning]])
+6. Updates wiki/index.md with the new one-liner
+7. Regenerates wiki/pageindex.json — adds the new page entry, preserves others
+8. Appends to wiki/log.md
+9. Auto-commits with message "Add CSS anchor positioning research"
 ```
 
 **Also works with URLs:**
@@ -91,8 +109,8 @@ Claude: fetches the article, saves to raw/, discusses, compiles into wiki pages.
 ```
 You: "I saw mempalace on Instagram — it's a spatial memory app, really cool UI"
 
-Claude: saves to raw/projects/, creates wiki/inspiration/mempalace.md,
-adds to inspiration-graph.canvas.
+Claude: saves to raw/projects/, creates wiki/inspiration/mempalace.md with
+appropriate tags, updates index.md and pageindex.json.
 ```
 
 ---
@@ -130,8 +148,10 @@ Agent:
 5. Checks existing pages — updates if exists, creates if new
 6. Documents evolution: "Previously no opinion on data fetching libraries.
    Now: prefer React Query for server state, confirmed after building
-   3 projects with it (2026-04-16)."
-7. Updates canvas, index, log
+   3 projects with it (2026-04-25)."
+7. Re-syncs wiki/pageindex.json entries for any pages it touched
+8. Updates wiki/index.md and wiki/log.md
+9. Auto-commits
 ```
 
 **What gets captured vs stripped:**
@@ -147,13 +167,14 @@ Agent:
 
 ## Mode: maintain
 
-**Audit the wiki for structural issues AND check if knowledge is outdated.**
+**Audit the wiki for structural issues, freshness, and pageindex sync.**
 
-Combines cleanup with freshness verification in one pass.
+Combines cleanup, freshness verification, and the LLM search index rebuild in one pass.
 
 **When to use:**
 - Periodically (weekly/monthly) to keep the wiki healthy
 - Before starting a new project to ensure knowledge is current
+- After a fresh-vault setup — bootstraps `pageindex.json` for the first time
 - When the wiki feels messy or you suspect stale content
 
 **How it works:**
@@ -164,21 +185,39 @@ You: "maintain my wiki"
 Claude:
 1. STRUCTURAL AUDIT:
    - Scans all wiki pages for valid frontmatter
+   - Flags pages with missing or empty `tags:` (mandatory for search)
    - Finds orphan pages (no inbound wikilinks)
-   - Finds missing concepts (wikilinks to pages that don't exist)
+   - Finds broken wikilinks (excluding code-block examples)
    - Checks index.md completeness
-   - Scans canvas files for dead nodes, orphan nodes, missing edges
 
-2. FRESHNESS CHECK:
+2. PAGEINDEX AUDIT:
+   - If wiki/pageindex.json missing → flags for bootstrap
+   - If present → verifies every page has an entry, every entry resolves
+     to a real file, every related[] reference resolves, frontmatter
+     matches between page and index entry
+
+3. FRESHNESS CHECK:
    - Identifies pages referencing libraries/frameworks with versions
    - Flags pages with old `updated` dates on fast-moving topics
    - Web searches for updates: "Redux Toolkit — any major changes?"
 
-3. REPORT:
+4. PAGEINDEX REBUILD (mechanical, no approval needed):
+   - Walks every wiki/<domain>/*.md page
+   - Pulls title/tags/related/confidence/updated from frontmatter
+   - Pulls summary from wiki/index.md one-liners
+   - Writes wiki/pageindex.json sorted alphabetically by id
+   - Re-reads and verifies: parses as JSON, entry count matches disk,
+     no empty tags, all file/related references resolve
+
+5. REPORT:
    ┌─────────────────────────────────────────────┐
    │ BROKEN (fix now):                           │
    │ - wiki/dev/old-page.md: dead wikilink to    │
    │   [[deleted-concept]]                       │
+   │                                             │
+   │ MISSING TAGS:                               │
+   │ - wiki/dev/orphan-page.md: tags: empty.     │
+   │   Suggest: ["api", "rest", "patterns"]      │
    │                                             │
    │ OUTDATED:                                   │
    │ - wiki/dev/nextjs-app-router.md: v14 info,  │
@@ -191,14 +230,21 @@ Claude:
    │ MISSING:                                    │
    │ - [[zustand]] mentioned but no page exists  │
    │                                             │
+   │ PAGEINDEX: Rebuilt. 47 pages indexed. 3     │
+   │ pages flagged for empty tags (above).       │
+   │                                             │
    │ SUGGESTIONS:                                │
    │ - Merge jwt-auth.md and token-auth.md       │
    │   (80% overlap)                             │
    └─────────────────────────────────────────────┘
 
-4. Asks before fixing — never auto-fixes silently
-5. Applies approved fixes, updates log.md
+6. Asks before fixing content — never auto-edits pages silently
+   (pageindex rebuild is the one exception — it's mechanical)
+7. Applies approved fixes, re-runs pageindex rebuild if frontmatter changed
+8. Auto-commits if anything was written
 ```
+
+The `pageindex.json` rebuild is the one thing maintain does without asking — it's purely derived from page frontmatter, so it can't introduce new errors. Everything else (content edits, tag additions, resolving broken refs) waits for approval.
 
 ---
 
@@ -209,7 +255,7 @@ For `learn` mode to work from any project, add this to your global `~/.claude/CL
 ```markdown
 ## Local Brain — Shared Knowledge Base
 
-I maintain a personal Obsidian vault at ~/Projects/obsidian_notes/your-vault-name/
+I maintain a personal Obsidian vault at ~/Projects/obsidian_notes/my-brain/
 that stores generalized developer knowledge across all projects.
 
 **"Learn from this" / "Update my brain" / "Update shared brain"** — When I say

@@ -1,6 +1,6 @@
 ---
 name: obsidian-canvas
-description: "Reference skill for creating and editing Obsidian Canvas (.canvas) JSON files. Use this skill whenever you need to create a canvas, edit a canvas, add nodes or edges to a canvas, build a knowledge graph canvas, or generate any .canvas file for an Obsidian vault. Also use when the local-brain agent needs to update the unified knowledge graph at wiki/index.canvas. Trigger on: 'create a canvas', 'update the canvas', 'add to the graph', 'build a knowledge graph', 'make a mind map', any mention of .canvas files, or when working with the cortex wiki's graph layer."
+description: "Reference skill for creating and editing Obsidian Canvas (.canvas) JSON files — the JSON 1.0 spec, node/edge shapes, positioning rules, color conventions, and Post-Write Verification Protocol. Use this skill whenever you need to present something visually on a canvas: mind maps, brainstorm boards, project planning layouts, onboarding diagrams, architecture sketches, flowcharts, knowledge graphs, feature-plan boards, decision trees, any spatial layout. Trigger on: 'create a canvas', 'make a mind map', 'build a graph', 'draw this as a canvas', 'flowchart this', 'brainstorm board', 'plan this visually', any mention of .canvas files."
 ---
 
 # Obsidian Canvas — JSON Canvas 1.0 Reference
@@ -21,8 +21,7 @@ This skill covers the spec, positioning rules, and conventions. Read the section
 6. [Edge Label Standards](#edge-label-standards) — Typed relationships
 7. [ID Generation](#id-generation)
 8. [Post-Write Verification Protocol](#post-write-verification-protocol) — MANDATORY after every canvas write
-9. [Knowledge Base Conventions](#knowledge-base-conventions) — Unified knowledge graph (`wiki/index.canvas`)
-10. [Examples](#examples) — Complete working canvases
+9. [Examples](#examples) — Complete working canvases
 
 ---
 
@@ -96,7 +95,7 @@ Embeds an existing file from the vault. Obsidian renders a live preview.
 
 **Standard size:** 400×300 for wiki pages, 400×400 for long documents.
 
-The `file` path must point to an actual file in the vault — the [Post-Write Verification Protocol](#post-write-verification-protocol) catches dead references.
+The `file` path must point to an actual file in the vault — the [Validation Checklist](#validation-checklist) catches dead references.
 
 ### Link Node
 
@@ -334,37 +333,40 @@ Edge labels are the most common source of visual clutter. Follow these rules:
 | `"5"` | Cyan | #53dfdd |
 | `"6"` | Purple | #a882ff |
 
-### Knowledge Base Color Conventions
+### Suggested Semantic Color Conventions
 
-**Node colors (confidence level):**
+These conventions aren't mandatory — they're a sensible default for canvases where nodes/edges carry semantic weight (knowledge maps, planning boards, decision trees). Pick something consistent per canvas.
+
+**Node colors by confidence or status:**
 | Color | Meaning |
 |-------|---------|
-| `"4"` green | High confidence — battle-tested, strong opinion |
-| `"3"` yellow | Medium confidence — reasonable belief, open to revision |
-| `"1"` red | Low confidence or outdated — needs attention |
-| No color | Default — neutral, no confidence signal |
+| `"4"` green | High confidence / done / validated |
+| `"3"` yellow | Medium / in progress / open to revision |
+| `"1"` red | Low confidence / blocked / needs attention |
+| No color | Neutral — no status signal |
 
-**Group colors (domain):**
-| Color | Domain |
+**Group colors by domain** (pick any scheme; keep it consistent across the canvas):
+| Color | Example Use |
 |-------|--------|
-| `"4"` green | Dev — developer knowledge |
-| `"6"` purple | Design — UI/UX, visual patterns |
-| `"5"` cyan | Tools — workflows, CLI, infrastructure |
-| `"3"` yellow | Inspiration — projects, ideas, concepts |
+| `"4"` green | Engineering / code / dev topics |
+| `"6"` purple | Design / UI / visual |
+| `"5"` cyan | Tools / infrastructure / ops |
+| `"3"` yellow | Ideas / inspiration / exploratory |
+| `"2"` orange | Provenance / sources / references |
 
 **Edge colors:**
 | Color | Meaning |
 |-------|---------|
 | `"1"` red | Contradicts or deprecated relationship |
 | `"4"` green | Preferred / recommended path |
-| `"5"` cyan | Informational — neutral relationship |
-| No color | Default — standard relationship |
+| `"5"` cyan | Informational / cross-group neutral relationship |
+| No color | Standard relationship |
 
 ---
 
 ## Edge Label Standards
 
-Use these standardized labels for typed relationships. Consistency matters — the local-brain agent and LLM navigation depend on predictable labels.
+Use these standardized labels for typed relationships. Consistency matters across a single canvas — predictable labels make the canvas readable months later.
 
 | Label | Direction | Arrow Config | Description |
 |-------|-----------|-------------|-------------|
@@ -377,7 +379,7 @@ Use these standardized labels for typed relationships. Consistency matters — t
 | `"inspired by"` | One-way | default | Source drew from target |
 | `"part of"` | One-way | default | Source is a component of target |
 
-You can use other labels when these don't fit, but prefer these when they apply — they're the vocabulary the knowledge graph is built on.
+You can use other labels when these don't fit, but prefer these when they apply — they're a shared vocabulary for relationship-style canvases.
 
 ---
 
@@ -432,39 +434,6 @@ This is MANDATORY after every canvas write. Re-read the canvas you just wrote an
 
 - [ ] **Shared pages float outside groups** — If a page is referenced by nodes in multiple groups (via edges), it should NOT be trapped inside one group. Place it between or outside the groups it connects.
 - [ ] **Hub nodes are prominent** — The core concept page for a topic cluster should be positioned at the top or center of its group, not buried among detail pages.
-
----
-
-## Knowledge Base Conventions
-
-Your Obsidian vault uses a **single unified knowledge graph canvas**:
-
-**File:** `wiki/index.canvas`
-
-This canvas is a graph index for the entire wiki. It parallels `wiki/index.md` — same purpose (routing to the right page), but as a traversable graph instead of a flat list. The canvas stores relationships as structure (nodes + edges), making it cheaper to traverse than reading full wiki pages to discover connections.
-
-**Why one canvas, not many:** Cross-domain connections (design concept → dev pattern) work naturally when everything is in one graph. Splitting into domain canvases would break traversal across domains and add file management overhead for no benefit.
-
-### Domain Groups
-
-Domains are represented as group nodes inside the single canvas:
-
-| Group Label | Group Color | Contains |
-|-------------|-------------|----------|
-| Dev | `"4"` green | wiki/dev/ pages |
-| Design | `"6"` purple | wiki/design/ pages |
-| Tools | `"5"` cyan | wiki/tools/ pages |
-| Inspiration | `"3"` yellow | wiki/inspiration/ pages |
-
-### When adding a wiki page to the canvas:
-1. Read the existing `wiki/index.canvas` to understand current layout
-2. Create a file node pointing to the wiki page
-3. Place it inside the appropriate domain group (create the group if it doesn't exist yet)
-4. Set node color based on the page's `confidence` frontmatter
-5. Create edges to related pages (check the page's `related:` frontmatter)
-6. Use appropriate edge labels and direction from the [Edge Label Standards](#edge-label-standards)
-7. Place the node near its most-related existing node within the group
-8. Cross-domain edges are encouraged — connect nodes across groups when concepts relate
 
 ---
 
@@ -560,9 +529,9 @@ A dev domain group containing three related concepts:
 }
 ```
 
-### Example 3: Unified Knowledge Graph with Cross-Domain Edges
+### Example 3: Domain Groups with a Cross-Domain Edge
 
-A single canvas with domain groups and cross-domain connections (the `wiki/index.canvas` pattern):
+A canvas with two domain groups and a labeled edge between members of different groups — useful for architecture sketches, mind maps that span categories, or planning boards that cross teams:
 
 ```json
 {

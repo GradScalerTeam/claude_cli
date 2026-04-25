@@ -38,14 +38,14 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 - **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** — What agents are and how to create your own
 - **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** — What skills are and how to create your own
 - **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** — Using Pencil for context-aware UI design with Claude Code
-- **[local-brain-guide/](local-brain-guide/)** — 6-part guide to building a personal knowledge base with Claude Code + Obsidian (concept, setup, schema, canvas graphs, agent modes, daily workflow)
+- **[local-brain-guide/](local-brain-guide/)** — 6-part guide to building a personal knowledge base with Claude Code + Obsidian (concept, setup, schema, `pageindex.json` search index, agent modes, daily workflow)
 
 ### Tools
 
 - **[agents/global-doc-master/](agents/global-doc-master/)** — Agent that creates all technical documentation (overview, tech-overview, design, planning, feature flows, deployment, issues, resolved, debug). Uses the `doc-master-assist` skill for templates and protocols
-- **[agents/local-brain/](agents/local-brain/)** — Agent that manages a personal Obsidian knowledge base. Four modes: fetch (read-only lookup), research (explore + add), learn (extract from sessions), maintain (cleanup + freshness). Uses the `obsidian-canvas` skill for knowledge graph canvases
+- **[agents/local-brain/](agents/local-brain/)** — Agent that manages a personal Obsidian knowledge base. Four modes: fetch (read-only lookup via `wiki/pageindex.json` LLM search index), research (explore + add), learn (extract from sessions), maintain (cleanup + freshness + pageindex rebuild). Cross-page relationships use `[[wikilinks]]` + Obsidian's built-in graph view — no separate canvas file
 - **[skills/doc-master-assist/](skills/doc-master-assist/)** — Template and protocol skill used by the doc-master agent. Contains 8 reference templates for all document types
-- **[skills/obsidian-canvas/](skills/obsidian-canvas/)** — Reference skill for creating and editing Obsidian Canvas (.canvas) JSON files. Covers the JSON Canvas 1.0 spec, node positioning rules, color conventions, and edge label standards
+- **[skills/obsidian-canvas/](skills/obsidian-canvas/)** — General-purpose reference skill for creating and editing Obsidian Canvas (.canvas) JSON files — mind maps, planning boards, architecture sketches, flowcharts. Covers the JSON Canvas 1.0 spec, positioning rules, color conventions, edge label standards, Post-Write Verification Protocol
 - **[skills/code-to-design/](skills/code-to-design/)** — Converts frontend code into pixel-accurate Pencil (.pen) design files
 - **[skills/github/](skills/github/)** — GitHub CLI operations — repos, PRs, issues, branch management
 - **[hooks/doc-scanner/](hooks/doc-scanner/)** — SessionStart hook that scans for `.md` files and gives Claude a documentation index at conversation start
@@ -67,7 +67,7 @@ claude_cli/
 │   ├── 01-CONCEPT.md                  # Why this exists, compilation vs retrieval
 │   ├── 02-SETUP-OBSIDIAN.md           # Install Obsidian, create vault, structure
 │   ├── 03-VAULT-SCHEMA.md             # CLAUDE.md schema, frontmatter, conventions
-│   ├── 04-CANVAS-GRAPHS.md            # Knowledge graph canvases, edge types, layout
+│   ├── 04-PAGEINDEX.md                # The pageindex.json LLM search index, anatomy, fetch behavior
 │   ├── 05-AGENT-MODES.md              # fetch, research, learn, maintain
 │   └── 06-DAILY-WORKFLOW.md           # How to use this day-to-day
 ├── hooks/

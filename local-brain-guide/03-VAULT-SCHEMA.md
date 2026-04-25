@@ -38,16 +38,17 @@ so every future project benefits from everything learned before.
 - `wiki/inspiration/` — projects, ideas, concepts
 - `wiki/comparisons/` — "X vs Y" analysis pages
 - `wiki/sources/` — one-page summaries of each ingested raw source
-- `wiki/index.md` — master catalog (one-line per page)
+- `wiki/index.md` — master catalog (one-line per page) — **for humans**
+- `wiki/pageindex.json` — LLM search index (tags, summary, related per page) — **for Claude**, rebuilt automatically
 - `wiki/overview.md` — high-level synthesis of the entire knowledge base
 - `wiki/log.md` — chronological, append-only activity log
 
 **Rules:**
 - Claude owns this layer — creates, updates, and cross-references pages
-- Every page must have proper frontmatter (see below)
-- Every new/updated page must be reflected in `wiki/index.md`
+- Every page must have proper frontmatter (see below) — including non-empty `tags:` (mandatory; the search index depends on it)
+- Every new/updated page must be reflected in `wiki/index.md` AND `wiki/pageindex.json` (the agent rebuilds the JSON index after every write)
 - Every session that modifies the wiki must append to `wiki/log.md`
-- Use `[[wikilinks]]` for all cross-references between pages
+- Use `[[wikilinks]]` for all cross-references between pages — Obsidian's graph view renders these automatically
 
 ### Layer 3: Outputs (`outputs/`) — Generated Artifacts
 - Slide decks, summaries, compiled guides generated from wiki content
@@ -61,15 +62,17 @@ title: Page Title
 type: concept | entity | source-summary | comparison | inspiration
 domain: dev | design | tools | inspiration | general
 tags:
-  - relevant-tag
+  - relevant-tag        # MANDATORY — non-empty. The pageindex.json search relies on tags.
 sources:
   - "[[source-page]]" or URL
 related:
-  - "[[related-page]]"
+  - "[[related-page]]"  # cross-references; Obsidian graph view + pageindex.json both consume this
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 confidence: high | medium | low
 ---
+
+**Why tags are mandatory:** They're the strongest match signal for `fetch` mode. A page without tags can only be found by title substring, which fails the moment you search with a synonym. `maintain` mode flags any page with empty tags. See [04 — Page Index](04-PAGEINDEX.md) for the full picture.
 
 ### Confidence Levels
 
@@ -110,7 +113,7 @@ Every frontmatter field becomes a queryable column in Obsidian Bases:
 
 ### Wikilinks → Graph Navigation
 
-Every `[[wikilink]]` creates an edge in Obsidian's graph view AND gives Claude a path to follow when navigating. More links = richer graph = better navigation.
+Every `[[wikilink]]` creates an edge in Obsidian's built-in graph view AND populates the `related[]` neighbors that Claude uses for hop-1 lookups in `fetch` mode. More links = richer graph = better navigation. No separate canvas/graph file is needed — Obsidian renders the graph from wikilinks automatically.
 
 ### Log → Audit Trail
 
@@ -151,4 +154,4 @@ This ensures every Claude session in every project knows about your brain and ho
 
 ---
 
-**Next:** [04 — Canvas Graphs](04-CANVAS-GRAPHS.md)
+**Next:** [04 — Page Index](04-PAGEINDEX.md)

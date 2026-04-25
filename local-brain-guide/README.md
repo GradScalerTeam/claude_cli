@@ -19,7 +19,7 @@ Claude's per-project memory (`~/.claude/projects/`) is siloed. Knowledge from Pr
 
 ## The Solution
 
-A **single Obsidian vault** that stores your generalized knowledge as structured markdown. Claude Code reads it, navigates it via a graph index, and updates it as you learn new things. Knowledge compounds instead of resetting.
+A **single Obsidian vault** that stores your generalized knowledge as structured markdown. Claude Code reads it via a purpose-built JSON search index, navigates relationships through wikilinks and Obsidian's built-in graph view, and updates everything as you learn new things. Knowledge compounds instead of resetting.
 
 ```
 You work on Project A → correct Claude on auth → "learn from this"
@@ -33,10 +33,12 @@ You work on Project A → correct Claude on auth → "learn from this"
 |---|---|
 | **Obsidian vault** | Folder of markdown files — your knowledge base |
 | **CLAUDE.md schema** | Rules for how Claude maintains the wiki |
-| **Domain canvases** | Visual knowledge graphs (`.canvas` JSON files) Claude navigates |
+| **`wiki/pageindex.json`** | LLM-optimized search index — tags, summaries, related neighbors per page |
+| **Obsidian's graph view** | Built-in visual graph rendered from `[[wikilinks]]` and `related:` frontmatter |
 | **`local-brain` agent** | 4-mode agent that manages everything |
-| **`obsidian-canvas` skill** | Teaches Claude to create clean canvas layouts |
 | **Global CLAUDE.md trigger** | "learn from this" works in any project |
+
+> **Optional:** the [`obsidian-canvas` skill](../skills/obsidian-canvas/) is **not required** for the brain — `pageindex.json` + Obsidian's built-in graph view handle search and visualization. Install it only if you separately want Claude to build canvases for *other* purposes (architecture sketches, planning boards, mind maps, decision trees). The brain itself never touches `.canvas` files.
 
 ## Guide Structure
 
@@ -47,7 +49,7 @@ Read in order if you're setting up from scratch. Jump to a specific section if y
 | 1 | **[Concept](01-CONCEPT.md)** | Why this exists, how it differs from RAG, the "compilation over retrieval" insight |
 | 2 | **[Setup Obsidian](02-SETUP-OBSIDIAN.md)** | Install Obsidian, create vault, folder structure, git init, recommended plugins |
 | 3 | **[Vault Schema](03-VAULT-SCHEMA.md)** | The CLAUDE.md schema, frontmatter template, naming conventions, wikilink rules |
-| 4 | **[Canvas Graphs](04-CANVAS-GRAPHS.md)** | Knowledge graph canvases, how Claude navigates them, edge types, positioning |
+| 4 | **[Page Index](04-PAGEINDEX.md)** | The `pageindex.json` LLM search index — anatomy, how fetch uses it, why tags matter, Obsidian's built-in graph view for visualization |
 | 5 | **[Agent Modes](05-AGENT-MODES.md)** | The 4 modes — fetch, research, learn, maintain — with real examples |
 | 6 | **[Daily Workflow](06-DAILY-WORKFLOW.md)** | How to actually use this day-to-day, when to ingest, when to learn, tips |
 
@@ -63,7 +65,7 @@ If you want Claude to set everything up for you:
 
 ```
 Read the local-brain-guide/ folder in the claude_cli repo. Set up a local brain
-for me — install Obsidian, create the vault, install the agent and skill, and
+for me — install Obsidian, create the vault, install the local-brain agent, and
 configure my global CLAUDE.md. Walk me through each step.
 ```
 

@@ -78,7 +78,7 @@ Agents are autonomous workers that investigate your codebase, ask you questions,
 | Agent | What It Does | Folder |
 |---|---|---|
 | **[Global Doc Master](agents/global-doc-master/)** | Creates and organizes all technical documentation — project overviews, tech overviews, design specs, planning docs, feature flows, deployment guides, issue reports, resolved postmortems, and debug runbooks. Uses the `doc-master-assist` skill for templates and protocols. Scans your codebase first, asks clarifying questions, and writes structured docs under `docs/`. | `agents/global-doc-master/` |
-| **[Local Brain](agents/local-brain/)** | Manages a personal Obsidian knowledge base that persists across all projects. Four modes: `fetch` (read-only lookup via index + canvas graph), `research` (explore new topics + add to wiki), `learn` (extract generalized preferences from work sessions), `maintain` (audit for orphans, staleness, outdated knowledge). Uses the `obsidian-canvas` skill for knowledge graph canvases. Inspired by [Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). | `agents/local-brain/` |
+| **[Local Brain](agents/local-brain/)** | Manages a personal Obsidian knowledge base that persists across all projects. Four modes: `fetch` (read-only lookup via `pageindex.json` LLM search index), `research` (explore new topics + add to wiki), `learn` (extract generalized preferences from work sessions), `maintain` (audit for orphans/staleness/outdated knowledge + rebuild the search index). Cross-page relationships use `[[wikilinks]]` and Obsidian's built-in graph view — no separate canvas file required. Inspired by [Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). | `agents/local-brain/` |
 
 > **Removed: Global Doc Fixer** — Previously this repo included a `global-doc-fixer` agent that autonomously reviewed and fixed documents in a loop (review → fix → re-review → repeat). We removed it because it consumed excessive tokens per run — the iterative review-fix loop often burned through significant context on minor formatting issues. If you already have it installed and want to remove it: `rm ~/.claude/agents/global-doc-fixer.md`
 
@@ -89,7 +89,7 @@ Skills are specialized capabilities you invoke with slash commands or natural la
 | Skill | What It Does | Folder |
 |---|---|---|
 | **[Doc Master Assist](skills/doc-master-assist/)** | Template and protocol skill used by the Doc Master agent. Contains 8 reference templates (overview, tech-overview, design, planning, feature-flow, issue, deployment, debug) with their specific protocols. Loaded on demand — only the relevant template is read per invocation. | `skills/doc-master-assist/` |
-| **[Obsidian Canvas](skills/obsidian-canvas/)** | Reference skill for creating and editing Obsidian Canvas (`.canvas`) JSON files. Covers the full JSON Canvas 1.0 spec, node positioning rules to prevent overlapping, color conventions, edge label standards, and layout algorithms. Used by the Local Brain agent for knowledge graph canvases. | `skills/obsidian-canvas/` |
+| **[Obsidian Canvas](skills/obsidian-canvas/)** | General-purpose reference skill for creating and editing Obsidian Canvas (`.canvas`) JSON files — mind maps, brainstorm boards, planning layouts, architecture sketches, flowcharts, decision trees. Covers the full JSON Canvas 1.0 spec, node positioning rules, color conventions, edge label standards, layout algorithms, and a Post-Write Verification Protocol. | `skills/obsidian-canvas/` |
 | **[Code to Design](skills/code-to-design/)** | Converts frontend code into pixel-accurate Pencil (`.pen`) design files. Works with any frontend framework (React, Vue, Svelte, HTML/CSS) and any CSS system (Tailwind, CSS modules, styled-components). | `skills/code-to-design/` |
 | **[GitHub](skills/github/)** | GitHub CLI operations — creating repos, pushing, PRs, issues, branch management. Wraps `gh` commands with proper conventions. | `skills/github/` |
 
@@ -130,7 +130,7 @@ github_project_code/claude_cli | main   +2 *1 ~3  /  ↑1
 | **[HOW_TO_CREATE_AGENTS.md](HOW_TO_CREATE_AGENTS.md)** | What agents are, how they work, and how to create your own using the agent-development plugin |
 | **[HOW_TO_CREATE_SKILLS.md](HOW_TO_CREATE_SKILLS.md)** | What skills are, how they differ from agents, and how to create your own using the skill-development plugin |
 | **[HOW_TO_USE_PENCIL_WITH_CLAUDE.md](HOW_TO_USE_PENCIL_WITH_CLAUDE.md)** | Using [Pencil](https://www.pencil.dev/) with Claude Code for context-aware UI design — repository selection, project context, and the full design workflow |
-| **[Local Brain Guide](local-brain-guide/)** | Build a personal knowledge base with Claude Code + Obsidian. Covers the concept (Karpathy's LLM Wiki), Obsidian setup, vault schema, canvas knowledge graphs, agent modes, and daily workflow. 6-part guide. |
+| **[Local Brain Guide](local-brain-guide/)** | Build a personal knowledge base with Claude Code + Obsidian. Covers the concept (Karpathy's LLM Wiki), Obsidian setup, vault schema, the `pageindex.json` LLM search index, agent modes, and daily workflow. 6-part guide. |
 
 ---
 

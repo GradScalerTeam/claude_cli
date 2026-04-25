@@ -86,27 +86,34 @@ Obsidian is optional — the LLM works with raw markdown files. But Obsidian add
 - **Web Clipper** — save articles from browser directly to `raw/`
 - **Zero lock-in** — it's just a folder of markdown files. Drop Obsidian anytime.
 
-## The Canvas Innovation
+## The Search Index Innovation
 
-Beyond Karpathy's original pattern, we add **knowledge graph canvases** — `.canvas` files that store typed relationships between concepts:
+Beyond Karpathy's original pattern, we add **`wiki/pageindex.json`** — a purpose-built JSON search index that lets the LLM find the right pages in a single read:
 
 ```json
 {
-  "nodes": [
-    {"type": "file", "file": "wiki/dev/jwt-auth.md"},
-    {"type": "file", "file": "wiki/dev/session-auth.md"}
-  ],
-  "edges": [
-    {"fromNode": "...", "toNode": "...", "label": "alternative to", "fromEnd": "arrow"}
+  "generated": "2026-04-25",
+  "pages": [
+    {
+      "id": "jwt-authentication",
+      "title": "JWT Authentication",
+      "tags": ["auth", "security", "spa"],
+      "summary": "JWT in httpOnly cookies for SPAs — XSS-safe pattern.",
+      "related": ["session-auth", "httponly-cookies"],
+      "confidence": "high",
+      "updated": "2026-03-12"
+    }
   ]
 }
 ```
 
-This gives the LLM a **graph-based index** alongside the flat `index.md`:
-- `index.md` tells the LLM **what pages exist**
-- Canvas tells the LLM **how they relate** ("alternative to", "depends on", "contradicts")
+This gives the LLM a **fast keyword/tag search** alongside the human-readable `index.md`:
+- `index.md` is for you — scrollable catalog of one-liners.
+- `pageindex.json` is for Claude — score by tag/title/summary, pick the top 2-3 candidates, read only those.
 
-The LLM reads the canvas JSON to navigate relationships. You see the same data as a visual graph in Obsidian. Same file, two interfaces.
+The whole index stays around 8KB even at 100+ pages, so a fetch is one index read + 2-3 page reads — far fewer tokens than scanning the wiki.
+
+For the visual side, **Obsidian's built-in graph view** renders the relationships you've encoded as `[[wikilinks]]` and `related:` frontmatter. No separate canvas file to maintain — same data, two readers.
 
 ## Open-Source by Default
 

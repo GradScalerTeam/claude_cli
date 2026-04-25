@@ -93,8 +93,8 @@ Might be useful for future UI work."
 ```
 
 After 10 pages, your wiki has enough content for:
-- Meaningful fetch results
-- Canvas graphs with visible connections
+- Meaningful fetch results (the search index now has multiple tag/title hits per query)
+- Obsidian's graph view to show visible connections between domains
 - Bases queries that return useful data
 
 ## Tips for Long-Term Use
@@ -121,7 +121,7 @@ Low confidence is fine. It's a reminder to research more, not a failure.
 
 ### Don't over-organize
 
-The LLM handles organization. You handle opinions and decisions. If you're spending time manually editing wiki pages or rearranging the canvas, you're doing the LLM's job.
+The LLM handles organization. You handle opinions and decisions. If you're spending time manually editing wiki pages or hand-curating `pageindex.json`, you're doing the LLM's job — let `maintain` mode rebuild it from your frontmatter.
 
 ### Git commit periodically
 
@@ -146,7 +146,7 @@ After a month of use:
 - You start every project with a 2-minute fetch that gives Claude your full context
 - You never re-explain the same preference twice
 - Your wiki has 30-50 pages covering your core knowledge areas
-- Canvas graphs show meaningful clusters and connections
+- Obsidian's graph view shows meaningful clusters and cross-domain connections
 - New projects benefit from everything you learned in previous ones
 - Knowledge compounds — each week, the brain is more useful than the last
 
