@@ -14,6 +14,42 @@ Think of it like a recipe. An agent is a chef who works independently. A skill i
 
 ---
 
+## What "A Reusable Slash Command" Actually Means
+
+This does not mean "make a shell alias." It means packaging a prompt workflow you repeat often into a Claude command you can reuse.
+
+For example, imagine you keep typing:
+
+```text
+Review the API routes in src/routes for validation, auth, error handling, and missing tests. Output findings by severity.
+```
+
+If you say that all the time, it is already a strong skill candidate. Once you turn it into a skill, you can just write:
+
+```text
+/review-api src/routes
+```
+
+What you are reusing is not just a shorter command. You are reusing:
+
+- a stable goal
+- a stable checklist
+- a stable output format
+- a variable input, such as which path to inspect
+
+The easiest confusion is between these four things:
+
+| Problem you are solving | Better fit |
+|---|---|
+| I keep repeating a long prompt | Skill |
+| I need a specialist with its own role and tool scope | Agent |
+| I need something to happen every time automatically | Hook |
+| I only want to shorten a shell command | shell alias or script |
+
+So a "reusable slash command" is better understood as a Claude workflow command, not an operating-system command alias.
+
+---
+
 ## Skills vs Agents — When to Use Which
 
 | | **Agent** | **Skill** |
@@ -56,6 +92,29 @@ Once a skill exists, you invoke it with a slash command:
 ```
 
 Or describe what you need in natural language — Claude will detect the relevant skill and use it automatically if the skill's description matches your request.
+
+### A More Realistic Example
+
+You can think of a skill as the upgrade path from a repeated prompt to a reusable slash command.
+
+Handwritten prompt:
+
+```text
+Check the routes in src/api for input validation, auth, error handling, and missing tests.
+```
+
+Skill invocation:
+
+```text
+/review-api src/api
+```
+
+The `SKILL.md` is doing two jobs for you:
+
+1. It freezes the review standard that should stay the same every time.
+2. It leaves only the changing input, such as the target path, as an argument.
+
+That is the biggest value of a skill: it turns repeated thinking into a reusable team workflow.
 
 ---
 
