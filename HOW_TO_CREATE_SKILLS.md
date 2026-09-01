@@ -40,10 +40,14 @@ Skills are folders containing a `SKILL.md` file and optional reference files.
 ~/.claude/skills/
 └── my-skill/
     ├── SKILL.md              # Main skill definition
-    └── references/           # Optional supporting files
-        ├── checklist.md
-        └── output-format.md
+    ├── references/           # Optional supporting files
+    │   ├── checklist.md
+    │   └── output-format.md
+    └── scripts/              # Optional executables the skill shells out to
+        └── run.sh
 ```
+
+Most skills are `SKILL.md` plus `references/` — pure instructions Claude reads. A skill only needs `scripts/` when it has to *do* something Claude can't, like calling an external CLI. If you add one, mark it executable (`chmod +x`) and have the script check its dependencies up front, failing with a clear message rather than part-way through. See `skills/codex-image-bridge/` for a worked example.
 
 ---
 

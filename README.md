@@ -92,6 +92,7 @@ Skills are specialized capabilities you invoke with slash commands or natural la
 | **[Obsidian Canvas](skills/obsidian-canvas/)** | General-purpose reference skill for creating and editing Obsidian Canvas (`.canvas`) JSON files — mind maps, brainstorm boards, planning layouts, architecture sketches, flowcharts, decision trees. Covers the full JSON Canvas 1.0 spec, node positioning rules, color conventions, edge label standards, layout algorithms, and a Post-Write Verification Protocol. | `skills/obsidian-canvas/` |
 | **[Code to Design](skills/code-to-design/)** | Converts frontend code into pixel-accurate Pencil (`.pen`) design files. Works with any frontend framework (React, Vue, Svelte, HTML/CSS) and any CSS system (Tailwind, CSS modules, styled-components). | `skills/code-to-design/` |
 | **[GitHub](skills/github/)** | GitHub CLI operations — creating repos, pushing, PRs, issues, branch management. Wraps `gh` commands with proper conventions. | `skills/github/` |
+| **[Codex Image Bridge](skills/codex-image-bridge/)** | Generate raster images — hero images, product mockups, textures, illustrations — without leaving Claude Code. Delegates to the Codex CLI's built-in `image_gen` tool (`gpt-image-2`), billed to your ChatGPT plan rather than an API key. **Requires the Codex CLI installed and signed in** — the skill checks first and tells you how to fix it, but never installs anything for you. | `skills/codex-image-bridge/` |
 
 > **Removed: Global Review Doc & Global Review Code** — Previously this repo included dedicated review skills (9-phase doc review, 12-phase code audit). We removed them because they consumed excessive tokens per invocation — the multi-phase review pipelines added significant overhead without proportional value. Claude's built-in self-analysis during coding already catches issues effectively. If you already have them installed and want to remove them: `rm -rf ~/.claude/skills/global-review-doc ~/.claude/skills/global-review-code`
 
@@ -149,7 +150,7 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install e
 
 1. AGENTS: Scan the agents/ folder. For each subfolder, check if it contains only a single agent .md file (+ README.md) or a folder-based agent with sub-files. For single-file agents (like global-doc-fixer), copy the .md file (NOT README.md) to ~/.claude/agents/<filename>. For folder-based agents (like global-doc-master which contains only global-doc-master.md + README.md), copy the entire folder to ~/.claude/agents/<folder-name>/ excluding README.md. Create ~/.claude/agents/ if it doesn't exist.
 
-2. SKILLS: Scan the skills/ folder. For each subfolder, copy the entire folder structure (SKILL.md + references/) to ~/.claude/skills/<skill-name>/ with exact content. Exclude README.md files.
+2. SKILLS: Scan the skills/ folder. For each subfolder, copy the entire folder structure (SKILL.md, plus references/ and scripts/ wherever they exist) to ~/.claude/skills/<skill-name>/ with exact content. Exclude README.md files. If a skill ships a scripts/ folder, mark its .sh files executable afterwards (chmod +x) — a skill whose script is not executable will fail at run time.
 
 3. HOOKS: Scan the hooks/ folder. For each subfolder, find the .sh file — that's the hook script. Copy it to ~/.claude/<filename> with exact content. Make it executable (chmod +x). Then read my existing ~/.claude/settings.json (create if needed) and add a SessionStart hook entry for each .sh file that runs "bash ~/.claude/<filename>". Merge with existing hooks — don't overwrite.
 
@@ -179,7 +180,7 @@ To install just the skills:
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the skills:
 
-Scan the skills/ folder. For each subfolder, copy the entire folder structure (SKILL.md + references/) to ~/.claude/skills/<skill-name>/ with exact content. Exclude README.md files.
+Scan the skills/ folder. For each subfolder, copy the entire folder structure (SKILL.md, plus references/ and scripts/ wherever they exist) to ~/.claude/skills/<skill-name>/ with exact content. Exclude README.md files. If a skill ships a scripts/ folder, mark its .sh files executable afterwards (chmod +x) — a skill whose script is not executable will fail at run time.
 
 After installing, read the README.md in each skill folder and give me a summary of what was installed and how to use each one.
 ```
@@ -217,7 +218,7 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for
 
 1. AGENTS: Scan the agents/ folder. For each subfolder, find the .md file that is NOT README.md. Compare it with my local version at ~/.claude/agents/<filename>. Skip any that don't exist locally.
 
-2. SKILLS: Scan the skills/ folder. For each subfolder, compare all non-README files (SKILL.md + everything in references/) with my local versions at ~/.claude/skills/<skill-name>/. Skip any that don't exist locally.
+2. SKILLS: Scan the skills/ folder. For each subfolder, compare all non-README files (SKILL.md plus everything in references/ and scripts/) with my local versions at ~/.claude/skills/<skill-name>/. Skip any that don't exist locally.
 
 3. HOOKS: Scan the hooks/ folder. For each subfolder, find the .sh file. Compare it with ~/.claude/<filename>. Skip any that don't exist locally.
 

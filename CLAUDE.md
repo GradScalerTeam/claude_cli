@@ -78,14 +78,18 @@ claude_cli/
 │   └── statusline-command.sh          # Custom status line script for Claude Code
 ├── agents/
 │   ├── global-doc-master/             # Doc master agent definition + README
-│   └── local-brain/                   # Local brain agent — personal knowledge base manager
+│   ├── local-brain/                   # Local brain agent — personal knowledge base manager
+│   └── uikit-generator/               # Style brief → complete M3 HTML UI kit
 └── skills/
     ├── doc-master-assist/             # Template & protocol skill for doc-master agent
     │   ├── SKILL.md                   # Skill router + shared quality protocols
     │   └── references/                # 8 document templates (loaded on demand)
     ├── obsidian-canvas/               # JSON Canvas spec + positioning rules for .canvas files
     ├── code-to-design/                # Frontend code → Pencil design files
-    └── github/                        # GitHub CLI operations skill
+    ├── github/                        # GitHub CLI operations skill
+    └── codex-image-bridge/            # Image generation via the Codex CLI's image_gen tool
+        ├── SKILL.md                   # Preflight, sizes, prompt guidance, review checklist
+        └── scripts/gen.sh             # Wrapper around `codex exec` (executable)
 ```
 
 ## Development Instructions
