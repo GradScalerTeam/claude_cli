@@ -77,8 +77,9 @@ Agents are autonomous workers that investigate your codebase, ask you questions,
 
 | Agent | What It Does | Folder |
 |---|---|---|
-| **[Global Doc Master](agents/global-doc-master/)** | Creates and organizes all technical documentation — project overviews, tech overviews, design specs, planning docs, feature flows, deployment guides, issue reports, resolved postmortems, and debug runbooks. Uses the `doc-master-assist` skill for templates and protocols. Scans your codebase first, asks clarifying questions, and writes structured docs under `docs/`. | `agents/global-doc-master/` |
+| **[Global Doc Master](agents/global-doc-master/)** | Creates and organizes all technical documentation — project overviews, tech overviews, design specs, planning docs, feature flows, deployment guides, issue reports, resolved postmortems, and debug runbooks. Ships with the [`doc-master-assist`](skills/doc-master-assist/) skill, which holds its 8 document templates and quality protocols — the two install as one unit. Scans your codebase first, asks clarifying questions, and writes structured docs under `docs/`. | `agents/global-doc-master/` |
 | **[Local Brain](agents/local-brain/)** | Manages a personal Obsidian knowledge base that persists across all projects. Four modes: `fetch` (read-only lookup via `pageindex.json` LLM search index), `research` (explore new topics + add to wiki), `learn` (extract generalized preferences from work sessions), `maintain` (audit for orphans/staleness/outdated knowledge + rebuild the search index). Cross-page relationships use `[[wikilinks]]` and Obsidian's built-in graph view — no separate canvas file required. Inspired by [Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). | `agents/local-brain/` |
+| **[UI Kit Generator](agents/uikit-generator/)** | Turns a style brief — a screenshot, a description, a color palette, or any mix — into one self-contained HTML UI kit at your project root. All 36 Material Design 3 components across 6 categories, rendered in the requested aesthetic, with foundations (color/type/shape/elevation/spacing), live interactivity, a dark-mode toggle, and WCAG AA contrast verified in both modes before delivery. Framework-agnostic: plain HTML/CSS/JS that React, Vue, Svelte, or Flutter developers all read from the same source. | `agents/uikit-generator/` |
 
 > **Removed: Global Doc Fixer** — Previously this repo included a `global-doc-fixer` agent that autonomously reviewed and fixed documents in a loop (review → fix → re-review → repeat). We removed it because it consumed excessive tokens per run — the iterative review-fix loop often burned through significant context on minor formatting issues. If you already have it installed and want to remove it: `rm ~/.claude/agents/global-doc-fixer.md`
 
@@ -88,7 +89,6 @@ Skills are specialized capabilities you invoke with slash commands or natural la
 
 | Skill | What It Does | Folder |
 |---|---|---|
-| **[Doc Master Assist](skills/doc-master-assist/)** | Template and protocol skill used by the Doc Master agent. Contains 8 reference templates (overview, tech-overview, design, planning, feature-flow, issue, deployment, debug) with their specific protocols. Loaded on demand — only the relevant template is read per invocation. | `skills/doc-master-assist/` |
 | **[Obsidian Canvas](skills/obsidian-canvas/)** | General-purpose reference skill for creating and editing Obsidian Canvas (`.canvas`) JSON files — mind maps, brainstorm boards, planning layouts, architecture sketches, flowcharts, decision trees. Covers the full JSON Canvas 1.0 spec, node positioning rules, color conventions, edge label standards, layout algorithms, and a Post-Write Verification Protocol. | `skills/obsidian-canvas/` |
 | **[Code to Design](skills/code-to-design/)** | Converts frontend code into pixel-accurate Pencil (`.pen`) design files. Works with any frontend framework (React, Vue, Svelte, HTML/CSS) and any CSS system (Tailwind, CSS modules, styled-components). | `skills/code-to-design/` |
 | **[GitHub](skills/github/)** | GitHub CLI operations — creating repos, pushing, PRs, issues, branch management. Wraps `gh` commands with proper conventions. | `skills/github/` |
@@ -141,6 +141,30 @@ Each component has its own README with full setup instructions. Navigate to the 
 
 > **Important:** After installing agents or skills, quit your current Claude CLI session and start a new one. Claude only loads agents and skills at session startup — so newly installed tools won't appear in `/help` or respond to `/slash-commands` until you restart.
 
+### Install One Thing
+
+Don't want the whole set? Every item below installs on its own. Click **Install** for a copy-paste prompt that installs just that one thing, and **Update** to pull its latest version later.
+
+| Item | Type | What It Does | Get It |
+|---|---|---|---|
+| **[Global Doc Master](agents/global-doc-master/)** *(+ [Doc Master Assist](skills/doc-master-assist/))* | Agent&nbsp;+&nbsp;Skill | Writes every kind of technical doc — overviews, planning, feature flows, deployment, issues, debug runbooks. The agent and its template skill are one unit and install together. | [Install](agents/global-doc-master/README.md#install) · [Update](agents/global-doc-master/README.md#check-for-updates) |
+| **[Local Brain](agents/local-brain/)** | Agent | Personal Obsidian knowledge base that persists across every project — fetch, research, learn, maintain | [Install](agents/local-brain/README.md#install) · [Update](agents/local-brain/README.md#check-for-updates) |
+| **[UI Kit Generator](agents/uikit-generator/)** | Agent | Style brief → complete 36-component Material Design 3 HTML UI kit, WCAG AA verified | [Install](agents/uikit-generator/README.md#install) · [Update](agents/uikit-generator/README.md#check-for-updates) |
+| **[Obsidian Canvas](skills/obsidian-canvas/)** | Skill | Correct `.canvas` JSON — mind maps, flowcharts, planning boards, architecture sketches | [Install](skills/obsidian-canvas/README.md#install) · [Update](skills/obsidian-canvas/README.md#check-for-updates) |
+| **[Code to Design](skills/code-to-design/)** | Skill | Frontend code → pixel-accurate Pencil `.pen` design files (needs the Pencil MCP) | [Install](skills/code-to-design/README.md#install) · [Update](skills/code-to-design/README.md#check-for-updates) |
+| **[GitHub](skills/github/)** | Skill | `gh` CLI operations with a confirm-before-every-remote-action rule (needs `gh`) | [Install](skills/github/README.md#install) · [Update](skills/github/README.md#check-for-updates) |
+| **[Codex Image Bridge](skills/codex-image-bridge/)** | Skill | Generate raster images without leaving Claude Code (needs the Codex CLI + a ChatGPT plan) | [Install](skills/codex-image-bridge/README.md#install) · [Update](skills/codex-image-bridge/README.md#check-for-updates) |
+| **[Doc Scanner](hooks/doc-scanner/)** | Hook | SessionStart hook — gives Claude an index of your project's docs at every conversation start | [Install](hooks/doc-scanner/README.md#install) · [Update](hooks/doc-scanner/README.md#check-for-updates) |
+| **[Status Line](scripts/)** | Script | Two-line status bar — git state, model, effort, context bar, rate limits (needs `jq`) | [Install](scripts/README.md#install) · [Update](scripts/README.md#check-for-updates) |
+
+**Dependencies worth knowing:**
+
+- **Global Doc Master is an agent plus a skill.** The agent holds the investigation logic, the `doc-master-assist` skill holds the 8 templates. They're one product — the install and update prompts handle both, and neither half works alone.
+- **Local Brain requires an Obsidian vault** set up first — see the [Local Brain Guide](local-brain-guide/).
+- **Code to Design, GitHub, and Codex Image Bridge each need an external tool** (Pencil MCP, `gh`, and the Codex CLI). Their install prompts check for it and tell you how to fix it, but never install it for you.
+
+Everything else is standalone.
+
 ### Install Everything
 
 To install all agents, skills, hooks, and scripts at once, paste this into your Claude CLI:
@@ -148,13 +172,13 @@ To install all agents, skills, hooks, and scripts at once, paste this into your 
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install everything:
 
-1. AGENTS: Scan the agents/ folder. For each subfolder, check if it contains only a single agent .md file (+ README.md) or a folder-based agent with sub-files. For single-file agents (like global-doc-fixer), copy the .md file (NOT README.md) to ~/.claude/agents/<filename>. For folder-based agents (like global-doc-master which contains only global-doc-master.md + README.md), copy the entire folder to ~/.claude/agents/<folder-name>/ excluding README.md. Create ~/.claude/agents/ if it doesn't exist.
+1. AGENTS: Scan the agents/ folder. Each subfolder holds exactly one agent .md file plus a README.md. Copy the agent .md file (NOT README.md) to ~/.claude/agents/<filename>.md. Create ~/.claude/agents/ if it doesn't exist.
 
 2. SKILLS: Scan the skills/ folder. For each subfolder, copy the entire folder structure (SKILL.md, plus references/ and scripts/ wherever they exist) to ~/.claude/skills/<skill-name>/ with exact content. Exclude README.md files. If a skill ships a scripts/ folder, mark its .sh files executable afterwards (chmod +x) — a skill whose script is not executable will fail at run time.
 
 3. HOOKS: Scan the hooks/ folder. For each subfolder, find the .sh file — that's the hook script. Copy it to ~/.claude/<filename> with exact content. Make it executable (chmod +x). Then read my existing ~/.claude/settings.json (create if needed) and add a SessionStart hook entry for each .sh file that runs "bash ~/.claude/<filename>". Merge with existing hooks — don't overwrite.
 
-4. SCRIPTS: Scan the scripts/ folder. Copy each .sh file to ~/.claude/<filename> with exact content. For statusline-command.sh specifically, also add the statusLine config to settings.json: { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } }. Merge with existing settings — don't overwrite.
+4. SCRIPTS: Scan the scripts/ folder. Copy each .sh file to ~/.claude/<filename> with exact content. For statusline-command.sh specifically, also add the statusLine config to settings.json: { "statusLine": { "type": "command", "command": "bash ~/.claude/statusline-command.sh" } }. Merge with existing settings — don't overwrite.
 
 After installing everything, read the README.md in each folder and give me a summary of what was installed and how to use each one.
 
@@ -168,7 +192,9 @@ To install just the agents:
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the agents:
 
-Scan the agents/ folder. For each subfolder, check if it contains only a single agent .md file (+ README.md) or a folder-based agent. For single-file agents, copy the .md file (NOT README.md) to ~/.claude/agents/<filename>. For folder-based agents, copy the entire folder to ~/.claude/agents/<folder-name>/ excluding README.md. Create ~/.claude/agents/ if it doesn't exist.
+Scan the agents/ folder. Each subfolder holds exactly one agent .md file plus a README.md. Copy the agent .md file (NOT README.md) to ~/.claude/agents/<filename>.md. Create ~/.claude/agents/ if it doesn't exist.
+
+THEN, because global-doc-master does not work without its template skill, also copy the entire skills/doc-master-assist/ folder to ~/.claude/skills/doc-master-assist/ with exact content — SKILL.md plus all 8 template files in references/. Exclude README.md.
 
 After installing, read the README.md in each agent folder and give me a summary of what was installed and how to use each one.
 ```
@@ -204,7 +230,7 @@ To install just the scripts (status line, etc.):
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the scripts:
 
-Scan the scripts/ folder. Copy each .sh file to ~/.claude/<filename> with exact content. For statusline-command.sh specifically, also add the statusLine config to my ~/.claude/settings.json: { "statusLine": { "command": "bash ~/.claude/statusline-command.sh" } }. Merge with existing settings — don't overwrite.
+Scan the scripts/ folder. Copy each .sh file to ~/.claude/<filename> with exact content. For statusline-command.sh specifically, also add the statusLine config to my ~/.claude/settings.json: { "statusLine": { "type": "command", "command": "bash ~/.claude/statusline-command.sh" } }. Merge with existing settings — don't overwrite.
 
 Tell me when it's done and explain what each script does.
 ```
@@ -216,7 +242,7 @@ Already have everything installed and want to check for newer versions? Paste th
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to everything I have installed:
 
-1. AGENTS: Scan the agents/ folder. For each subfolder, find the .md file that is NOT README.md. Compare it with my local version at ~/.claude/agents/<filename>. Skip any that don't exist locally.
+1. AGENTS: Scan the agents/ folder. For each subfolder, find the .md file that is NOT README.md. Compare it with my local version at ~/.claude/agents/<filename>.md. Skip any that don't exist locally. Note: if local-brain is installed, my copy has <VAULT_PATH> replaced with a real path — preserve that.
 
 2. SKILLS: Scan the skills/ folder. For each subfolder, compare all non-README files (SKILL.md plus everything in references/ and scripts/) with my local versions at ~/.claude/skills/<skill-name>/. Skip any that don't exist locally.
 

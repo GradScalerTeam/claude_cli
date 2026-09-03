@@ -23,7 +23,7 @@ The workflow is:
 1. **For new projects:** Start with a project overview (`docs/overview.md`) — the agent interviews you extensively to capture the entire project vision, business logic, and user journeys
 2. You describe what you want to build (can be vague — that's fine)
 3. The agent scans your codebase, asks clarifying questions, and writes the document
-4. You run `@global-doc-fixer` on the document — it reviews, fixes, and repeats until the doc is solid
+4. You read the document and push back on anything vague — the agent revises until the plan is solid
 5. Only then do you start building — either manually or by handing the doc to a development agent
 
 **You should also use it when:**
@@ -195,22 +195,33 @@ The agent asks: "What's the first thing you check when a payment fails?", "Which
 
 ---
 
-## Setup
+## Install
 
-### Fresh Install
+> **Requires the [doc-master-assist skill](../../skills/doc-master-assist/).** The agent holds the investigation logic; the skill holds the 8 document templates. Install the agent without the skill and it has nothing to write into. The prompt below installs both.
 
-To set up the Global Doc Master as a global agent in your Claude Code CLI, paste this prompt directly into your Claude CLI:
-
-```
-Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and read the file at agents/global-doc-master/global-doc-master.md — copy its entire content and create a new agent file at ~/.claude/agents/global-doc-master.md with the exact same content. Create the ~/.claude/agents/ directory if it doesn't exist. After installing, read the README.md in the same folder (agents/global-doc-master/README.md) and give me a summary of what this agent does and how to use it.
-```
-
-That's it. The agent is now available in every project you work on with Claude Code CLI.
-
-### Check for Updates
-
-Already have the Global Doc Master set up and want to check if there's a newer version? Paste this into your Claude CLI:
+Paste this into your Claude CLI:
 
 ```
-Fetch the latest version of global-doc-master.md from the GitHub repo https://github.com/GradScalerTeam/claude_cli at agents/global-doc-master/global-doc-master.md — compare it with my local version at ~/.claude/agents/global-doc-master.md. If there are any differences, show me what changed, update my local file to match the latest version, and give me a summary of what was updated and why it matters.
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the global-doc-master agent together with the skill it depends on:
+
+1. AGENT: Read agents/global-doc-master/global-doc-master.md and save it to ~/.claude/agents/global-doc-master.md with the exact same content. Create ~/.claude/agents/ if it doesn't exist. Do NOT copy README.md.
+
+2. REQUIRED SKILL: Copy the entire skills/doc-master-assist/ folder to ~/.claude/skills/doc-master-assist/ with exact content — SKILL.md plus all 8 template files in references/. Exclude README.md. The agent is broken without this.
+
+After installing, confirm both landed (agent file + all 8 templates) and give me a summary of what this agent does and how to invoke it.
+```
+
+Then quit your Claude CLI session and start a new one — agents and skills only load at session startup.
+
+## Check for Updates
+
+Already installed and want the latest version? Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to global-doc-master and its required skill:
+
+1. Compare agents/global-doc-master/global-doc-master.md with my local version at ~/.claude/agents/global-doc-master.md.
+2. Compare skills/doc-master-assist/SKILL.md and all 8 template files in skills/doc-master-assist/references/ with my local versions at ~/.claude/skills/doc-master-assist/.
+
+Tell me which files changed and what changed in each. If there are updates, ask me whether I want you to explain the changes first or pull them straight into my local files.
 ```

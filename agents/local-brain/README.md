@@ -12,16 +12,37 @@ This agent works with an **Obsidian vault** set up as a structured knowledge bas
 
 ## Install
 
-```bash
-# copy agent to global agents
-cp -r agents/local-brain ~/.claude/agents/local-brain
+Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the local-brain agent:
+
+Read agents/local-brain/local-brain.md and save it to ~/.claude/agents/local-brain.md with the exact same content. Create ~/.claude/agents/ if it doesn't exist. Do NOT copy README.md.
+
+Then ask me for my Obsidian vault path and replace BOTH occurrences of <VAULT_PATH> in ~/.claude/agents/local-brain.md with it. If I don't have a vault yet, read the local-brain-guide/ folder in the repo and walk me through creating one first — the agent does nothing without a vault and its CLAUDE.md schema.
+
+Finally, show me the "Local Brain" block from agents/local-brain/README.md that I need to add to my ~/.claude/CLAUDE.md, with my real vault path filled in.
+```
+
+Then quit your Claude CLI session and start a new one — agents only load at session startup.
+
+## Check for Updates
+
+Already installed and want the latest version? Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to the local-brain agent:
+
+Compare agents/local-brain/local-brain.md with my local version at ~/.claude/agents/local-brain.md. IMPORTANT: my local copy has <VAULT_PATH> replaced with my real vault path — treat that as a customization, not a difference, and preserve it in any update.
+
+Tell me what else changed. If there are real updates, ask me whether I want you to explain the changes first or pull them straight into my local file with my vault path kept intact.
 ```
 
 ## Setup (Required)
 
 **1. Set your vault path in the agent:**
 
-Open `~/.claude/agents/local-brain/local-brain.md` and replace **both occurrences** of `<VAULT_PATH>` with your actual vault path:
+Open `~/.claude/agents/local-brain.md` and replace **both occurrences** of `<VAULT_PATH>` with your actual vault path:
 
 ```markdown
 # find these lines:

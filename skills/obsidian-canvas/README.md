@@ -26,11 +26,29 @@ Whenever you need to present something **visually on a canvas** — the skill is
 
 ## Install
 
-```bash
-cp -r skills/obsidian-canvas ~/.claude/skills/obsidian-canvas
+Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the obsidian-canvas skill:
+
+Copy skills/obsidian-canvas/SKILL.md to ~/.claude/skills/obsidian-canvas/SKILL.md with exact content. Exclude README.md. Create ~/.claude/skills/obsidian-canvas/ if it doesn't exist.
+
+After installing, give me a summary of what this skill does and when it triggers.
 ```
 
-No additional setup needed — Claude automatically uses the skill when working with `.canvas` files or when you ask for a visual canvas.
+Then quit your Claude CLI session and start a new one — skills only load at session startup.
+
+No further setup needed. Claude uses the skill automatically when working with `.canvas` files or when you ask for a mind map, flowchart, or planning board.
+
+## Check for Updates
+
+Already installed and want the latest version? Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to the obsidian-canvas skill:
+
+Compare skills/obsidian-canvas/SKILL.md with my local version at ~/.claude/skills/obsidian-canvas/SKILL.md. Tell me what changed. If there are updates, ask me whether I want you to explain the changes first or pull them straight into my local file.
+```
 
 ## What's Inside
 

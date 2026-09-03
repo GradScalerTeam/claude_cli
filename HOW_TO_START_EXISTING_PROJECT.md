@@ -54,25 +54,18 @@ The agent reads your actual code, traces every layer, and produces flow document
 
 ---
 
-## Step 3: Review the Code and Document Issues
+## Step 3: Document the Problems You Already Know About
 
-Now that the codebase is documented, review the actual code to find existing problems. Run the code review skill on your project:
+Now that the codebase is documented, capture the problems in it. Every existing project has a mental backlog — the endpoint nobody sanitized, the page that makes too many calls, the module everyone avoids touching. Getting those written down turns tribal knowledge into something Claude can actually work from.
 
-```
-/global-review-code
-```
-
-Or review specific areas:
+Ask Claude to look over an area if you want a second opinion first:
 
 ```
-/global-review-code src/auth/
-/global-review-code src/api/
-/global-review-code src/components/
+Look through src/auth/ and tell me what problems you see — security, error handling,
+anything that looks fragile
 ```
 
-Claude will run a 12-phase audit — architecture, security, performance, error handling, dependencies, testing, and framework best practices. It produces a report with findings grouped by severity.
-
-**For each significant finding**, use the doc master to create an issue doc:
+**For each significant problem**, use the doc master to create an issue doc:
 
 ```
 @global-doc-master there's a security issue — the user input on the search endpoint
@@ -97,9 +90,9 @@ This builds a searchable history under `docs/resolved/`.
 
 ---
 
-## Step 4: Create Local Tools for Your Project
+## Step 4: Create a Local Doc Master for Your Project
 
-Now that Claude understands your codebase through the flow docs and code review, create local versions of the tools that are tailored to your specific project.
+Now that Claude understands your codebase through the flow docs and issue docs, create a local version of the doc master tailored to your specific project.
 
 ### Local Doc Master Agent
 
@@ -116,29 +109,7 @@ docs in docs/feature_flow/ and the existing code to understand the project.
 
 This creates a project-specific agent in `.claude/agents/` that knows your routes, models, services, and conventions — so every doc it writes from now on references your actual code accurately.
 
-### Local Review Skills
-
-Use the skill-development plugin to create local versions of both review skills:
-
-```
-/skill-development
-
-Create a local review-doc skill for this project. It should work like the global
-global-review-doc skill but be adapted to this project's tech stack, architecture,
-and conventions. Refer to the existing code and flow docs to understand what patterns
-and security domains are relevant.
-```
-
-```
-/skill-development
-
-Create a local review-code skill for this project. It should work like the global
-global-review-code skill but be tailored to this project's framework, folder structure,
-and coding patterns. It should know the project's architecture and check against
-the actual conventions used here.
-```
-
-From this point on, use the **local** tools instead of the global ones. They produce faster, more accurate results because they already know your project.
+From this point on, use the **local** doc master instead of the global one. It produces faster, more accurate docs because it already knows your project.
 
 ---
 
@@ -170,10 +141,9 @@ These agents live in `.claude/agents/` and are ready to use whenever you need to
 
 Once your existing project is set up with Claude CLI, the day-to-day workflow is the same as a new project:
 
-1. **New feature?** → Use the local doc master to create a planning doc, run `@global-doc-fixer` to review and fix it until READY, then build
+1. **New feature?** → Use the local doc master to create a planning doc, read it over, then build from it
 2. **Bug found?** → Use the local doc master to create an issue doc, fix it, move to resolved
-3. **Code changes?** → Use the local review-code skill to audit before merging
-4. **Feature shipped?** → Use the local doc master to create or update the flow doc
+3. **Feature shipped?** → Use the local doc master to create or update the flow doc
 
 The difference is that everything is faster because your local tools already know the project.
 
@@ -184,10 +154,8 @@ The difference is that everything is faster because your local tools already kno
 ```
 1. Open Claude in your project          →  cd my-project && claude
 2. Create feature flow docs             →  @global-doc-master document [each feature]
-3. Review the code                      →  /global-review-code
-4. Document issues found                →  @global-doc-master [describe each issue]
-5. Create local doc master agent        →  /agent-development
-6. Create local review skills           →  /skill-development (review-doc + review-code)
-7. Create development agents            →  /agent-development (frontend, backend, etc.)
-8. Use local tools for all future work
+3. Document known problems              →  @global-doc-master [describe each issue]
+4. Create local doc master agent        →  /agent-development
+5. Create development agents            →  /agent-development (frontend, backend, etc.)
+6. Use local tools for all future work
 ```

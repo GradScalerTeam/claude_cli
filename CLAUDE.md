@@ -20,15 +20,13 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 
 1. **Planning Phase** — Use `global-doc-master` agent to create detailed planning documents under `docs/planning/`. These are the blueprints that everything else builds on.
 
-2. **Review & Fix** — Use the `global-doc-fixer` agent to autonomously review and fix planning docs. It runs `global-review-doc`, fixes all findings, re-reviews, and repeats until the plan is solid. No manual iteration needed. Good plans = good code.
+2. **Agent-Driven Development** — Use the `agent-development` skill to scan planning docs and generate project-specific agents. These agents live in the local project and are purpose-built for the work described in the plan.
 
-3. **Agent-Driven Development** — Use the `agent-development` skill to scan planning docs and generate project-specific agents. These agents live in the local project and are purpose-built for the work described in the plan.
+3. **Parallel Execution** — Run generated agents in parallel to build out the project. Claude CLI handles the implementation while the developer oversees and course-corrects.
 
-4. **Parallel Execution** — Run generated agents in parallel to build out the project. Claude CLI handles the implementation while the developer oversees and course-corrects.
+4. **Review** — Claude reviews its own work inline while coding. For anything significant, document the issue with `global-doc-master` before fixing so there's a record under `docs/issues/`.
 
-5. **Code Review** — Use the `global-review-code` skill to audit the implementation. Document issues with `global-doc-master`, fix, and re-review.
-
-6. **Test & Improve** — Test with curl (backend) or Playwright (frontend). Create new planning docs for improvements/fixes, and the cycle repeats.
+5. **Test & Improve** — Test with curl (backend) or Playwright (frontend). Create new planning docs for improvements/fixes, and the cycle repeats.
 
 ### Guides
 

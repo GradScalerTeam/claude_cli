@@ -52,43 +52,9 @@ When it's done, you'll have a detailed blueprint for your project in `docs/plann
 
 ---
 
-## Step 3: Review the Planning Doc
+## Step 3: Generate Project-Specific Agents
 
-Now use the review skill to tear the planning doc apart before you build anything. This catches gaps, missing edge cases, security issues, and ambiguities.
-
-```
-/global-review-doc docs/planning/your-project-plan.md
-```
-
-Claude will run a 9-phase review and produce a report with findings grouped by severity — Critical, Important, and Minor. It will also give a verdict: **READY**, **REVISE**, or **REWRITE**.
-
-Read the review carefully. It will tell you exactly what's missing, what's ambiguous, and what could cause problems during implementation.
-
----
-
-## Step 4: Fix the Doc Until It's Implementation-Ready
-
-Instead of manually reviewing, fixing, and re-reviewing (which often takes 5-10+ rounds), use the **Global Doc Fixer** agent to handle the entire cycle:
-
-```
-@global-doc-fixer docs/planning/your-project-plan.md
-```
-
-The agent will:
-1. Run `global-review-doc` on your document
-2. Fix all factual issues automatically (wrong paths, line numbers, outdated references)
-3. Ask you MCQ questions for any business logic decisions it can't make on its own
-4. Re-review after fixes, then repeat until the verdict is **READY**
-
-This typically converges in 2-4 rounds. The agent handles it all — you just answer the occasional question when it needs your input.
-
-**Prefer manual control?** You can still do it step by step — run `/global-review-doc`, read the findings, fix them yourself, and re-review. But for most cases, the doc fixer agent is faster and catches more.
-
----
-
-## Step 5: Generate Project-Specific Agents
-
-Now that the planning doc is solid, don't just jump into coding. Instead, use the **agent-development** plugin to create agents that are purpose-built for your specific project.
+Now that you have a planning doc, don't just jump into coding. Instead, use the **agent-development** plugin to create agents that are purpose-built for your specific project.
 
 ```
 /agent-development
@@ -100,7 +66,7 @@ Why this matters: generic Claude is good, but agents that know your specific pro
 
 ---
 
-## Step 6: Run Agents in Parallel to Build the Project
+## Step 4: Run Agents in Parallel to Build the Project
 
 Once your agents are generated, tell Claude to run them:
 
@@ -122,25 +88,11 @@ For a well-planned project, auto-edit mode is usually fine. The planning doc alr
 
 ---
 
-## Step 7: Review the Code
+## Step 5: Document and Fix Issues
 
-Now that the agents have written the code, review it before you even run it. Use the code review skill to audit what was built:
+Read through what the agents built before you run it. Claude flags problems as it writes, but a pass over the finished code still catches things — especially where two agents worked on connected pieces.
 
-```
-/global-review-code src/
-```
-
-Or review the entire project:
-
-```
-/global-review-code
-```
-
-Claude will run a 12-phase audit — architecture, security (OWASP + domain-specific), performance, error handling, dependencies, testing, and framework best practices. It produces a report with findings grouped by severity: Critical, Important, and Minor.
-
-**If issues are found:**
-
-For small fixes, just tell Claude to fix them directly based on the review findings.
+For small fixes, just tell Claude what's wrong and it will fix them directly.
 
 For bigger issues — security vulnerabilities, architectural problems, missing error handling — use the doc master to document the issue properly before fixing:
 
@@ -160,7 +112,7 @@ This builds a history of issues and fixes that's searchable later.
 
 ---
 
-## Step 8: Test the Project
+## Step 6: Test the Project
 
 Once the code is written, test it. How you test depends on what you built:
 
@@ -193,15 +145,14 @@ Do both — test the API with curl first, then test the frontend with Playwright
 
 ---
 
-## Step 9: Fix Issues and Iterate
+## Step 7: Iterate
 
 If tests reveal bugs or missing functionality:
 
 1. Describe the issue to Claude — it will fix it directly
-2. For bigger issues, create a new planning doc for the fix: `@global-doc-master there's a bug where...`
-3. Run `@global-doc-fixer` on the new doc, then rebuild — same cycle as before
+2. For bigger issues, create a new planning doc for the fix: `@global-doc-master there's a bug where...`, then rebuild from it — same cycle as before
 
-This is the loop: **Plan → Review → Build → Test → Fix → Repeat**. Each cycle makes the project better.
+This is the loop: **Plan → Build → Test → Fix → Repeat**. Each cycle makes the project better.
 
 ---
 
@@ -246,7 +197,7 @@ The more flow docs you create, the easier it is for anyone — human or AI — t
 
 ## Recommended: Create Local Versions of Your Tools
 
-This is the final step and it's the one that makes your project truly self-sufficient. Up until now, you've been using the **global** doc master agent and the **global** review skills — they work on any project but don't know the specifics of yours. Now that your project is built and working, create **local** versions that are tailored to your codebase.
+This is the final step and it's the one that makes your project truly self-sufficient. Up until now you've been using the **global** doc master agent — it works on any project but doesn't know the specifics of yours. Now that your project is built and working, create a **local** version tailored to your codebase.
 
 ### Local Doc Master Agent
 
@@ -263,48 +214,23 @@ actual code when writing docs.
 
 This creates a project-specific agent in `.claude/agents/` that knows your routes, your models, your services — so when it writes docs, it references your actual code instead of generic patterns.
 
-### Local Review Skills
-
-Use the skill-development plugin to create local versions of the review skills:
-
-```
-/skill-development
-
-Create a local review-doc skill for this project. It should work like the global
-global-review-doc skill but be adapted to this project's tech stack, architecture,
-and conventions. It should know which files to check, which patterns to verify,
-and which security domains are relevant.
-```
-
-```
-/skill-development
-
-Create a local review-code skill for this project. It should work like the global
-global-review-code skill but be tailored to this project's framework, folder structure,
-and coding patterns. It should know the project's architecture and check against
-the actual conventions used here.
-```
-
 ### Why This Matters
 
-The global tools are general-purpose — they work everywhere but know nothing about your specific project. The local versions inherit the same review phases, output formats, and thoroughness, but they're pre-loaded with knowledge of your codebase. They check against your actual patterns, your actual routes, your actual models. Reviews are faster and more accurate because the tools already know the lay of the land.
+The global agent is general-purpose — it works everywhere but knows nothing about your specific project. The local version is pre-loaded with knowledge of your codebase, so it references your actual patterns, your actual routes, your actual models instead of generic ones.
 
-Think of it this way: the global tools got you from zero to a working project. The local tools keep that project healthy as it grows.
+Think of it this way: the global agent got you from zero to a working project. The local one keeps that project healthy as it grows.
 
 ---
 
 ## Summary
 
 ```
-1.  Create folder, open Claude           →  mkdir my-project && cd my-project && claude
-2.  Write planning doc                   →  @global-doc-master [describe your project]
-3.  Answer the agent's questions         →  Be specific, cover edge cases
-4.  Review the doc                       →  /global-review-doc docs/planning/your-plan.md
-5.  Fix until READY                      →  @global-doc-fixer handles the review-fix loop
-6.  Generate project-specific agents     →  /agent-development
-7.  Run agents in parallel               →  Tell Claude to run all agents and build
-8.  Review the code                      →  /global-review-code src/
-9.  Fix issues (doc master for big ones) →  @global-doc-master [describe the issue]
-10. Test (curl for backend, Playwright for frontend)
-11. Fix issues, repeat the cycle
+1. Create folder, open Claude           →  mkdir my-project && cd my-project && claude
+2. Write planning doc                   →  @global-doc-master [describe your project]
+3. Answer the agent's questions         →  Be specific, cover edge cases
+4. Generate project-specific agents     →  /agent-development
+5. Run agents in parallel               →  Tell Claude to run all agents and build
+6. Document issues                      →  @global-doc-master [describe the issue]
+7. Test (curl for backend, Playwright for frontend)
+8. Fix issues, repeat the cycle
 ```

@@ -67,7 +67,7 @@ description: "Builds backend features..."
 
 ---
 
-## Setup
+## Manual Setup
 
 ### Step 1: Copy the script
 
@@ -108,9 +108,9 @@ Quit your current Claude CLI session and start a new one. The doc scanner will r
 
 ---
 
-## Install via Claude CLI
+## Install
 
-Paste this into your Claude CLI to install automatically:
+Paste this into your Claude CLI:
 
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the doc scanner hook:
@@ -120,6 +120,18 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install t
 2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add a SessionStart hook that runs "bash ~/.claude/doc-scanner.sh". Merge it with any existing hooks — don't overwrite them.
 
 After installing, start a new session and confirm the doc scanner runs.
+```
+
+## Check for Updates
+
+Already installed and want the latest version? Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to the doc-scanner hook:
+
+Compare hooks/doc-scanner/doc-scanner.sh with my local version at ~/.claude/doc-scanner.sh. IMPORTANT: the variables at the top of the script (PREVIEW_LINES, MAX_PREVIEW_FILES, -maxdepth) are meant to be tuned per machine — if my local values differ, treat those as my customizations and preserve them rather than overwriting.
+
+Tell me what else changed. If there are real updates, ask me whether I want you to explain the changes first or pull them into my local file with my tuned values kept. Re-run `chmod +x ~/.claude/doc-scanner.sh` if you replace it.
 ```
 
 ---

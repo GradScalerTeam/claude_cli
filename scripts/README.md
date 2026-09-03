@@ -77,7 +77,35 @@ If the directory isn't a git repo, only the path is shown.
 
 ---
 
-## Setup
+## Install
+
+Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the status line:
+
+1. Read scripts/statusline-command.sh and save it to ~/.claude/statusline-command.sh with the exact same content. Make it executable (chmod +x).
+
+2. Read my existing ~/.claude/settings.json (create it if it doesn't exist) and add this statusLine config, MERGING with whatever is already in the file — do not overwrite my other settings:
+
+   "statusLine": { "type": "command", "command": "bash ~/.claude/statusline-command.sh" }
+
+3. Check that `jq` and `git` are installed — the script needs both. If jq is missing, tell me the install command for my platform.
+
+The status line appears after the next assistant message — no restart needed.
+```
+
+## Check for Updates
+
+Already installed and want the latest version? Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to the status line script:
+
+Compare scripts/statusline-command.sh with my local version at ~/.claude/statusline-command.sh. Tell me what changed. If there are updates, ask me whether I want you to explain the changes first or pull them straight into my local file — and re-run `chmod +x` afterwards if you replace it.
+```
+
+## Manual Setup
 
 **1. Copy the script to `~/.claude/`:**
 

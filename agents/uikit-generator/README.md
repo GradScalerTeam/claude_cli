@@ -22,7 +22,7 @@ The **UI Kit Generator** is a Claude Code CLI agent that turns a style brief —
 The workflow is:
 
 1. You describe a style — give it a screenshot, a Figma link, a brand palette, or just a name ("brutalism", "neumorphism", "Stripe-clean")
-2. The agent reads `M3_UI_KIT_REFERENCE.md` (the M3 component taxonomy), then generates the HTML kit at root
+2. The agent loads the M3 component taxonomy (built into the agent definition), then generates the HTML kit at root
 3. The agent runs a WCAG AA contrast audit and fixes any failing token combinations before declaring done
 4. You open the file in a browser, click around, toggle dark mode, and confirm the aesthetic is what you wanted
 5. From there, the kit is the reference for every screen you build — same colors, same shapes, same spacing, same component variants
@@ -94,12 +94,35 @@ Plus:
 
 ---
 
+## Install
+
+Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the uikit-generator agent:
+
+Read agents/uikit-generator/uikit-generator.md and save it to ~/.claude/agents/uikit-generator.md with the exact same content. Create ~/.claude/agents/ if it doesn't exist. Do NOT copy README.md.
+
+After installing, give me a summary of what this agent does and show me a few example invocations.
+```
+
+Then quit your Claude CLI session and start a new one — agents only load at session startup.
+
+## Check for Updates
+
+Already installed and want the latest version? Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to the uikit-generator agent:
+
+Compare agents/uikit-generator/uikit-generator.md with my local version at ~/.claude/agents/uikit-generator.md. Tell me what changed. If there are updates, ask me whether I want you to explain the changes first or pull them straight into my local file.
+```
+
 ## Reference
 
-- **Component taxonomy:** [`M3_UI_KIT_REFERENCE.md`](../../M3_UI_KIT_REFERENCE.md) at the project root
-- **Existing example kits** (the agent uses these as structural templates):
-  - [`m3-ui-kit-brutalism.html`](../../m3-ui-kit-brutalism.html)
-  - [`m3-ui-kit-glassmorphism.html`](../../m3-ui-kit-glassmorphism.html)
+The agent is **self-contained** — the full 36-component M3 taxonomy is written into the agent definition itself, so it works immediately after install with nothing else to download.
+
+Optionally, it will also pick up an `M3_UI_KIT_REFERENCE.md` at your project root if one exists, and use it as the canonical taxonomy instead of its inline list. That file is **not bundled with this repo** — it's a hook for teams who maintain their own component inventory. Without it, the agent falls back to its built-in list and output is unaffected.
 
 ---
 

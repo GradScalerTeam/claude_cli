@@ -6,7 +6,7 @@ disable-model-invocation: false
 
 # GitHub CLI Access
 
-The `gh` CLI is installed and authenticated as **dev-arctik** via HTTPS.
+The `gh` CLI must be installed and authenticated before this skill can do anything. Check with `gh auth status`.
 
 ## Rules
 - **ALWAYS ask the user for confirmation before any GitHub action** — this includes creating repos, pushing code, creating PRs/issues, deleting branches, and any other remote operation.

@@ -39,12 +39,29 @@ The script checks both conditions before it starts and exits with instructions i
 
 ## Install
 
-```bash
-cp -r skills/codex-image-bridge ~/.claude/skills/codex-image-bridge
-chmod +x ~/.claude/skills/codex-image-bridge/scripts/gen.sh
+Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install the codex-image-bridge skill:
+
+Copy the entire skills/codex-image-bridge/ folder to ~/.claude/skills/codex-image-bridge/ with exact content — SKILL.md plus scripts/gen.sh. Exclude README.md. Create ~/.claude/skills/ if it doesn't exist.
+
+CRITICAL: run `chmod +x ~/.claude/skills/codex-image-bridge/scripts/gen.sh` afterwards. This skill ships an executable and silently fails without it.
+
+Then run the preflight for me: check whether the Codex CLI is installed (`codex --version`) and signed in. If either fails, tell me the exact command to fix it — do NOT install Codex or run a login flow yourself.
 ```
 
-The `chmod` matters — this is the only skill in the repo that ships an executable, and it will not run without it.
+Then quit your Claude CLI session and start a new one — skills only load at session startup.
+
+## Check for Updates
+
+Already installed and want the latest version? Paste this into your Claude CLI:
+
+```
+Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for updates to the codex-image-bridge skill:
+
+Compare skills/codex-image-bridge/SKILL.md and skills/codex-image-bridge/scripts/gen.sh with my local versions at ~/.claude/skills/codex-image-bridge/. Tell me what changed. If there are updates, ask me whether I want you to explain the changes first or pull them straight into my local files — and re-run `chmod +x` on scripts/gen.sh afterwards if you replace it.
+```
 
 ## Usage
 
