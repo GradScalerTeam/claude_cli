@@ -15,7 +15,8 @@ export const diffKey = (s: { repo: string; group: string; path: string }) => `${
 
 // Staged compares the index with HEAD, unstaged the working tree with the index, untracked and conflicts show the file on disk.
 function diffArgs(sel: Selection): string[] {
-  const base = ['diff', '--no-color', '--no-ext-diff']
+  // No external diff tool and no textconv filter: either is a program the repo's own config could name.
+  const base = ['diff', '--no-color', '--no-ext-diff', '--no-textconv']
   if (sel.group === 'staged') return [...base, '--cached', '-M', '--', ...(sel.origPath ? [sel.origPath, sel.path] : [sel.path])]
   if (sel.group === 'untracked' || sel.group === 'conflict') return [...base, '--no-index', '--', '/dev/null', sel.path]
   return [...base, '--', sel.path]

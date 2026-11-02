@@ -47,14 +47,15 @@ function engine(on: On) {
 
 // statusOf: what `git status` prints per repo root; topLevel: the session folder's own repo, or null when it is not one.
 // Records every command with the repo it ran in (the -C argument), args after the -c prefix.
-function fakeGit(on: On, ran: Ran, statusOf: Record<string, string>, topLevel: string | null, children: Record<string, string> = {}) {
+function fakeGit(on: On, ran: Ran, statusOf: Record<string, string>, topLevel: string | null, children: Record<string, string> = {}, argvs: string[][] = []) {
   on('process.run', (_, e) => {
     const argv = [...e.argv]
-    if (argv[1] === 'rev-parse' && argv[2] === '--show-toplevel') {
+    argvs.push(argv)
+    // `git rev-parse --show-toplevel` for the session folder, `git -C frontend ... --show-toplevel` from the child scan.
+    if (argv.includes('--show-toplevel')) {
+      if (argv[1] === '-C') return ok(`${children[argv[2]]}\n`)
       return topLevel ? ok(`${topLevel}\n`) : { value: { exitCode: 128, stdout: '', stderr: 'fatal: not a git repository' } }
     }
-    // `git -C frontend rev-parse --show-toplevel` from the child scan.
-    if (argv[1] === '-C' && argv[3] === 'rev-parse' && argv[4] === '--show-toplevel') return ok(`${children[argv[2]]}\n`)
     const root = argv[2]
     const args = argv.slice(argv.indexOf('core.quotePath=false') + 1)
     ran.push({ root, args })
@@ -187,6 +188,26 @@ test('a parent folder with frontend and backend repos shows a section each', asy
   await ui.press({ key: 'fold-repo:frontend' })
   expect(await ui.find({ key: 'open-frontend:unstaged:src/App.jsx' })).toBeUndefined()
   expect(await ui.find({ key: 'open-backend:untracked:app.py' })).toBeDefined()
+  await ui.unmount()
+})
+
+// A repo's own .git/config must not run a program through the mod: every git call turns those settings off, and diffs skip textconv.
+test('every git call disables fsmonitor, hooks and the ext transport', async ($, on) => {
+  const ran: Ran = []
+  const argvs: string[][] = []
+  fakeGit(on, ran, { '/p/frontend': [...branch('main'), '? a.txt'].join('\n') }, null, { frontend: '/p/frontend' }, argvs)
+
+  await started($)
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  await ui.press({ key: 'open-frontend:untracked:a.txt' })
+  await ui.press({ key: 'stage-frontend:untracked:a.txt' })
+
+  const git = argvs.filter(a => a[0] === 'git')
+  expect(git.length).toBeGreaterThan(3)
+  for (const argv of git) {
+    for (const flag of ['core.fsmonitor=false', 'core.hooksPath=/dev/null', 'protocol.ext.allow=never']) expect(argv).toContain(flag)
+  }
+  expect(ran.filter(r => r.args[0] === 'diff').every(r => r.args.includes('--no-textconv'))).toBe(true)
   await ui.unmount()
 })
 

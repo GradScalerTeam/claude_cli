@@ -68,6 +68,21 @@ Only one refresh runs at a time. A request that arrives mid-refresh triggers one
 
 ---
 
+## Safety
+
+The mod runs git on its own, in every repo it finds, including child folders you never opened. A repo's `.git/config` can name programs for git to run: `core.fsmonitor` on every `git status`, a `textconv` filter or external diff tool on `git diff`. A clone never copies that file, but a folder that arrived with its `.git` already inside (an extracted archive, a synced folder, someone else's checkout) can carry one.
+
+So every git command the mod runs turns those off on the command line, which wins over the repo's own config:
+
+```
+git -c core.fsmonitor=false -c core.hooksPath=/dev/null -c protocol.ext.allow=never ...
+git diff --no-ext-diff --no-textconv ...
+```
+
+The flags live in `SAFE` in `hooks/git.ts`, and a test (`every git call disables fsmonitor, hooks and the ext transport`) fails if any git call goes out without them.
+
+---
+
 ## Files
 
 | File | Role |

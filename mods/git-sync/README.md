@@ -59,6 +59,20 @@ Only one refresh runs at a time. A request that arrives mid-refresh triggers one
 
 ---
 
+## Safety
+
+The mod runs git on its own, in every repo it finds, including child folders you never opened. A repo's `.git/config` can name programs for git to run: `core.fsmonitor` on every `git status`, hooks on a pull, the `ext::` transport on a fetch. A clone never copies that file, but a folder that arrived with its `.git` already inside (an extracted archive, a synced folder, someone else's checkout) can carry one.
+
+So every git command the mod runs turns those off on the command line, which wins over the repo's own config:
+
+```
+git -c core.fsmonitor=false -c core.hooksPath=/dev/null -c protocol.ext.allow=never ...
+```
+
+This lives in `SAFE` in `hooks/git.ts`. Your own SSH and credential settings still apply to fetch and pull, so private remotes keep working.
+
+---
+
 ## Files
 
 | File | Role |
