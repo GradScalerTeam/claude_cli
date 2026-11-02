@@ -24,6 +24,7 @@ export const SAFE = [
 // The repo-config keys known to run nothing on the commands these mods use; any other key in the repo's own config means the repo is not watched.
 // An allowlist, so a setting nobody thought of fails safe. It covers what git itself, VS Code, the GitHub CLI and Git LFS write. fsmonitor and hooksPath
 // are listed because SAFE overrides them; a remote's url is listed because SAFE blocks the ext:: and file:: transports, and vcs (a helper program) is not.
+// http.* is not listed: a repo's own http.proxy or http.sslVerify=false could steer a fetch, and the credentials git hands it, to someone else.
 const SAFE_KEY = new RegExp(
   '^(' +
     [
@@ -44,7 +45,6 @@ const SAFE_KEY = new RegExp(
       'lfs\\.(repositoryformatversion|url)',
       'gc\\.(auto|autodetach)',
       'color\\..+',
-      'http\\..+',
     ].join('|') +
     ')$',
 )

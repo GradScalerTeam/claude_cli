@@ -221,17 +221,19 @@ test('every git call disables fsmonitor, hooks, submodules and signatures', asyn
 // An allowlist: a key nobody listed blocks the repo even when it looks harmless, while what VS Code and the GitHub CLI write does not.
 test('a key not on the safe list blocks the repo; tool-written keys do not', async ($, on) => {
   const ran: Ran = []
-  const children = { tools: '/p/tools', odd: '/p/odd' }
+  const children = { tools: '/p/tools', odd: '/p/odd', proxied: '/p/proxied' }
   fakeGit(
     on,
     ran,
-    { '/p/tools': [...branch('main'), '? a.txt'].join('\n'), '/p/odd': [...branch('main'), '? b.txt'].join('\n') },
+    { '/p/tools': [...branch('main'), '? a.txt'].join('\n'), '/p/odd': [...branch('main'), '? b.txt'].join('\n'), '/p/proxied': [...branch('main'), '? c.txt'].join('\n') },
     null,
     children,
     [],
     {
-      '/p/tools': ['local\tcore.bare', 'local\tremote.origin.url', 'local\tremote.origin.gh-resolved', 'local\tbranch.main.vscode-merge-base', 'local\tuser.email'].join('\n'),
+      '/p/tools': ['local\tcore.bare', 'local\tremote.origin.url', 'local\tremote.origin.gh-resolved', 'local\tbranch.main.vscode-merge-base', 'local\tuser.email', 'global\thttp.proxy'].join('\n'),
       '/p/odd': 'local\tcore.bare\nlocal\tsomething.new\n',
+      // Runs no program, but could steer a fetch and the credentials git sends with it.
+      '/p/proxied': 'local\tcore.bare\nlocal\thttp.proxy\n',
     },
   )
 
@@ -240,6 +242,9 @@ test('a key not on the safe list blocks the repo; tool-written keys do not', asy
   expect(await ui.find({ key: 'open-tools:untracked:a.txt' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /Not watched: its git config sets something\.new, which is not on the list/ })).toBeDefined()
   expect(ran.filter(r => r.root === '/p/odd').map(r => r.args[0])).toEqual(['config'])
+  // A repo's own http.proxy blocks it; the same key in your global config (on the tools repo above) does not.
+  expect(await ui.find({ type: 'Text', text: /Not watched: its git config sets http\.proxy/ })).toBeDefined()
+  expect(ran.filter(r => r.root === '/p/proxied').map(r => r.args[0])).toEqual(['config'])
   await ui.unmount()
 })
 
