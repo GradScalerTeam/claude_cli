@@ -13,7 +13,7 @@ import { refresh, runAction } from './snapshot'
 
 // Same refs as snapshot.ts and register.tsx (the state scan wants them declared in each file that reads them); collapsed is this file's alone.
 // collapsed holds `repo:<name>` for a folded repo and `<name>:<group>` for a folded group inside one.
-const repos = atom({ plugin: 'git-diff', key: 'repos' } as const, null, { shape: 'repos-1' })
+const repos = atom({ plugin: 'git-diff', key: 'repos' } as const, null, { shape: 'repos-2' })
 const expanded = atom({ plugin: 'git-diff', key: 'expanded' } as const, [])
 const diffs = atom({ plugin: 'git-diff', key: 'diffs' } as const, {}, { shape: 'diffs-1' })
 const paneOpen = atom({ plugin: 'git-diff', key: 'paneOpen' } as const, false)
@@ -264,17 +264,20 @@ export function registerChanges(on: On) {
 
     const branchText = (s: GitSnapshot) => (
       <Text dimColor>
-        {s.branch}
-        {s.upstream ? ` ↑${s.ahead} ↓${s.behind}` : ' · no upstream'}
+        {s.blocked ? 'not watched' : s.branch}
+        {s.blocked ? '' : s.upstream ? ` ↑${s.ahead} ↓${s.behind}` : ' · no upstream'}
       </Text>
     )
 
-    const repoBody = (s: GitSnapshot) => (
-      <Box flexDirection="column" alignItems="stretch" gap="sm">
-        {s.error && <Text color="warning" size="footnote">{s.error}</Text>}
-        {s.files.length === 0 ? <Text dimColor>No changes. The working tree is clean.</Text> : groupsOf(s)}
-      </Box>
-    )
+    const repoBody = (s: GitSnapshot) =>
+      s.blocked ? (
+        <Text color="warning" wrap="wrap">Not watched: {s.blocked}. The pane runs no git in this repo.</Text>
+      ) : (
+        <Box flexDirection="column" alignItems="stretch" gap="sm">
+          {s.error && <Text color="warning" size="footnote">{s.error}</Text>}
+          {s.files.length === 0 ? <Text dimColor>No changes. The working tree is clean.</Text> : groupsOf(s)}
+        </Box>
+      )
 
     const allFiles = list.flatMap(s => s.files)
     const busy = list.find(s => s.busy)?.busy
@@ -286,7 +289,8 @@ export function registerChanges(on: On) {
             {/* One repo: its branch heads the pane. Several: each repo's header carries its own branch instead. */}
             {list.length === 1 ? (
               <Text wrap="truncate-end">
-                <Text bold>{list[0].branch}</Text>
+                {/* A blocked repo has no branch read, so it is named instead. */}
+                <Text bold>{list[0].branch || list[0].name}</Text>
                 {list[0].upstream && <Text dimColor> ↑{list[0].ahead} ↓{list[0].behind}</Text>}
               </Text>
             ) : (

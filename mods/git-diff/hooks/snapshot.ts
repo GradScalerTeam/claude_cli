@@ -11,16 +11,18 @@ import { findRepos, git } from './git'
 import type { Repo } from './git'
 
 // The engine's state scan reads atoms declared in the file that uses them, so each file of this mod declares the ones it reads.
-const repos = atom({ plugin: 'git-diff', key: 'repos' } as const, null, { shape: 'repos-1' })
+const repos = atom({ plugin: 'git-diff', key: 'repos' } as const, null, { shape: 'repos-2' })
 const expanded = atom({ plugin: 'git-diff', key: 'expanded' } as const, [])
 const diffs = atom({ plugin: 'git-diff', key: 'diffs' } as const, {}, { shape: 'diffs-1' })
 
 // all: every repo found, so a parent repo can leave out the child repos it would otherwise list as untracked folders ("frontend/").
 async function readSnapshot($: EngineInterface, repo: Repo, all: Repo[], previous: GitSnapshot | undefined): Promise<GitSnapshot> {
-  const { root, name } = repo
+  const { root, name, blocked } = repo
+  const base = { name, root, busy: previous?.busy ?? null, blocked }
+  // Not even a status: with a filter driver configured, status alone can run it.
+  if (blocked) return { branch: '', upstream: null, ahead: 0, behind: 0, files: [], ...base, error: null }
   // -uall lists each untracked file rather than its folder, so every row of the pane opens a diff.
   const status = await git($, root, ['status', '--porcelain=v2', '--branch', '--untracked-files=all'])
-  const base = { name, root, busy: previous?.busy ?? null }
   if (status.exitCode !== 0) {
     const said = status.stderr.trim().split('\n')[0]
     return { branch: '', upstream: null, ahead: 0, behind: 0, files: [], ...base, error: `git status failed: ${said}` }

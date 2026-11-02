@@ -13,7 +13,7 @@ export const LIST_LIMIT = 8
 
 // The engine's state scan reads atoms declared in the file that uses them, so each file of this mod declares the ones it reads.
 // repos replaced the single `snapshot` when several repos arrived; keep its shape tag the same in every file.
-const repos = atom({ plugin: 'git-sync', key: 'repos' } as const, null, { shape: 'repos-2' })
+const repos = atom({ plugin: 'git-sync', key: 'repos' } as const, null, { shape: 'repos-3' })
 
 // One line per commit: hash, author, relative age, subject (tab-separated so subjects may hold spaces).
 async function commits($: EngineInterface, root: string, range: string): Promise<Commit[]> {
@@ -38,12 +38,15 @@ async function pausedOp($: EngineInterface, root: string): Promise<PausedOp> {
 
 // all: every repo found, so a parent repo can leave out the child repos it would otherwise count as untracked folders ("frontend/").
 async function readSnapshot($: EngineInterface, repo: Repo, all: Repo[], previous: GitSnapshot | undefined): Promise<GitSnapshot> {
-  const { root, name } = repo
+  const { root, name, blocked } = repo
+  const base = { name, root, busy: previous?.busy ?? null, error: null, checkedAt: await $.clock.now(), blocked }
+  const empty = { branch: '', upstream: null, ahead: 0, behind: 0, staged: 0, modified: 0, untracked: 0, conflicts: [], paused: null, incoming: [], outgoing: [] }
+  // Not even a status: with a filter driver configured, status alone can run it.
+  if (blocked) return { ...empty, ...base }
   const status = await git($, root, ['status', '--porcelain=v2', '--branch', '--untracked-files=all'])
-  const base = { name, root, busy: previous?.busy ?? null, error: null, checkedAt: await $.clock.now() }
   if (status.exitCode !== 0) {
     const said = status.stderr.trim().split('\n')[0]
-    return { branch: '', upstream: null, ahead: 0, behind: 0, staged: 0, modified: 0, untracked: 0, conflicts: [], paused: null, incoming: [], outgoing: [], ...base, error: `git status failed: ${said}` }
+    return { ...empty, ...base, error: `git status failed: ${said}` }
   }
 
   const nested = new Set(all.filter(r => r.root.startsWith(`${root}/`)).map(r => `${r.root.slice(root.length + 1)}/`))
@@ -85,6 +88,7 @@ async function readSnapshot($: EngineInterface, repo: Repo, all: Repo[], previou
 // One repo's part: file changes, then ahead/behind. Same marks as the terminal status line: !conflicts +staged *modified ~new, each only
 // when it isn't zero; push/pull always shows, ↑0 ↓0 included, so being level with the remote is visible at a glance.
 function repoStatus(s: GitSnapshot): string {
+  if (s.blocked) return 'not watched'
   const counts = [
     s.conflicts.length > 0 && `!${s.conflicts.length}`,
     s.staged > 0 && `+${s.staged}`,
@@ -106,6 +110,8 @@ export function statusLine(list: GitSnapshot[]): string | undefined {
 // A request that lands mid-refresh runs once more after it, so the last edit is never missed.
 let running: Promise<void> | null = null
 let again = false
+// Repos already explained in a toast: the status line can only say "not watched", so the reason is told once per load.
+const warned = new Set<string>()
 
 export function refresh($: EngineInterface, withFetch: boolean): Promise<void> {
   if (running) {
@@ -118,7 +124,11 @@ export function refresh($: EngineInterface, withFetch: boolean): Promise<void> {
     const next = await Promise.all(
       found.map(async repo => {
         let error: string | null = null
-        if (withFetch) {
+        if (repo.blocked && !warned.has(repo.root)) {
+          warned.add(repo.root)
+          $.ui.toast(`Git sync is not watching ${repo.name}: ${repo.blocked}.`)
+        }
+        if (withFetch && !repo.blocked) {
           const fetched = await git($, repo.root, ['fetch', '--quiet'], 60_000).catch(() => null)
           if (!fetched || fetched.exitCode !== 0) error = 'Could not reach the remote; showing the last fetched state.'
         }

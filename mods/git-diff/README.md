@@ -70,16 +70,14 @@ Only one refresh runs at a time. A request that arrives mid-refresh triggers one
 
 ## Safety
 
-The mod runs git on its own, in every repo it finds, including child folders you never opened. A repo's `.git/config` can name programs for git to run: `core.fsmonitor` on every `git status`, a `textconv` filter or external diff tool on `git diff`. A clone never copies that file, but a folder that arrived with its `.git` already inside (an extracted archive, a synced folder, someone else's checkout) can carry one.
+The mod runs git on its own, in every repo it finds, including child folders you never opened. A repo's `.git/config` can name programs for git to run: a filter driver on `git status`, `git diff` or Stage (`git add`), a `textconv` or external diff tool on `git diff`. A clone never copies that file, but a folder that arrived with its `.git` already inside (an extracted archive, a synced folder, someone else's checkout) can carry one.
 
-So every git command the mod runs turns those off on the command line, which wins over the repo's own config:
+Two layers stop that:
 
-```
-git -c core.fsmonitor=false -c core.hooksPath=/dev/null -c protocol.ext.allow=never ...
-git diff --no-ext-diff --no-textconv ...
-```
+1. **A config check before anything else.** For each repo found, the mod reads its config with `git config --list --show-scope`, which only reads files. If the repo's *own* config (local or worktree scope) sets a key that runs a program, the pane lists that repo as **Not watched**, names the key, and runs no other git there. The keys it blocks on: `filter.*`, `credential.*`, `include.*`/`includeIf.*`, `uploadpack.*`, `diff.*.textconv`, `diff.*.command`, `merge.*.driver`, `remote.*.uploadpack`/`receivepack`, and `core.sshCommand`, `core.askPass`, `core.gitProxy`, `core.alternateRefsCommand`.
+2. **Flags on every command**, which win over the repo's own config: `-c core.fsmonitor=false -c core.hooksPath=/dev/null -c protocol.ext.allow=never -c protocol.file.allow=never`, plus `--no-ext-diff --no-textconv` on `git diff`.
 
-The flags live in `SAFE` in `hooks/git.ts`, and a test (`every git call disables fsmonitor, hooks and the ext transport`) fails if any git call goes out without them.
+Your **global** config is yours, so it never blocks a repo: Git LFS's filter, for one, keeps working. The cost is a repo whose own `.git/config` sets one of those keys on purpose. The pane won't open it. Both layers live in `hooks/git.ts`, and two tests guard them: `every git call disables fsmonitor, hooks and the ext transport`, and `a repo whose config names a program is not watched, and runs no git`.
 
 ---
 

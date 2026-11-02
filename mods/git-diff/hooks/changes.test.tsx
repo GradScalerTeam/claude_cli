@@ -47,7 +47,8 @@ function engine(on: On) {
 
 // statusOf: what `git status` prints per repo root; topLevel: the session folder's own repo, or null when it is not one.
 // Records every command with the repo it ran in (the -C argument), args after the -c prefix.
-function fakeGit(on: On, ran: Ran, statusOf: Record<string, string>, topLevel: string | null, children: Record<string, string> = {}, argvs: string[][] = []) {
+// configOf: what `git config --list --name-only --show-scope` prints per repo root; none means a config with nothing risky in it.
+function fakeGit(on: On, ran: Ran, statusOf: Record<string, string>, topLevel: string | null, children: Record<string, string> = {}, argvs: string[][] = [], configOf: Record<string, string> = {}) {
   on('process.run', (_, e) => {
     const argv = [...e.argv]
     argvs.push(argv)
@@ -59,6 +60,7 @@ function fakeGit(on: On, ran: Ran, statusOf: Record<string, string>, topLevel: s
     const root = argv[2]
     const args = argv.slice(argv.indexOf('core.quotePath=false') + 1)
     ran.push({ root, args })
+    if (args[0] === 'config') return ok(configOf[root] ?? 'local\tcore.bare\n')
     if (args[0] === 'status') return ok(statusOf[root])
     if (args[0] === 'diff') return ok(DIFF)
     if (args[0] === 'rev-parse') return { value: { exitCode: 1, stdout: '', stderr: '' } }
@@ -208,6 +210,32 @@ test('every git call disables fsmonitor, hooks and the ext transport', async ($,
     for (const flag of ['core.fsmonitor=false', 'core.hooksPath=/dev/null', 'protocol.ext.allow=never']) expect(argv).toContain(flag)
   }
   expect(ran.filter(r => r.args[0] === 'diff').every(r => r.args.includes('--no-textconv'))).toBe(true)
+  await ui.unmount()
+})
+
+// A repo whose own config names a filter driver is listed but never touched: status alone could run the filter.
+// The user's global filters (Git LFS lives there) are theirs, so a global-scope key blocks nothing.
+test('a repo whose config names a program is not watched, and runs no git', async ($, on) => {
+  const ran: Ran = []
+  const children = { safe: '/p/safe', planted: '/p/planted' }
+  fakeGit(
+    on,
+    ran,
+    { '/p/safe': [...branch('main'), '? a.txt'].join('\n'), '/p/planted': [...branch('main'), '? b.txt'].join('\n') },
+    null,
+    children,
+    [],
+    { '/p/safe': 'global\tfilter.lfs.clean\nlocal\tcore.bare\n', '/p/planted': 'local\tcore.bare\nlocal\tfilter.Evil.clean\n' },
+  )
+
+  await started($)
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+
+  expect(await ui.find({ key: 'open-safe:untracked:a.txt' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /Not watched: its git config sets filter\.Evil\.clean/ })).toBeDefined()
+  expect(await ui.find({ key: 'open-planted:untracked:b.txt' })).toBeUndefined()
+  // The only command run in the planted repo is the config read itself.
+  expect(ran.filter(r => r.root === '/p/planted').map(r => r.args[0])).toEqual(['config'])
   await ui.unmount()
 })
 

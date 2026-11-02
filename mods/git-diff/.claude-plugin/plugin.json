@@ -1,6 +1,6 @@
 {
   "name": "git-diff",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A /git-diff Changes pane laid out like VS Code's Source Control: staged and unstaged groups, per-file diffs (side by side when wide) and Stage/Unstage.",
   "types": "./types/index.d.ts",
   "author": {

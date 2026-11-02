@@ -25,6 +25,8 @@ export type GitSnapshot = {
   checkedAt: number
   busy: string | null
   error: string | null
+  // Why the mod runs no git here (the repo's own config names a program), or null; a blocked repo reads as empty.
+  blocked: string | null
 }
 
 declare module 'claude-code' {

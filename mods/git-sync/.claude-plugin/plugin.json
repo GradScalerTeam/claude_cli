@@ -1,6 +1,6 @@
 {
   "name": "git-sync",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Git sync: a git status line entry, and a band for incoming commits (with a fast-forward-only Pull) and merge conflicts.",
   "types": "./types/index.d.ts",
   "author": {

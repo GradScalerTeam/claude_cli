@@ -15,7 +15,7 @@ const FETCH_EVERY_MS = 3 * 60 * 1000
 // Tools whose call can leave the working tree different; Bash covers git itself as well as rm, mv, sed and friends.
 const CHANGING_TOOLS = new Set(['Bash', 'Edit', 'Write', 'NotebookEdit'])
 
-const repos = atom({ plugin: 'git-sync', key: 'repos' } as const, null, { shape: 'repos-2' })
+const repos = atom({ plugin: 'git-sync', key: 'repos' } as const, null, { shape: 'repos-3' })
 const dismissed = atom({ plugin: 'git-sync', key: 'dismissed' } as const, null)
 
 type Band = { kind: 'conflicts' | 'incoming'; key: string; s: GitSnapshot }

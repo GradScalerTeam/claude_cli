@@ -30,6 +30,8 @@ export type GitSnapshot = {
   files: ChangedFile[]
   busy: string | null
   error: string | null
+  // Why the mod runs no git here (the repo's own config names a program), or null; a blocked repo has no files.
+  blocked: string | null
 }
 
 // The file a diff is loaded for; repo + path + group pick exactly one row (a ChangedFile fits it).

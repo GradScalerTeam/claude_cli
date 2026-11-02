@@ -61,15 +61,14 @@ Only one refresh runs at a time. A request that arrives mid-refresh triggers one
 
 ## Safety
 
-The mod runs git on its own, in every repo it finds, including child folders you never opened. A repo's `.git/config` can name programs for git to run: `core.fsmonitor` on every `git status`, hooks on a pull, the `ext::` transport on a fetch. A clone never copies that file, but a folder that arrived with its `.git` already inside (an extracted archive, a synced folder, someone else's checkout) can carry one.
+The mod runs git on its own, in every repo it finds, including child folders you never opened. A repo's `.git/config` can name programs for git to run: a filter driver on `git status`, a credential helper or SSH command on a fetch, hooks on a pull. A clone never copies that file, but a folder that arrived with its `.git` already inside (an extracted archive, a synced folder, someone else's checkout) can carry one.
 
-So every git command the mod runs turns those off on the command line, which wins over the repo's own config:
+Two layers stop that:
 
-```
-git -c core.fsmonitor=false -c core.hooksPath=/dev/null -c protocol.ext.allow=never ...
-```
+1. **A config check before anything else.** For each repo found, the mod reads its config with `git config --list --show-scope`, which only reads files. If the repo's *own* config (local or worktree scope) sets a key that runs a program, the mod skips that repo completely: no status, no fetch. The keys it blocks on: `filter.*`, `credential.*`, `include.*`/`includeIf.*`, `uploadpack.*`, `diff.*.textconv`, `diff.*.command`, `merge.*.driver`, `remote.*.uploadpack`/`receivepack`, and `core.sshCommand`, `core.askPass`, `core.gitProxy`, `core.alternateRefsCommand`. The status line shows that repo as `not watched`, and a toast says which key caused it.
+2. **Flags on every command**, which win over the repo's own config: `-c core.fsmonitor=false -c core.hooksPath=/dev/null -c protocol.ext.allow=never -c protocol.file.allow=never`.
 
-This lives in `SAFE` in `hooks/git.ts`. Your own SSH and credential settings still apply to fetch and pull, so private remotes keep working.
+Your **global** config is yours, so it never blocks a repo: Git LFS's filter, your credential helper and your SSH settings keep working. The cost is a repo whose own `.git/config` sets one of those keys on purpose, such as a per-repo `core.sshCommand`. Git Sync won't watch it. Both layers live in `hooks/git.ts`.
 
 ---
 
