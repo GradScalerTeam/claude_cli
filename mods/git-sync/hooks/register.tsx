@@ -82,7 +82,7 @@ export const register: Register = on => {
           <Text color="suggestion">{s.busy}</Text>
         ) : (
           band.kind === 'incoming' && (
-            <Button key="band-pull" variant="primary" onPress={() => void runAction($, s.root, 'Pull', ['pull', '--ff-only'])}>Pull</Button>
+            <Button key="band-pull" variant="primary" onPress={() => void runAction($, s.root, 'Pull', ['pull', '--ff-only', '--no-recurse-submodules'])}>Pull</Button>
           )
         )}
         <Button key="band-dismiss" role="dismiss" onPress={hide}>Dismiss</Button>

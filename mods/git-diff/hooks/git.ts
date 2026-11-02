@@ -1,7 +1,7 @@
 // git-diff/hooks/git.ts
 // The one way this mod runs git, and how it finds the repos to watch: the session folder's own repo, plus any child folder with its own .git
 // (a parent folder holding separate frontend and backend repos). Every command runs with -C <repo root>, so root-relative paths from
-// `git status --porcelain` feed straight back into diff, add and restore. A repo whose own config names a program is found but not watched.
+// `git status --porcelain` feed straight back into diff, add and restore. A repo whose own config holds a setting not known to be safe is found but not watched.
 
 import type { EngineInterface } from 'claude-code'
 
@@ -12,26 +12,57 @@ export type Repo = { root: string; name: string; blocked: string | null }
 const SKIP = new Set(['node_modules', 'dist', 'build', 'venv', '.venv', '__pycache__'])
 
 // The mod runs git on its own, in every repo it finds, so a repo's .git/config must not be able to run a program through it.
-// These settings are turned off on every command as a second layer; the config check below is the first.
-// Command-line -c beats the repo's own config.
-export const SAFE = ['-c', 'core.fsmonitor=false', '-c', 'core.hooksPath=/dev/null', '-c', 'protocol.ext.allow=never', '-c', 'protocol.file.allow=never']
+// These settings are turned off on every command as a second layer; the config check below is the first. Command-line -c beats the repo's own config.
+// The submodule ones keep git out of submodules, whose own configs the check never reads; the signature ones stop git log and pull from running gpg.
+export const SAFE = [
+  '--no-pager',
+  ...['core.fsmonitor=false', 'core.hooksPath=/dev/null', 'protocol.ext.allow=never', 'protocol.file.allow=never'],
+  ...['submodule.recurse=false', 'fetch.recurseSubmodules=false', 'diff.ignoreSubmodules=all', 'status.submoduleSummary=false'],
+  ...['log.showSignature=false', 'merge.verifySignatures=false'],
+].flatMap(arg => (arg.startsWith('--') ? [arg] : ['-c', arg]))
 
-// Repo-config keys that make git run a program on a command these mods use (status, diff, add, fetch, pull), or pull in another config file.
-// Only the repo's own config (scope local or worktree) is checked: your global config is yours, but a .git/config can arrive with the folder.
-const RUNS_A_PROGRAM = /^(filter\.|credential\.|include\.|includeif\.|uploadpack\.|diff\..+\.(textconv|command)$|merge\..+\.driver$|remote\..+\.(uploadpack|receivepack)$|core\.(sshcommand|askpass|gitproxy|alternaterefscommand)$)/
+// The repo-config keys known to run nothing on the commands these mods use; any other key in the repo's own config means the repo is not watched.
+// An allowlist, so a setting nobody thought of fails safe. It covers what git itself, VS Code, the GitHub CLI and Git LFS write. fsmonitor and hooksPath
+// are listed because SAFE overrides them; a remote's url is listed because SAFE blocks the ext:: and file:: transports, and vcs (a helper program) is not.
+const SAFE_KEY = new RegExp(
+  '^(' +
+    [
+      'core\\.(repositoryformatversion|filemode|bare|logallrefupdates|ignorecase|precomposeunicode|symlinks|autocrlf|eol|safecrlf|fsmonitor|hookspath|untrackedcache|commitgraph|multipackindex|splitindex|preloadindex|abbrev|quotepath|compression|longpaths|checkstat|trustctime|sparsecheckout|sparsecheckoutcone)',
+      'remote\\..+\\.(url|pushurl|fetch|push|tagopt|prune|mirror|promisor|partialclonefilter|skipdefaultupdate|gh-resolved)',
+      'branch\\..+\\.[a-z-]+',
+      'submodule\\..+\\.(url|active|branch)',
+      'user\\.(name|email|signingkey)',
+      'pull\\.(rebase|ff)',
+      'push\\.(default|autosetupremote)',
+      'fetch\\.prune',
+      'init\\.defaultbranch',
+      'rebase\\.autostash',
+      'merge\\.(ff|conflictstyle)',
+      'rerere\\.enabled',
+      'status\\.showuntrackedfiles',
+      'extensions\\.[a-z]+',
+      'lfs\\.(repositoryformatversion|url)',
+      'gc\\.(auto|autodetach)',
+      'color\\..+',
+      'http\\..+',
+    ].join('|') +
+    ')$',
+)
 
 // quotePath off so non-ASCII file names come back as written, not as octal escapes.
 export async function git($: EngineInterface, root: string, args: string[], timeoutMs = 30_000) {
   return $.process.run(['git', '-C', root, ...SAFE, '-c', 'core.quotePath=false', ...args], { timeoutMs })
 }
 
-// Why this repo is not watched, or null when its own config names no program. Listing config only reads files: it runs nothing.
+// Why this repo is not watched, or null when its own config holds only known-safe keys. Listing config only reads files: it runs nothing.
+// Only the repo's own config (scope local or worktree) is checked: your global config is yours, but a .git/config can arrive with the folder.
+// Keys pulled in by include.path show as local too, and include.path itself is not on the list.
 async function blockedBy($: EngineInterface, root: string): Promise<string | null> {
   const r = await git($, root, ['config', '--list', '--name-only', '--show-scope'], 10_000).catch(() => null)
   if (!r || r.exitCode !== 0) return 'its git config could not be read'
   for (const line of r.stdout.split('\n')) {
     const [scope, key = ''] = line.split('\t')
-    if ((scope === 'local' || scope === 'worktree') && RUNS_A_PROGRAM.test(key.toLowerCase())) return `its git config sets ${key}, which can run a program`
+    if ((scope === 'local' || scope === 'worktree') && !SAFE_KEY.test(key.toLowerCase())) return `its git config sets ${key}, which is not on the list of settings known to be safe`
   }
   return null
 }

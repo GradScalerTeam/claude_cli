@@ -22,7 +22,7 @@ async function readSnapshot($: EngineInterface, repo: Repo, all: Repo[], previou
   // Not even a status: with a filter driver configured, status alone can run it.
   if (blocked) return { branch: '', upstream: null, ahead: 0, behind: 0, files: [], ...base, error: null }
   // -uall lists each untracked file rather than its folder, so every row of the pane opens a diff.
-  const status = await git($, root, ['status', '--porcelain=v2', '--branch', '--untracked-files=all'])
+  const status = await git($, root, ['status', '--porcelain=v2', '--branch', '--untracked-files=all', '--ignore-submodules=all'])
   if (status.exitCode !== 0) {
     const said = status.stderr.trim().split('\n')[0]
     return { branch: '', upstream: null, ahead: 0, behind: 0, files: [], ...base, error: `git status failed: ${said}` }

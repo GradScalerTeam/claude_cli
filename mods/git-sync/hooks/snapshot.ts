@@ -17,7 +17,7 @@ const repos = atom({ plugin: 'git-sync', key: 'repos' } as const, null, { shape:
 
 // One line per commit: hash, author, relative age, subject (tab-separated so subjects may hold spaces).
 async function commits($: EngineInterface, root: string, range: string): Promise<Commit[]> {
-  const { exitCode, stdout } = await git($, root, ['log', '--format=%h%x09%an%x09%ar%x09%s', `-n${LIST_LIMIT + 1}`, range])
+  const { exitCode, stdout } = await git($, root, ['log', '--no-show-signature', '--format=%h%x09%an%x09%ar%x09%s', `-n${LIST_LIMIT + 1}`, range])
   if (exitCode !== 0) return []
   return stdout
     .split('\n')
@@ -43,7 +43,7 @@ async function readSnapshot($: EngineInterface, repo: Repo, all: Repo[], previou
   const empty = { branch: '', upstream: null, ahead: 0, behind: 0, staged: 0, modified: 0, untracked: 0, conflicts: [], paused: null, incoming: [], outgoing: [] }
   // Not even a status: with a filter driver configured, status alone can run it.
   if (blocked) return { ...empty, ...base }
-  const status = await git($, root, ['status', '--porcelain=v2', '--branch', '--untracked-files=all'])
+  const status = await git($, root, ['status', '--porcelain=v2', '--branch', '--untracked-files=all', '--ignore-submodules=all'])
   if (status.exitCode !== 0) {
     const said = status.stderr.trim().split('\n')[0]
     return { ...empty, ...base, error: `git status failed: ${said}` }
@@ -129,7 +129,7 @@ export function refresh($: EngineInterface, withFetch: boolean): Promise<void> {
           $.ui.toast(`Git sync is not watching ${repo.name}: ${repo.blocked}.`)
         }
         if (withFetch && !repo.blocked) {
-          const fetched = await git($, repo.root, ['fetch', '--quiet'], 60_000).catch(() => null)
+          const fetched = await git($, repo.root, ['fetch', '--quiet', '--no-recurse-submodules'], 60_000).catch(() => null)
           if (!fetched || fetched.exitCode !== 0) error = 'Could not reach the remote; showing the last fetched state.'
         }
         const snap = await readSnapshot($, repo, found, previous.find(p => p.root === repo.root))

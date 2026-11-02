@@ -193,8 +193,9 @@ test('a parent folder with frontend and backend repos shows a section each', asy
   await ui.unmount()
 })
 
-// A repo's own .git/config must not run a program through the mod: every git call turns those settings off, and diffs skip textconv.
-test('every git call disables fsmonitor, hooks and the ext transport', async ($, on) => {
+// A repo's own .git/config must not run a program through the mod: every git call turns those settings off, keeps out of submodules and skips
+// signature checks; status and diff also skip submodules by flag, and diffs skip textconv.
+test('every git call disables fsmonitor, hooks, submodules and signatures', async ($, on) => {
   const ran: Ran = []
   const argvs: string[][] = []
   fakeGit(on, ran, { '/p/frontend': [...branch('main'), '? a.txt'].join('\n') }, null, { frontend: '/p/frontend' }, argvs)
@@ -207,9 +208,38 @@ test('every git call disables fsmonitor, hooks and the ext transport', async ($,
   const git = argvs.filter(a => a[0] === 'git')
   expect(git.length).toBeGreaterThan(3)
   for (const argv of git) {
-    for (const flag of ['core.fsmonitor=false', 'core.hooksPath=/dev/null', 'protocol.ext.allow=never']) expect(argv).toContain(flag)
+    const flags = ['--no-pager', 'core.fsmonitor=false', 'core.hooksPath=/dev/null', 'protocol.ext.allow=never', 'protocol.file.allow=never', 'submodule.recurse=false', 'diff.ignoreSubmodules=all', 'log.showSignature=false']
+    for (const flag of flags) expect(argv).toContain(flag)
   }
-  expect(ran.filter(r => r.args[0] === 'diff').every(r => r.args.includes('--no-textconv'))).toBe(true)
+  const diffsRan = ran.filter(r => r.args[0] === 'diff')
+  expect(diffsRan.length).toBeGreaterThan(0)
+  expect(diffsRan.every(r => r.args.includes('--no-textconv') && r.args.includes('--ignore-submodules=all'))).toBe(true)
+  expect(ran.filter(r => r.args[0] === 'status').every(r => r.args.includes('--ignore-submodules=all'))).toBe(true)
+  await ui.unmount()
+})
+
+// An allowlist: a key nobody listed blocks the repo even when it looks harmless, while what VS Code and the GitHub CLI write does not.
+test('a key not on the safe list blocks the repo; tool-written keys do not', async ($, on) => {
+  const ran: Ran = []
+  const children = { tools: '/p/tools', odd: '/p/odd' }
+  fakeGit(
+    on,
+    ran,
+    { '/p/tools': [...branch('main'), '? a.txt'].join('\n'), '/p/odd': [...branch('main'), '? b.txt'].join('\n') },
+    null,
+    children,
+    [],
+    {
+      '/p/tools': ['local\tcore.bare', 'local\tremote.origin.url', 'local\tremote.origin.gh-resolved', 'local\tbranch.main.vscode-merge-base', 'local\tuser.email'].join('\n'),
+      '/p/odd': 'local\tcore.bare\nlocal\tsomething.new\n',
+    },
+  )
+
+  await started($)
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ key: 'open-tools:untracked:a.txt' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /Not watched: its git config sets something\.new, which is not on the list/ })).toBeDefined()
+  expect(ran.filter(r => r.root === '/p/odd').map(r => r.args[0])).toEqual(['config'])
   await ui.unmount()
 })
 
