@@ -1,0 +1,9 @@
+{
+  "name": "gradscaler-mods",
+  "owner": { "name": "GradScaler" },
+  "description": "Claude Code mods from the GradScaler claude_cli guide: git status line and sync band, and a git diff Changes pane.",
+  "plugins": [
+    { "name": "git-sync", "source": "./mods/git-sync" },
+    { "name": "git-diff", "source": "./mods/git-diff" }
+  ]
+}

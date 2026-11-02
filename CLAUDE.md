@@ -46,6 +46,8 @@ This repository documents and demonstrates a specific, battle-tested workflow:
 - **[skills/obsidian-canvas/](skills/obsidian-canvas/)** — General-purpose reference skill for creating and editing Obsidian Canvas (.canvas) JSON files — mind maps, planning boards, architecture sketches, flowcharts. Covers the JSON Canvas 1.0 spec, positioning rules, color conventions, edge label standards, Post-Write Verification Protocol
 - **[skills/code-to-design/](skills/code-to-design/)** — Converts frontend code into pixel-accurate Pencil (.pen) design files
 - **[skills/github/](skills/github/)** — GitHub CLI operations — repos, PRs, issues, branch management
+- **[mods/git-sync/](mods/git-sync/)** — Claude Code mod: a `git ↑N ↓M` status line entry and a band for incoming commits and conflicts (fast-forward-only Pull). Runs git itself, no model calls
+- **[mods/git-diff/](mods/git-diff/)** — Claude Code mod: a `/git-diff` Changes pane laid out like VS Code's Source Control, with per-file diffs and Stage/Unstage. Both mods install from the repo-root marketplace, `.claude-plugin/marketplace.json`
 - **[hooks/doc-scanner/](hooks/doc-scanner/)** — SessionStart hook that scans for `.md` files and gives Claude a documentation index at conversation start
 
 ## Project Structure
@@ -74,6 +76,11 @@ claude_cli/
 │       └── README.md                  # Setup guide and explanation
 ├── scripts/
 │   └── statusline-command.sh          # Custom status line script for Claude Code
+├── .claude-plugin/
+│   └── marketplace.json               # Makes this repo a plugin marketplace for the mods below
+├── mods/
+│   ├── git-sync/                      # Git status line entry, incoming-commits band
+│   └── git-diff/                      # /git-diff Changes pane with diffs and Stage/Unstage
 ├── agents/
 │   ├── global-doc-master/             # Doc master agent definition + README
 │   ├── local-brain/                   # Local brain agent — personal knowledge base manager

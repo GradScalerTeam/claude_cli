@@ -121,6 +121,15 @@ github_project_code/claude_cli | main   +2 *1 ~3  /  ↑1
 |---|---|
 | **[Status Line](scripts/statusline-command.sh)** — see [scripts/README.md](scripts/README.md) for full setup and color coding reference | `scripts/` |
 
+### Mods
+
+Mods change Claude Code's own interface: a status line entry, a band above the prompt, a pane beside the chat, a slash command. Each one is a small plugin, and this repo is a plugin marketplace for them ([`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)), so each installs with one `/plugin install` line.
+
+| Mod | What It Does | Folder |
+|---|---|---|
+| **[Git Sync](mods/git-sync/)** | Keeps git state visible while Claude works. Adds a `git +2 *3 · ↑0 ↓2` status line entry and a band above the prompt for incoming commits (with a fast-forward-only Pull) or merge conflicts. Handles a folder holding several repos. Runs git itself, so it costs no tokens. | `mods/git-sync/` |
+| **[Git Diff](mods/git-diff/)** | A `/git-diff` Changes pane beside the chat, laid out like VS Code's Source Control. Click a file to open its diff under it (side by side when the pane is wide), and stage or unstage as you review. Only reads git while open, and never discards work. | `mods/git-diff/` |
+
 ### Guides
 
 | Guide | What It Covers |
@@ -156,6 +165,8 @@ Don't want the whole set? Every item below installs on its own. Click **Install*
 | **[Codex Image Bridge](skills/codex-image-bridge/)** | Skill | Generate raster images without leaving Claude Code (needs the Codex CLI + a ChatGPT plan) | [Install](skills/codex-image-bridge/README.md#install) · [Update](skills/codex-image-bridge/README.md#check-for-updates) |
 | **[Doc Scanner](hooks/doc-scanner/)** | Hook | SessionStart hook — gives Claude an index of your project's docs at every conversation start | [Install](hooks/doc-scanner/README.md#install) · [Update](hooks/doc-scanner/README.md#check-for-updates) |
 | **[Status Line](scripts/)** | Script | Two-line status bar — git state, model, effort, context bar, rate limits (needs `jq`) | [Install](scripts/README.md#install) · [Update](scripts/README.md#check-for-updates) |
+| **[Git Sync](mods/git-sync/)** | Mod | Git status line entry and a band for incoming commits and conflicts (needs `git`) | [Install](mods/git-sync/README.md#install) · [Update](mods/git-sync/README.md#check-for-updates) |
+| **[Git Diff](mods/git-diff/)** | Mod | `/git-diff` Changes pane with per-file diffs and Stage/Unstage (needs `git`) | [Install](mods/git-diff/README.md#install) · [Update](mods/git-diff/README.md#check-for-updates) |
 
 **Dependencies worth knowing:**
 
@@ -167,7 +178,7 @@ Everything else is standalone.
 
 ### Install Everything
 
-To install all agents, skills, hooks, and scripts at once, paste this into your Claude CLI:
+To install all agents, skills, hooks, scripts, and mods at once, paste this into your Claude CLI:
 
 ```
 Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install everything:
@@ -179,6 +190,8 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and install e
 3. HOOKS: Scan the hooks/ folder. For each subfolder, find the .sh file — that's the hook script. Copy it to ~/.claude/<filename> with exact content. Make it executable (chmod +x). Then read my existing ~/.claude/settings.json (create if needed) and add a SessionStart hook entry for each .sh file that runs "bash ~/.claude/<filename>". Merge with existing hooks — don't overwrite.
 
 4. SCRIPTS: Scan the scripts/ folder. Copy each .sh file to ~/.claude/<filename> with exact content. For statusline-command.sh specifically, also add the statusLine config to settings.json: { "statusLine": { "type": "command", "command": "bash ~/.claude/statusline-command.sh" } }. Merge with existing settings — don't overwrite.
+
+5. MODS: Read .claude-plugin/marketplace.json at the repo root. For each mod it lists, run `claude plugin install <mod-name>@gradscaler-mods` after adding the marketplace once with `claude plugin marketplace add GradScalerTeam/claude_cli`. Don't copy mod folders by hand.
 
 After installing everything, read the README.md in each folder and give me a summary of what was installed and how to use each one.
 
@@ -249,6 +262,8 @@ Go to the GitHub repo https://github.com/GradScalerTeam/claude_cli and check for
 3. HOOKS: Scan the hooks/ folder. For each subfolder, find the .sh file. Compare it with ~/.claude/<filename>. Skip any that don't exist locally.
 
 4. SCRIPTS: Scan the scripts/ folder. Compare each .sh file with ~/.claude/<filename>. Skip any that don't exist locally.
+
+5. MODS: For each mod listed in .claude-plugin/marketplace.json that I have installed (check with `claude plugin list`), run `claude plugin update <mod-name>@gradscaler-mods`. After updating, remind me to run /reload-plugins or start a new session.
 
 For each component, tell me if there are any differences. If updates are found, ask me whether I want you to explain what changed first or directly pull the new updates into my local files.
 ```
